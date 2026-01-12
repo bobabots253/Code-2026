@@ -13,12 +13,46 @@
 
 package frc.robot.subsystems.swerve;
 
-import static frc.robot.subsystems.swerve.SwerveConstants.*;
-import static frc.robot.util.SparkUtil.*;
+import static frc.robot.subsystems.swerve.SwerveConstants.backLeftDriveCanId;
+import static frc.robot.subsystems.swerve.SwerveConstants.backLeftTurnCanId;
+import static frc.robot.subsystems.swerve.SwerveConstants.backLeftZeroRotation;
+import static frc.robot.subsystems.swerve.SwerveConstants.backRightDriveCanId;
+import static frc.robot.subsystems.swerve.SwerveConstants.backRightTurnCanId;
+import static frc.robot.subsystems.swerve.SwerveConstants.backRightZeroRotation;
+import static frc.robot.subsystems.swerve.SwerveConstants.driveEncoderPositionFactor;
+import static frc.robot.subsystems.swerve.SwerveConstants.driveEncoderVelocityFactor;
+import static frc.robot.subsystems.swerve.SwerveConstants.driveKd;
+import static frc.robot.subsystems.swerve.SwerveConstants.driveKp;
+import static frc.robot.subsystems.swerve.SwerveConstants.driveKs;
+import static frc.robot.subsystems.swerve.SwerveConstants.driveKv;
+import static frc.robot.subsystems.swerve.SwerveConstants.driveMotorCurrentLimit;
+import static frc.robot.subsystems.swerve.SwerveConstants.frontLeftDriveCanId;
+import static frc.robot.subsystems.swerve.SwerveConstants.frontLeftTurnCanId;
+import static frc.robot.subsystems.swerve.SwerveConstants.frontLeftZeroRotation;
+import static frc.robot.subsystems.swerve.SwerveConstants.frontRightDriveCanId;
+import static frc.robot.subsystems.swerve.SwerveConstants.frontRightTurnCanId;
+import static frc.robot.subsystems.swerve.SwerveConstants.frontRightZeroRotation;
+import static frc.robot.subsystems.swerve.SwerveConstants.odometryFrequency;
+import static frc.robot.subsystems.swerve.SwerveConstants.turnEncoderInverted;
+import static frc.robot.subsystems.swerve.SwerveConstants.turnEncoderPositionFactor;
+import static frc.robot.subsystems.swerve.SwerveConstants.turnEncoderVelocityFactor;
+import static frc.robot.subsystems.swerve.SwerveConstants.turnInverted;
+import static frc.robot.subsystems.swerve.SwerveConstants.turnKd;
+import static frc.robot.subsystems.swerve.SwerveConstants.turnKp;
+import static frc.robot.subsystems.swerve.SwerveConstants.turnMotorCurrentLimit;
+import static frc.robot.subsystems.swerve.SwerveConstants.turnPIDMaxInput;
+import static frc.robot.subsystems.swerve.SwerveConstants.turnPIDMinInput;
+import static frc.robot.util.SparkUtil.ifOk;
+import static frc.robot.util.SparkUtil.sparkStickyFault;
+import static frc.robot.util.SparkUtil.tryUntilOk;
+
+import java.util.Queue;
+import java.util.function.DoubleSupplier;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -28,15 +62,14 @@ import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
-import java.util.Queue;
-import java.util.function.DoubleSupplier;
 
 /**
  * Module IO implementation for Spark Flex drive motor controller, Spark Max turn motor controller,
@@ -61,8 +94,8 @@ public class ModuleIOSpark implements ModuleIO {
   private final Queue<Double> turnPositionQueue;
 
   // Connection debouncers
-  private final Debouncer driveConnectedDebounce = new Debouncer(0.5);
-  private final Debouncer turnConnectedDebounce = new Debouncer(0.5);
+  private final Debouncer driveConnectedDebounce = new Debouncer(0.5, Debouncer.DebounceType.kFalling);
+  private final Debouncer turnConnectedDebounce = new Debouncer(0.5, Debouncer.DebounceType.kFalling);
 
   public ModuleIOSpark(int module) {
     zeroRotation =
@@ -71,7 +104,7 @@ public class ModuleIOSpark implements ModuleIO {
           case 1 -> frontRightZeroRotation;
           case 2 -> backLeftZeroRotation;
           case 3 -> backRightZeroRotation;
-          default -> new Rotation2d();
+          default -> Rotation2d.kZero;
         };
     driveSpark =
         new SparkFlex(
@@ -151,7 +184,7 @@ public class ModuleIOSpark implements ModuleIO {
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
         .positionWrappingEnabled(true)
         .positionWrappingInputRange(turnPIDMinInput, turnPIDMaxInput)
-        .pidf(turnKp, 0.0, turnKd, 0.0);
+        .pid(driveKp, 0.0, driveKd);
     turnConfig
         .signals
         .absoluteEncoderPositionAlwaysOn(true)
@@ -230,7 +263,7 @@ public class ModuleIOSpark implements ModuleIO {
   @Override
   public void setDriveVelocity(double velocityRadPerSec) {
     double ffVolts = driveKs * Math.signum(velocityRadPerSec) + driveKv * velocityRadPerSec;
-    driveController.setReference(
+    driveController.setSetpoint(
         velocityRadPerSec,
         ControlType.kVelocity,
         ClosedLoopSlot.kSlot0,
@@ -243,6 +276,6 @@ public class ModuleIOSpark implements ModuleIO {
     double setpoint =
         MathUtil.inputModulus(
             rotation.plus(zeroRotation).getRadians(), turnPIDMinInput, turnPIDMaxInput);
-    turnController.setReference(setpoint, ControlType.kPosition);
+    turnController.setSetpoint(setpoint, ControlType.kPosition);
   }
 }

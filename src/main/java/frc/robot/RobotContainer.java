@@ -29,11 +29,11 @@ import frc.robot.subsystems.swerve.ModuleIO;
 import frc.robot.subsystems.swerve.ModuleIOSim;
 import frc.robot.subsystems.swerve.ModuleIOSpark;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
-import frc.robot.subsystems.vision.Vision;
+// import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
-import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+// import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -45,7 +45,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final SwerveSubsystem swerveSubsystem;
-  private final Vision vision;
+//   private final Vision vision;
 
   //labubu
 
@@ -68,11 +68,11 @@ public class RobotContainer {
                 new ModuleIOSpark(2),
                 new ModuleIOSpark(3));
 
-        vision =
-            new Vision(
-                swerveSubsystem::addVisionMeasurement,
-                new VisionIOLimelight(VisionConstants.FrontLeftLL, swerveSubsystem::getRotation),
-                new VisionIOLimelight(VisionConstants.FrontRightLL, swerveSubsystem::getRotation));
+        // vision =
+        //     new Vision(
+        //         swerveSubsystem::addVisionMeasurement,
+        //         new VisionIOLimelight(VisionConstants.FrontLeftLL, swerveSubsystem::getRotation),
+        //         new VisionIOLimelight(VisionConstants.FrontRightLL, swerveSubsystem::getRotation));
 
         break;
 
@@ -86,17 +86,17 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim());
 
-        vision =
-            new Vision(
-                swerveSubsystem::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.FrontLeftLL,
-                    VisionConstants.robotToFrontLeftLL,
-                    swerveSubsystem::getPose),
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.FrontRightLL,
-                    VisionConstants.robotToFrontRightLL,
-                    swerveSubsystem::getPose));
+        // vision =
+        //     new Vision(
+        //         swerveSubsystem::addVisionMeasurement,
+        //         new VisionIOPhotonVisionSim(
+        //             VisionConstants.FrontLeftLL,
+        //             VisionConstants.robotToFrontLeftLL,
+        //             swerveSubsystem::getPose),
+        //         new VisionIOPhotonVisionSim(
+        //             VisionConstants.FrontRightLL,
+        //             VisionConstants.robotToFrontRightLL,
+        //             swerveSubsystem::getPose));
         break;
 
       default:
@@ -109,8 +109,8 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
 
-        vision =
-            new Vision(swerveSubsystem::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        // vision =
+        //     new Vision(swerveSubsystem::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 
         break;
     }
