@@ -49,7 +49,8 @@
 //                 Rotation2d.fromDegrees(result.getBestTarget().getYaw()),
 //                 Rotation2d.fromDegrees(result.getBestTarget().getPitch()));
 //       } else {
-//         inputs.latestTargetObservation = new TargetObservation(Rotation2d.kZero, Rotation2d.kZero);
+//         inputs.latestTargetObservation = new TargetObservation(Rotation2d.kZero,
+// Rotation2d.kZero);
 //       }
 
 //       // Add pose observation
@@ -91,7 +92,8 @@
 //           Transform3d cameraToTarget = target.bestCameraToTarget;
 //           Transform3d fieldToCamera = fieldToTarget.plus(cameraToTarget.inverse());
 //           Transform3d fieldToRobot = fieldToCamera.plus(robotToCamera.inverse());
-//           Pose3d robotPose = new Pose3d(fieldToRobot.getTranslation(), fieldToRobot.getRotation());
+//           Pose3d robotPose = new Pose3d(fieldToRobot.getTranslation(),
+// fieldToRobot.getRotation());
 
 //           // Add tag ID
 //           tagIds.add((short) target.fiducialId);

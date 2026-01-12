@@ -37,17 +37,12 @@ import static frc.robot.subsystems.swerve.SwerveConstants.turnEncoderInverted;
 import static frc.robot.subsystems.swerve.SwerveConstants.turnEncoderPositionFactor;
 import static frc.robot.subsystems.swerve.SwerveConstants.turnEncoderVelocityFactor;
 import static frc.robot.subsystems.swerve.SwerveConstants.turnInverted;
-import static frc.robot.subsystems.swerve.SwerveConstants.turnKd;
-import static frc.robot.subsystems.swerve.SwerveConstants.turnKp;
 import static frc.robot.subsystems.swerve.SwerveConstants.turnMotorCurrentLimit;
 import static frc.robot.subsystems.swerve.SwerveConstants.turnPIDMaxInput;
 import static frc.robot.subsystems.swerve.SwerveConstants.turnPIDMinInput;
 import static frc.robot.util.SparkUtil.ifOk;
 import static frc.robot.util.SparkUtil.sparkStickyFault;
 import static frc.robot.util.SparkUtil.tryUntilOk;
-
-import java.util.Queue;
-import java.util.function.DoubleSupplier;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
@@ -62,14 +57,14 @@ import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
+import java.util.Queue;
+import java.util.function.DoubleSupplier;
 
 /**
  * Module IO implementation for Spark Flex drive motor controller, Spark Max turn motor controller,
@@ -94,8 +89,10 @@ public class ModuleIOSpark implements ModuleIO {
   private final Queue<Double> turnPositionQueue;
 
   // Connection debouncers
-  private final Debouncer driveConnectedDebounce = new Debouncer(0.5, Debouncer.DebounceType.kFalling);
-  private final Debouncer turnConnectedDebounce = new Debouncer(0.5, Debouncer.DebounceType.kFalling);
+  private final Debouncer driveConnectedDebounce =
+      new Debouncer(0.5, Debouncer.DebounceType.kFalling);
+  private final Debouncer turnConnectedDebounce =
+      new Debouncer(0.5, Debouncer.DebounceType.kFalling);
 
   public ModuleIOSpark(int module) {
     zeroRotation =
