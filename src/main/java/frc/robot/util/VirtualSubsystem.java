@@ -5,7 +5,7 @@ import java.util.List;
 
 public abstract class VirtualSubsystem {
   private static List<VirtualSubsystem> instances = new ArrayList<>();
-    
+
   public VirtualSubsystem() {
     instances.add(this);
   }
