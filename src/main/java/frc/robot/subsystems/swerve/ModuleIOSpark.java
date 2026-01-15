@@ -13,33 +13,8 @@
 
 package frc.robot.subsystems.swerve;
 
-import static frc.robot.subsystems.swerve.SwerveConstants.backLeftDriveCanId;
-import static frc.robot.subsystems.swerve.SwerveConstants.backLeftTurnCanId;
-import static frc.robot.subsystems.swerve.SwerveConstants.backLeftZeroRotation;
-import static frc.robot.subsystems.swerve.SwerveConstants.backRightDriveCanId;
-import static frc.robot.subsystems.swerve.SwerveConstants.backRightTurnCanId;
-import static frc.robot.subsystems.swerve.SwerveConstants.backRightZeroRotation;
-import static frc.robot.subsystems.swerve.SwerveConstants.driveEncoderPositionFactor;
-import static frc.robot.subsystems.swerve.SwerveConstants.driveEncoderVelocityFactor;
-import static frc.robot.subsystems.swerve.SwerveConstants.driveKd;
-import static frc.robot.subsystems.swerve.SwerveConstants.driveKp;
-import static frc.robot.subsystems.swerve.SwerveConstants.driveKs;
-import static frc.robot.subsystems.swerve.SwerveConstants.driveKv;
-import static frc.robot.subsystems.swerve.SwerveConstants.driveMotorCurrentLimit;
-import static frc.robot.subsystems.swerve.SwerveConstants.frontLeftDriveCanId;
-import static frc.robot.subsystems.swerve.SwerveConstants.frontLeftTurnCanId;
-import static frc.robot.subsystems.swerve.SwerveConstants.frontLeftZeroRotation;
-import static frc.robot.subsystems.swerve.SwerveConstants.frontRightDriveCanId;
-import static frc.robot.subsystems.swerve.SwerveConstants.frontRightTurnCanId;
-import static frc.robot.subsystems.swerve.SwerveConstants.frontRightZeroRotation;
-import static frc.robot.subsystems.swerve.SwerveConstants.odometryFrequency;
-import static frc.robot.subsystems.swerve.SwerveConstants.turnEncoderInverted;
-import static frc.robot.subsystems.swerve.SwerveConstants.turnEncoderPositionFactor;
-import static frc.robot.subsystems.swerve.SwerveConstants.turnEncoderVelocityFactor;
-import static frc.robot.subsystems.swerve.SwerveConstants.turnInverted;
-import static frc.robot.subsystems.swerve.SwerveConstants.turnMotorCurrentLimit;
-import static frc.robot.subsystems.swerve.SwerveConstants.turnPIDMaxInput;
-import static frc.robot.subsystems.swerve.SwerveConstants.turnPIDMinInput;
+import static frc.robot.subsystems.swerve.SwerveConstants.*;
+
 import static frc.robot.util.SparkUtil.ifOk;
 import static frc.robot.util.SparkUtil.sparkStickyFault;
 import static frc.robot.util.SparkUtil.tryUntilOk;
@@ -158,7 +133,7 @@ public class ModuleIOSpark implements ModuleIO {
         5,
         () ->
             driveSpark.configure(
-                driveConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters));
+                driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
     tryUntilOk(driveSpark, 5, () -> driveEncoder.setPosition(0.0));
 
     // Configure turn motor
@@ -179,7 +154,7 @@ public class ModuleIOSpark implements ModuleIO {
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
         .positionWrappingEnabled(true)
         .positionWrappingInputRange(turnPIDMinInput, turnPIDMaxInput)
-        .pid(driveKp, 0.0, driveKd);
+        .pid(turnKp, 0.0, turnKd); // Default Zero FF
     turnConfig
         .signals
         .absoluteEncoderPositionAlwaysOn(true)
