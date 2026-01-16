@@ -25,13 +25,13 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
+import frc.robot.util.VirtualSubsystem;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
-public class Vision extends SubsystemBase {
+public class Vision extends VirtualSubsystem {
   private final VisionConsumer consumer;
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
@@ -237,30 +237,12 @@ public class Vision extends SubsystemBase {
 
     // Log summary data
 
+    Logger.recordOutput("Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[0]));
+    Logger.recordOutput("Vision/Summary/RobotPoses", allRobotPoses.toArray(new Pose3d[0]));
     Logger.recordOutput(
-        "Vision/Summary/TagPoses",
-             allTagPoses.toArray(new Pose3d[0]));
+        "Vision/Summary/RobotPosesAccepted", allRobotPosesAccepted.toArray(new Pose3d[0]));
     Logger.recordOutput(
-        "Vision/Summary/RobotPoses",
-             allRobotPoses.toArray(new Pose3d[0]));
-    Logger.recordOutput(
-        "Vision/Summary/RobotPosesAccepted",
-             allRobotPosesAccepted.toArray(new Pose3d[0]));
-    Logger.recordOutput(
-        "Vision/Summary/RobotPosesRejected",
-             allRobotPosesRejected.toArray(new Pose3d[0]));
-
-    // Old logging code         
-    // Logger.recordOutput(
-    //     "Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[allTagPoses.size()]));
-    // Logger.recordOutput(
-    //     "Vision/Summary/RobotPoses", allRobotPoses.toArray(new Pose3d[allRobotPoses.size()]));
-    // Logger.recordOutput(
-    //     "Vision/Summary/RobotPosesAccepted",
-    //     allRobotPosesAccepted.toArray(new Pose3d[allRobotPosesAccepted.size()]));
-    // Logger.recordOutput(
-    //     "Vision/Summary/RobotPosesRejected",
-    //     allRobotPosesRejected.toArray(new Pose3d[allRobotPosesRejected.size()]));
+        "Vision/Summary/RobotPosesRejected", allRobotPosesRejected.toArray(new Pose3d[0]));
   }
 
   @FunctionalInterface
@@ -270,4 +252,7 @@ public class Vision extends SubsystemBase {
         double timestampSeconds,
         Matrix<N3, N1> visionMeasurementStdDevs);
   }
+
+  @Override
+  public void periodicAfterScheduler() {}
 }

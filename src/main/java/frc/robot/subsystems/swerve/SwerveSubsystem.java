@@ -103,8 +103,7 @@ public class SwerveSubsystem extends SubsystemBase {
     Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback(
         (activePath) -> {
-          Logger.recordOutput(
-            "Odometry/Trajectory", activePath.toArray(new Pose2d[0]));
+          Logger.recordOutput("Odometry/Trajectory", activePath.toArray(new Pose2d[0]));
         });
     PathPlannerLogging.setLogTargetPoseCallback(
         (targetPose) -> {
