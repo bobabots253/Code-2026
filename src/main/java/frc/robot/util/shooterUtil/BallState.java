@@ -1,0 +1,18 @@
+package frc.robot.util.shooterUtil;
+
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Translation3d;
+
+// I trust RustHOUNDS ;)
+
+public class BallState {
+  public Pose3d pose;
+  public Translation3d velocity;
+  public Translation3d omega; // rad/s
+
+  public BallState(Pose3d position, Translation3d velocity, Translation3d omega) {
+    this.pose = position;
+    this.velocity = velocity;
+    this.omega = omega;
+  }
+}

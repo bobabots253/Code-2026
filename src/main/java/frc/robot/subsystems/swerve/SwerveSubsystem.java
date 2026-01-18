@@ -39,18 +39,20 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.util.FullSubsystem;
 import frc.robot.util.LocalADStarAK;
+import frc.robot.util.swerveUtil.ChassisAccelerations;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class SwerveSubsystem extends SubsystemBase {
+public class SwerveSubsystem extends FullSubsystem {
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -68,6 +70,16 @@ public class SwerveSubsystem extends SubsystemBase {
         new SwerveModulePosition(),
         new SwerveModulePosition()
       };
+
+  private ChassisSpeeds lastRobotRelativeChassisSpeeds = new ChassisSpeeds();
+  private ChassisSpeeds lastFieldRelativeSpeeds = new ChassisSpeeds();
+  private double lastRobotRelativeChassisAccelerationsTimestamp = Timer.getFPGATimestamp();
+
+  private ChassisAccelerations robotRelativeChassisAccelerations =
+      new ChassisAccelerations(0, 0, 0);
+  private ChassisAccelerations fieldRelativeChassisAccelerations =
+      new ChassisAccelerations(0, 0, 0);
+
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
 
@@ -142,6 +154,25 @@ public class SwerveSubsystem extends SubsystemBase {
 
     long moduleTimeNano = System.nanoTime();
     Logger.recordOutput("Drive/Time/ModuleUpdate", (moduleTimeNano - gyroTimeNano) / 1e6);
+
+    double robotRelativeChassisAccelerationsTimestamp = Timer.getFPGATimestamp();
+    double dt =
+        robotRelativeChassisAccelerationsTimestamp - lastRobotRelativeChassisAccelerationsTimestamp;
+    ChassisSpeeds currentRobotRelativeSpeeds = getChassisSpeeds();
+    ChassisSpeeds currentFieldRelativeSpeeds =
+        ChassisSpeeds.fromRobotRelativeSpeeds(currentRobotRelativeSpeeds, getRotation());
+
+    if (dt > 0) {
+      robotRelativeChassisAccelerations =
+          new ChassisAccelerations(currentRobotRelativeSpeeds, lastRobotRelativeChassisSpeeds, dt);
+      fieldRelativeChassisAccelerations =
+          new ChassisAccelerations(currentFieldRelativeSpeeds, lastFieldRelativeSpeeds, dt);
+    }
+
+    lastRobotRelativeChassisSpeeds = currentRobotRelativeSpeeds;
+    lastFieldRelativeSpeeds = currentFieldRelativeSpeeds;
+
+    lastRobotRelativeChassisAccelerationsTimestamp = robotRelativeChassisAccelerationsTimestamp;
 
     long disabledStartNano = moduleTimeNano;
     // Stop moving when disabled
@@ -287,6 +318,18 @@ public class SwerveSubsystem extends SubsystemBase {
     return kinematics.toChassisSpeeds(getModuleStates());
   }
 
+  /** Returns the current robot-relative acceleration of the chassis based on odometry. */
+  @AutoLogOutput(key = "SwerveRobotRelativeChassisAccelerations/Measured")
+  public ChassisAccelerations getRobotRelativeChassisAccelerations() {
+    return robotRelativeChassisAccelerations;
+  }
+
+  /** Returns the current acceleration of the chassis based on odometry. */
+  @AutoLogOutput(key = "SwerveFieldRelativeChassisAccelerations/Measured")
+  public ChassisAccelerations getFieldRelativeChassisAccelerations() {
+    return fieldRelativeChassisAccelerations;
+  }
+
   /** Returns the position of each module in radians. */
   public double[] getWheelRadiusCharacterizationPositions() {
     double[] values = new double[4];
@@ -338,5 +381,29 @@ public class SwerveSubsystem extends SubsystemBase {
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
     return maxSpeedMetersPerSec / driveBaseRadius;
+  }
+
+  @Override
+  public void periodicAfterScheduler() {
+    Logger.recordOutput(
+        "Drive/robotRelativeChassisAccelerations/Ax",
+        robotRelativeChassisAccelerations.axMetersPerSecondSquared);
+    Logger.recordOutput(
+        "Drive/robotRelativeChassisAccelerations/Ay",
+        robotRelativeChassisAccelerations.ayMetersPerSecondSquared);
+    Logger.recordOutput(
+        "Drive/robotRelativeChassisAccelerations/Omega",
+        robotRelativeChassisAccelerations.omegaRadiansPerSecondSquared);
+    Logger.recordOutput(
+        "Drive/fieldRelativeChassisAccelerations/Ax",
+        fieldRelativeChassisAccelerations.axMetersPerSecondSquared);
+    Logger.recordOutput(
+        "Drive/fieldRelativeChassisAccelerations/Ay",
+        fieldRelativeChassisAccelerations.ayMetersPerSecondSquared);
+    Logger.recordOutput(
+        "Drive/fieldRelativeChassisAccelerations/Omega",
+        fieldRelativeChassisAccelerations.omegaRadiansPerSecondSquared);
+
+    System.gc(); // Call if Garbage Collection is needed
   }
 }
