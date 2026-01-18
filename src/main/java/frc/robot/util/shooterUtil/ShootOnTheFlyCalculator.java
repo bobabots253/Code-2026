@@ -1,151 +1,145 @@
 package frc.robot.util.shooterUtil;
 
-import java.util.function.Function;
-
-import frc.robot.util.shooterUtil.BallPhysics.ShotSolution;
-import frc.robot.util.swerveUtil.ChassisAccelerations;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import frc.robot.util.shooterUtil.BallPhysics.ShotSolution;
+import frc.robot.util.swerveUtil.ChassisAccelerations;
+import java.util.function.Function;
 
 /**
- * Provides static methods to calculate the effective target position to aim for
- * when shooting on the fly.
+ * Provides static methods to calculate the effective target position to aim for when shooting on
+ * the fly.
  */
 public class ShootOnTheFlyCalculator {
 
-    public static double getTimeToShoot(Pose2d robotPose, Pose3d targetPose,
-            Function<Double, Double> xyDistanceToProjectileVelocity) {
-        Transform3d diff = new Pose3d(robotPose).minus(targetPose);
-        double xyDistance = new Translation2d(diff.getX(), diff.getY()).getNorm();
-        double distance = diff.getTranslation().getNorm();
-        double projectileVelocity = xyDistanceToProjectileVelocity.apply(xyDistance);
-        double time = distance / projectileVelocity;
-        return time;
+  public static double getTimeToShoot(
+      Pose2d robotPose,
+      Pose3d targetPose,
+      Function<Double, Double> xyDistanceToProjectileVelocity) {
+    Transform3d diff = new Pose3d(robotPose).minus(targetPose);
+    double xyDistance = new Translation2d(diff.getX(), diff.getY()).getNorm();
+    double distance = diff.getTranslation().getNorm();
+    double projectileVelocity = xyDistanceToProjectileVelocity.apply(xyDistance);
+    double time = distance / projectileVelocity;
+    return time;
+  }
+
+  public static double getTimeToShoot(
+      Pose3d shooterPose, Pose3d targetPose, double launchSpeed, double launchPitchRad) {
+    Translation3d s = shooterPose.getTranslation();
+    Translation3d t = targetPose.getTranslation();
+
+    double dx = t.getX() - s.getX();
+    double dy = t.getY() - s.getY();
+
+    double horizontalDist = Math.hypot(dx, dy);
+    double vHoriz = launchSpeed * Math.cos(launchPitchRad);
+
+    if (vHoriz <= 1e-6) {
+      throw new IllegalArgumentException("Horizontal velocity too small");
     }
 
-    public static double getTimeToShoot(
-            Pose3d shooterPose,
-            Pose3d targetPose,
-            double launchSpeed,
-            double launchPitchRad) {
-        Translation3d s = shooterPose.getTranslation();
-        Translation3d t = targetPose.getTranslation();
+    return horizontalDist / vHoriz;
+  }
 
-        double dx = t.getX() - s.getX();
-        double dy = t.getY() - s.getY();
+  public static Pose3d calculateEffectiveTargetLocation(
+      Pose2d robotPose,
+      Pose3d targetPose,
+      ChassisSpeeds fieldRelRobotVelocity,
+      ChassisAccelerations fieldRelRobotAcceleration,
+      Function<Double, Double> xyDistanceToProjectileVelocity,
+      double goalPositionIterations,
+      double accelerationCompensationFactor) {
 
-        double horizontalDist = Math.hypot(dx, dy);
-        double vHoriz = launchSpeed * Math.cos(launchPitchRad);
+    double shotTime = getTimeToShoot(robotPose, targetPose, xyDistanceToProjectileVelocity);
 
-        if (vHoriz <= 1e-6) {
-            throw new IllegalArgumentException("Horizontal velocity too small");
-        }
+    Pose3d correctedTargetPose = new Pose3d();
+    for (int i = 0; i < goalPositionIterations; i++) {
+      double virtualGoalX =
+          targetPose.getX()
+              - shotTime
+                  * (fieldRelRobotVelocity.vxMetersPerSecond
+                      + fieldRelRobotAcceleration.axMetersPerSecondSquared
+                          * accelerationCompensationFactor);
+      double virtualGoalY =
+          targetPose.getY()
+              - shotTime
+                  * (fieldRelRobotVelocity.vyMetersPerSecond
+                      + fieldRelRobotAcceleration.ayMetersPerSecondSquared
+                          * accelerationCompensationFactor);
 
-        return horizontalDist / vHoriz;
+      correctedTargetPose =
+          new Pose3d(virtualGoalX, virtualGoalY, targetPose.getZ(), targetPose.getRotation());
+
+      double newShotTime =
+          getTimeToShoot(robotPose, correctedTargetPose, xyDistanceToProjectileVelocity);
+
+      shotTime = newShotTime;
+      if (Math.abs(newShotTime - shotTime) <= 0.010) {
+        break;
+      }
     }
 
-    public static Pose3d calculateEffectiveTargetLocation(
-            Pose2d robotPose, Pose3d targetPose,
-            ChassisSpeeds fieldRelRobotVelocity,
-            ChassisAccelerations fieldRelRobotAcceleration,
-            Function<Double, Double> xyDistanceToProjectileVelocity,
-            double goalPositionIterations,
-            double accelerationCompensationFactor) {
+    return correctedTargetPose;
+  }
 
-        double shotTime = getTimeToShoot(robotPose, targetPose, xyDistanceToProjectileVelocity);
+  public record InterceptSolution(
+      Pose3d effectiveTargetPose,
+      double launchPitchRad,
+      double launchSpeed,
+      double flightTime,
+      double requiredYaw) {}
 
-        Pose3d correctedTargetPose = new Pose3d();
-        for (int i = 0; i < goalPositionIterations; i++) {
-            double virtualGoalX = targetPose.getX()
-                    - shotTime * (fieldRelRobotVelocity.vxMetersPerSecond
-                            + fieldRelRobotAcceleration.axMetersPerSecondSquared
-                                    * accelerationCompensationFactor);
-            double virtualGoalY = targetPose.getY()
-                    - shotTime * (fieldRelRobotVelocity.vyMetersPerSecond
-                            + fieldRelRobotAcceleration.ayMetersPerSecondSquared
-                                    * accelerationCompensationFactor);
+  public static InterceptSolution solveShootOnTheFly(
+      Pose3d shooterPose,
+      Pose3d targetPose,
+      ChassisSpeeds fieldRelRobotVelocity,
+      ChassisAccelerations fieldRelRobotAcceleration,
+      double targetSpeedRps,
+      int maxIterations,
+      double timeTolerance) {
 
-            correctedTargetPose = new Pose3d(virtualGoalX, virtualGoalY, targetPose.getZ(),
-                    targetPose.getRotation());
+    ShotSolution sol = BallPhysics.solveBallisticWithSpeed(shooterPose, targetPose, targetSpeedRps);
 
-            double newShotTime = getTimeToShoot(robotPose, correctedTargetPose, xyDistanceToProjectileVelocity);
+    double t = sol.flightTimeSeconds();
+    Pose3d effectiveTarget = targetPose;
 
-            shotTime = newShotTime;
-            if (Math.abs(newShotTime - shotTime) <= 0.010) {
-                break;
-            }
-        }
+    for (int i = 0; i < maxIterations; i++) {
 
-        return correctedTargetPose;
-    }
+      double dx = fieldRelRobotVelocity.vxMetersPerSecond * t;
+      // + 0.5 * fieldRelRobotAcceleration.axMetersPerSecondSquared * t * t;
 
-    public record InterceptSolution(
-            Pose3d effectiveTargetPose,
-            double launchPitchRad,
-            double launchSpeed,
-            double flightTime,
-            double requiredYaw) {
-    }
+      double dy = fieldRelRobotVelocity.vyMetersPerSecond * t;
+      // + 0.5 * fieldRelRobotAcceleration.ayMetersPerSecondSquared * t * t;
 
-    public static InterceptSolution solveShootOnTheFly(
-            Pose3d shooterPose,
-            Pose3d targetPose,
-            ChassisSpeeds fieldRelRobotVelocity,
-            ChassisAccelerations fieldRelRobotAcceleration,
-            double targetSpeedRps,
-            int maxIterations,
-            double timeTolerance) {
+      effectiveTarget =
+          new Pose3d(
+              targetPose.getX() - dx,
+              targetPose.getY() - dy,
+              targetPose.getZ(),
+              targetPose.getRotation());
 
-        ShotSolution sol = BallPhysics.solveBallisticWithSpeed(
-                shooterPose,
-                targetPose,
-                targetSpeedRps);
+      ShotSolution newSol =
+          BallPhysics.solveBallisticWithSpeed(shooterPose, effectiveTarget, targetSpeedRps);
 
-        double t = sol.flightTimeSeconds();
-        Pose3d effectiveTarget = targetPose;
-
-        for (int i = 0; i < maxIterations; i++) {
-
-            double dx = fieldRelRobotVelocity.vxMetersPerSecond * t;
-            // + 0.5 * fieldRelRobotAcceleration.axMetersPerSecondSquared * t * t;
-
-            double dy = fieldRelRobotVelocity.vyMetersPerSecond * t;
-            // + 0.5 * fieldRelRobotAcceleration.ayMetersPerSecondSquared * t * t;
-
-            effectiveTarget = new Pose3d(
-                    targetPose.getX() - dx,
-                    targetPose.getY() - dy,
-                    targetPose.getZ(),
-                    targetPose.getRotation());
-
-            ShotSolution newSol = BallPhysics.solveBallisticWithSpeed(
-                    shooterPose,
-                    effectiveTarget,
-                    targetSpeedRps);
-
-            if (Math.abs(newSol.flightTimeSeconds() - t) < timeTolerance) {
-                return new InterceptSolution(
-                        effectiveTarget,
-                        newSol.launchPitchRad(),
-                        newSol.launchSpeed(),
-                        newSol.flightTimeSeconds(),
-                        0);
-            }
-
-            sol = newSol;
-            t = newSol.flightTimeSeconds();
-        }
-
+      if (Math.abs(newSol.flightTimeSeconds() - t) < timeTolerance) {
         return new InterceptSolution(
-                effectiveTarget,
-                sol.launchPitchRad(),
-                sol.launchSpeed(),
-                sol.flightTimeSeconds(),
-                0);
+            effectiveTarget,
+            newSol.launchPitchRad(),
+            newSol.launchSpeed(),
+            newSol.flightTimeSeconds(),
+            0);
+      }
+
+      sol = newSol;
+      t = newSol.flightTimeSeconds();
     }
+
+    return new InterceptSolution(
+        effectiveTarget, sol.launchPitchRad(), sol.launchSpeed(), sol.flightTimeSeconds(), 0);
+  }
 }
