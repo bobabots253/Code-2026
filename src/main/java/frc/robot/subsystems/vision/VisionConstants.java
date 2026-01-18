@@ -20,13 +20,19 @@ public class VisionConstants {
   // Camera names, must match names configured on coprocessor
   public static String FrontLeftLL = "limelight-purple";
   public static String FrontRightLL = "limelight-orange";
+  public static String BackLeftLL = "limelight-green";
+  public static String BackRightLL = "limelight-blue";
 
   // Robot to camera transforms
   // (Not used by Limelight, configure in LL Finder UI instead)
   public static Transform3d robotToFrontLeftLL =
-      new Transform3d(0.2667, 0.1778, 0.1778, new Rotation3d(0.0, 0.35, 0.0));
+      new Transform3d(0.2667, 0.1778, 0.1778, new Rotation3d(0.0, 0.35, 0.0)); // update
   public static Transform3d robotToFrontRightLL =
-      new Transform3d(0.2667, -0.1778, 0.1778, new Rotation3d(0.0, 0.35, 0.0));
+      new Transform3d(0.2667, -0.1778, 0.1778, new Rotation3d(0.0, 0.35, 0.0)); // update
+  public static Transform3d robotToBackLeftLL =
+      new Transform3d(-0.2667, 0.1778, 0.1778, new Rotation3d(0.0, 0.35, 0.0)); // update
+  public static Transform3d robotToBackRightLL =
+      new Transform3d(-0.2667, -0.1778, 0.1778, new Rotation3d(0.0, 0.35, 0.0)); // update
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;

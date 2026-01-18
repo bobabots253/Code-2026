@@ -26,12 +26,12 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
-import frc.robot.util.VirtualSubsystem;
+import frc.robot.util.FullSubsystem;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
-public class Vision extends VirtualSubsystem {
+public class Vision extends FullSubsystem {
   private final VisionConsumer consumer;
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
@@ -254,5 +254,7 @@ public class Vision extends VirtualSubsystem {
   }
 
   @Override
-  public void periodicAfterScheduler() {}
+  public void periodicAfterScheduler() {
+    System.gc();
+  }
 }

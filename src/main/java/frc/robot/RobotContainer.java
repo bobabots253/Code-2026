@@ -64,7 +64,9 @@ public class RobotContainer {
             new Vision(
                 swerveSubsystem::addVisionMeasurement,
                 new VisionIOLimelight(VisionConstants.FrontLeftLL, swerveSubsystem::getRotation),
-                new VisionIOLimelight(VisionConstants.FrontRightLL, swerveSubsystem::getRotation));
+                new VisionIOLimelight(VisionConstants.FrontRightLL, swerveSubsystem::getRotation),
+                new VisionIOLimelight(VisionConstants.BackLeftLL, swerveSubsystem::getRotation),
+                new VisionIOLimelight(VisionConstants.BackRightLL, swerveSubsystem::getRotation));
 
         break;
 
@@ -88,6 +90,18 @@ public class RobotContainer {
                 new VisionIOPhotonVisionSim(
                     VisionConstants.FrontRightLL,
                     VisionConstants.robotToFrontRightLL,
+                    swerveSubsystem::getPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.FrontRightLL,
+                    VisionConstants.robotToFrontRightLL,
+                    swerveSubsystem::getPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.BackLeftLL,
+                    VisionConstants.robotToBackLeftLL,
+                    swerveSubsystem::getPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.BackRightLL,
+                    VisionConstants.robotToBackRightLL,
                     swerveSubsystem::getPose));
         break;
 
