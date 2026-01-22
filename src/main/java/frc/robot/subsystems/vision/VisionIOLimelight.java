@@ -32,6 +32,7 @@ public class VisionIOLimelight implements VisionIO {
   private final DoubleSubscriber tySubscriber;
   private final DoubleArraySubscriber megatag1Subscriber;
   private final DoubleArraySubscriber megatag2Subscriber;
+  private final DoubleArraySubscriber homeworkSubscriber;
 
   /**
    * Creates a new VisionIOLimelight.
@@ -61,6 +62,8 @@ public class VisionIOLimelight implements VisionIO {
     // Should be "botpose_wpiblue", but don't fix what isn't broken
     megatag2Subscriber =
         table.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
+
+    homeworkSubscriber = table.getDoubleArrayTopic("hw").subscribe(new double[] {});
   }
 
   @Override
