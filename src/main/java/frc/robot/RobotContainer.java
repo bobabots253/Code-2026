@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.swerve.*;
 import frc.robot.subsystems.vision.*;
-import frc.robot.subsystems.vision.Vision;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -63,10 +62,10 @@ public class RobotContainer {
         vision =
             new Vision(
                 swerveSubsystem::addVisionMeasurement,
-                new VisionIOLimelight(VisionConstants.FrontLeftLL, swerveSubsystem::getRotation),
-                new VisionIOLimelight(VisionConstants.FrontRightLL, swerveSubsystem::getRotation),
-                new VisionIOLimelight(VisionConstants.BackLeftLL, swerveSubsystem::getRotation),
-                new VisionIOLimelight(VisionConstants.BackRightLL, swerveSubsystem::getRotation));
+                new VisionIOLimelight(VisionConstants.cameraPurple, swerveSubsystem::getRotation),
+                new VisionIOLimelight(VisionConstants.cameraOrange, swerveSubsystem::getRotation),
+                new VisionIOLimelight(VisionConstants.cameraGreen, swerveSubsystem::getRotation),
+                new VisionIOLimelight(VisionConstants.cameraBlue, swerveSubsystem::getRotation));
 
         break;
 
@@ -84,24 +83,20 @@ public class RobotContainer {
             new Vision(
                 swerveSubsystem::addVisionMeasurement,
                 new VisionIOPhotonVisionSim(
-                    VisionConstants.FrontLeftLL,
-                    VisionConstants.robotToFrontLeftLL,
+                    VisionConstants.cameraPurple,
+                    VisionConstants.cameraTransformToPurple,
                     swerveSubsystem::getPose),
                 new VisionIOPhotonVisionSim(
-                    VisionConstants.FrontRightLL,
-                    VisionConstants.robotToFrontRightLL,
+                    VisionConstants.cameraOrange,
+                    VisionConstants.cameraTransformToOrange,
                     swerveSubsystem::getPose),
                 new VisionIOPhotonVisionSim(
-                    VisionConstants.FrontRightLL,
-                    VisionConstants.robotToFrontRightLL,
+                    VisionConstants.cameraGreen,
+                    VisionConstants.cameraTransformToGreen,
                     swerveSubsystem::getPose),
                 new VisionIOPhotonVisionSim(
-                    VisionConstants.BackLeftLL,
-                    VisionConstants.robotToBackLeftLL,
-                    swerveSubsystem::getPose),
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.BackRightLL,
-                    VisionConstants.robotToBackRightLL,
+                    VisionConstants.cameraBlue,
+                    VisionConstants.cameraTransformToBlue,
                     swerveSubsystem::getPose));
         break;
 
