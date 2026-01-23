@@ -1,4 +1,4 @@
-package frc.robot.subsystems.hood;
+package frc.robot.subsystems.shooter;
 
 public class HoodConstants {
   // change when IDs are figured out

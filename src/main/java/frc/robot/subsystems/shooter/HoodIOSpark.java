@@ -1,6 +1,6 @@
-package frc.robot.subsystems.hood;
+package frc.robot.subsystems.shooter;
 
-import static frc.robot.subsystems.hood.HoodConstants.*;
+import static frc.robot.subsystems.shooter.HoodConstants.*;
 import static frc.robot.util.SparkUtil.*;
 
 import com.revrobotics.AbsoluteEncoder;
