@@ -108,8 +108,8 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
-    LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 1);
-    LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 1);
+    LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 0);
+    LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 0);
   }
 
   /** This function is called periodically when disabled. */
@@ -141,13 +141,13 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+    LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 3);
+    LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 3);  
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 2);
-    LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 2);  
   }
 
   /** This function is called once when test mode is enabled. */

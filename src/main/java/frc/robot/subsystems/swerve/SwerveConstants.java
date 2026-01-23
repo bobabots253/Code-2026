@@ -22,7 +22,7 @@ import edu.wpi.first.math.util.Units;
 
 public class SwerveConstants {
   public static final double maxSpeedMetersPerSec = 5.74; // <- Check
-  public static final double odometryFrequency = 50.0; // Hz, tune
+  public static final double odometryFrequency = 250; // Hz, Test faster than periodic block timing
   public static final double trackWidth = Units.inchesToMeters(26.5);
   public static final double wheelBase = Units.inchesToMeters(26.5);
 
