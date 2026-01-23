@@ -6,7 +6,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import java.util.TreeMap;
 
-public class FieldSetup {
+public class fieldSetup {
   // new Translation2d(0,0)
   public static Rotation3d oneEightyRotation = new Rotation3d(0, 0, 180);
   public static Rotation3d ninetyRotation = new Rotation3d(0, 0, 90);
