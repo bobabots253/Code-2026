@@ -13,6 +13,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Meter;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -25,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.swerve.*;
 import frc.robot.subsystems.vision.*;
+import frc.robot.util.fuelSimUtil.FuelSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -98,6 +101,8 @@ public class RobotContainer {
                     VisionConstants.cameraBlue,
                     VisionConstants.cameraTransformToBlue,
                     swerveSubsystem::getPose));
+
+        configureFuelSim();
         break;
 
       default:
@@ -199,6 +204,25 @@ public class RobotContainer {
     //             },
     //             swerveSubsystem));
     // }
+  }
+
+  public void configureFuelSim() {
+    FuelSim instance = FuelSim.getInstance();
+    instance.spawnStartingFuel();
+    instance.registerRobot(
+        SwerveConstants.ROBOT_LENGTH.in(Meter),
+        SwerveConstants.ROBOT_WIDTH.in(Meter),
+        SwerveConstants.BUMPER_HEIGHT.in(Meter),
+        swerveSubsystem::getPose,
+        swerveSubsystem::getChassisSpeeds);
+
+    instance.start();
+    Commands.runOnce(
+            () -> {
+              FuelSim.getInstance().clearFuel();
+              FuelSim.getInstance().spawnStartingFuel();
+            })
+        .schedule();
   }
 
   /**
