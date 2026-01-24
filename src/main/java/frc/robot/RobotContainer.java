@@ -171,15 +171,16 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    // Lock to 0° when A button is held
+    // Lock to Hub when A button is held
     controller
         .a()
         .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
+            DriveCommands.joystickDriveAndShootHub(
                 swerveSubsystem,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
-                () -> new Rotation2d()));
+                shotCalculator.getCorrectedTargetPose2d(),
+                1.0));
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(swerveSubsystem::stopWithX, swerveSubsystem));
@@ -206,7 +207,7 @@ public class RobotContainer {
     //               aimController.reset();
     //             },
     //             () -> {
-    //                 swerveSubsystem.run(0.0,
+    //                 swerveSubsystem.runEnd(() -> {
     // aimController.calculate(vision.getTargetX(0).getRadians()));
     //             },
     //             swerveSubsystem));

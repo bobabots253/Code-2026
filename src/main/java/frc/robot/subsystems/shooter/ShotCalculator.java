@@ -2,6 +2,7 @@ package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -23,6 +24,7 @@ public class ShotCalculator extends SubsystemBase {
 
   private Pose3d shooterPose = Pose3d.kZero;
   private Pose3d correctedTargetPose = Pose3d.kZero;
+  private Pose2d robotPose = Pose2d.kZero;
 
   public ShotCalculator(SwerveSubsystem swerveSubsystem) {
     this.swerveSubsystem = swerveSubsystem;
@@ -30,7 +32,7 @@ public class ShotCalculator extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Pose2d robotPose = swerveSubsystem.getPose();
+    robotPose = swerveSubsystem.getPose();
     updateTargetByAlliance();
 
     shooterPose = new Pose3d(robotPose).plus(ShootOnTheFlyConstants.SHOOTER_TRANSFORM_CENTER);
@@ -41,13 +43,13 @@ public class ShotCalculator extends SubsystemBase {
 
     Pose3d correctedTargetPose =
         ShootOnTheFlyCalculator.calculateEffectiveTargetLocation(
-            shooterPose, targetLocation, drivetrainSpeeds, drivetrainAccelerations, 5, 0.005);
+            shooterPose, targetLocation, drivetrainSpeeds, drivetrainAccelerations, 5, 0.001);
 
     Logger.recordOutput("ShotCalculator/CorrectedTargetPose", correctedTargetPose);
   }
 
-  public Pose3d getCorrectedTargetPose3d() {
-    return correctedTargetPose;
+  public Pose2d getCorrectedTargetPose2d() {
+    return correctedTargetPose.toPose2d();
   }
 
   public double getCorrectedTargetSpeedRPM() {
@@ -62,6 +64,19 @@ public class ShotCalculator extends SubsystemBase {
     return targetAngle =
         ShootOnTheFlyConstants.HOOD_DEGREES_INTERPOLATOR.get(
             correctedTargetPose.getTranslation().getDistance(shooterPose.getTranslation()));
+  }
+
+  public Rotation2d getCorrectTargetRotation() {
+    double deltaX = correctedTargetPose.getX() - robotPose.getX();
+    double deltaY = correctedTargetPose.getY() - robotPose.getY();
+
+    // Calculate the absolute heading to the target
+    double angleToTargetRad = Math.atan2(deltaY, deltaX);
+
+    // Subtract current robot heading to get the relative difference
+    double currentHeadingRad = robotPose.getRotation().getRadians();
+    double angleErrorRad = angleToTargetRad - currentHeadingRad;
+    return new Rotation2d(angleErrorRad);
   }
 
   public void updateTargetByAlliance() {
