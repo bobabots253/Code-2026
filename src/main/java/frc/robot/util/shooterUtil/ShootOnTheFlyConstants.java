@@ -8,6 +8,8 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 public class ShootOnTheFlyConstants {
 
   public static final double shooterHeightOffset = 0.5; // Meters, height of shooter from ground
+  public static final Transform3d SHOOTER_TRANSFORM_CENTER =
+      new Transform3d(-0.24, 0, 0.5, Rotation3d.kZero);
 
   public static final InterpolatingDoubleTreeMap FLYWHEEL_RPM_INTERPOLATOR =
       new InterpolatingDoubleTreeMap();

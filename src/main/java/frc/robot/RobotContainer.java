@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.subsystems.shooter.ShotCalculator;
 import frc.robot.subsystems.swerve.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.util.fuelSimUtil.FuelSim;
@@ -40,6 +41,7 @@ public class RobotContainer {
   // Subsystems
   private final SwerveSubsystem swerveSubsystem;
   private final Vision vision;
+  private final ShotCalculator shotCalculator;
 
   // labubu
 
@@ -70,6 +72,7 @@ public class RobotContainer {
                 new VisionIOLimelight(VisionConstants.cameraGreen, swerveSubsystem::getRotation),
                 new VisionIOLimelight(VisionConstants.cameraBlue, swerveSubsystem::getRotation));
 
+        shotCalculator = new ShotCalculator(swerveSubsystem);
         break;
 
       case SIM:
@@ -102,6 +105,8 @@ public class RobotContainer {
                     VisionConstants.cameraTransformToBlue,
                     swerveSubsystem::getPose));
 
+        shotCalculator = new ShotCalculator(swerveSubsystem);
+
         configureFuelSim();
         break;
 
@@ -117,6 +122,8 @@ public class RobotContainer {
 
         vision =
             new Vision(swerveSubsystem::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+
+        shotCalculator = new ShotCalculator(swerveSubsystem);
 
         break;
     }
