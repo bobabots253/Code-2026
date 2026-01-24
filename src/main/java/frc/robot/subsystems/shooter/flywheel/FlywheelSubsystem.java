@@ -1,10 +1,5 @@
 package frc.robot.subsystems.shooter.flywheel;
 
-import java.util.function.DoubleSupplier;
-
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.Alert;
@@ -14,6 +9,9 @@ import frc.robot.subsystems.shooter.flywheel.FlywheelIO.FlywheelIOOutputMode;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIO.FlywheelIOOutputs;
 import frc.robot.util.FullSubsystem;
 import frc.robot.util.LoggedTunableNumber;
+import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class FlywheelSubsystem extends FullSubsystem {
   private final FlywheelIO io;
@@ -113,7 +111,7 @@ public class FlywheelSubsystem extends FullSubsystem {
     return inputs.velocityRadsPerSec;
   }
 
-    public Command runStaticSetpointCommand(DoubleSupplier RPM) {
+  public Command runStaticSetpointCommand(DoubleSupplier RPM) {
     return runEnd(() -> runFlywheelRPM(RPM.getAsDouble()), this::stop);
   }
 }
