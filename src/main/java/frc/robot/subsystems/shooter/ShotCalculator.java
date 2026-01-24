@@ -52,9 +52,9 @@ public class ShotCalculator extends SubsystemBase {
     double atanParam = deltaY / deltaX;
 
     if (isRedAlliance()) {
-      angleToTargetRad = Math.atan(atanParam) + Math.PI;
+      angleToTargetRad = Math.atan(atanParam) + Math.PI + (Math.PI / 2);
     } else {
-      angleToTargetRad = Math.atan(atanParam);
+      angleToTargetRad = Math.atan(atanParam) + (Math.PI / 2);
     }
 
     Logger.recordOutput("ShotCalculator/DeltaX", deltaX);
