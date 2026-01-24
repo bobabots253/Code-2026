@@ -13,8 +13,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants.Mode;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.fuelSimUtil.FuelSim;
@@ -169,5 +171,10 @@ public class Robot extends LoggedRobot {
   @Override
   public void simulationPeriodic() {
     FuelSim.getInstance().updateSim();
+  }
+
+  /** Whether to display alerts related to hardware faults. */
+  public static boolean showHardwareAlerts() {
+    return Constants.getMode() != Mode.SIM && Timer.getTimestamp() > 30.0;
   }
 }
