@@ -26,6 +26,8 @@ public class ShotCalculator extends SubsystemBase {
   private Pose3d correctedTargetPose = Pose3d.kZero;
   private Pose2d robotPose = Pose2d.kZero;
 
+  private double angleToTargetRad;
+
   public ShotCalculator(SwerveSubsystem swerveSubsystem) {
     this.swerveSubsystem = swerveSubsystem;
   }
@@ -45,6 +47,19 @@ public class ShotCalculator extends SubsystemBase {
         ShootOnTheFlyCalculator.calculateEffectiveTargetLocation(
             shooterPose, targetLocation, drivetrainSpeeds, drivetrainAccelerations, 5, 0.001);
 
+    double deltaX = correctedTargetPose.getX() - robotPose.getX();
+    double deltaY = correctedTargetPose.getY() - robotPose.getY();
+    double atanParam = deltaY / deltaX;
+
+    if (isRedAlliance()) {
+      angleToTargetRad = Math.atan(atanParam) + Math.PI;
+    } else {
+      angleToTargetRad = Math.atan(atanParam);
+    }
+
+    Logger.recordOutput("ShotCalculator/DeltaX", deltaX);
+    Logger.recordOutput("ShotCalculator/DeltaY", deltaY);
+    Logger.recordOutput("ShotCalculator/AngleToTargetRad", angleToTargetRad);
     Logger.recordOutput("ShotCalculator/CorrectedTargetPose", correctedTargetPose);
   }
 
@@ -67,16 +82,18 @@ public class ShotCalculator extends SubsystemBase {
   }
 
   public Rotation2d getCorrectTargetRotation() {
-    double deltaX = correctedTargetPose.getX() - robotPose.getX();
-    double deltaY = correctedTargetPose.getY() - robotPose.getY();
-
     // Calculate the absolute heading to the target
-    double angleToTargetRad = Math.atan2(deltaY, deltaX);
 
     // Subtract current robot heading to get the relative difference
     double currentHeadingRad = robotPose.getRotation().getRadians();
-    double angleErrorRad = angleToTargetRad - currentHeadingRad;
-    return new Rotation2d(angleErrorRad);
+    // double angleErrorRad = angleToTargetRad - currentHeadingRad;
+    return new Rotation2d(angleToTargetRad);
+  }
+
+  public boolean isRedAlliance() {
+    var alliance = DriverStation.getAlliance();
+
+    return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
   }
 
   public void updateTargetByAlliance() {

@@ -175,12 +175,11 @@ public class RobotContainer {
     controller
         .a()
         .whileTrue(
-            DriveCommands.joystickDriveAndShootHub(
+            DriveCommands.joystickDriveAtAngle(
                 swerveSubsystem,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
-                shotCalculator.getCorrectedTargetPose2d(),
-                1.0));
+                () -> shotCalculator.getCorrectTargetRotation()));
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(swerveSubsystem::stopWithX, swerveSubsystem));
