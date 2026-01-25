@@ -37,19 +37,28 @@ public class ShooterSubsystem extends SubsystemBase {
                     .transformBy(ShootOnTheFlyConstants.ROBOT_TO_SHOOTER_TRANSFORM),
             fieldSpeedsSupplier);
 
-    this.setDefaultCommand(
-        shooterFuelSim.repeatedlyLaunchFuel(
-            () -> {
-              return Units.MetersPerSecond.of(calculator.getCorrectTargetVelocity());
-            },
-            () -> Units.Degrees.of(calculator.getCorrectedTargetAngle()),
-            this));
+    // this.setDefaultCommand(
+    //     shooterFuelSim.repeatedlyLaunchFuel(
+    //         () -> {
+    //           return Units.MetersPerSecond.of(calculator.getCorrectTargetVelocity());
+    //         },
+    //         () -> Units.Degrees.of(calculator.getCorrectedTargetAngle()),
+    //         this));
   }
 
   public Command ShootOnTheFlyCommand() {
     return Commands.parallel(
         m_flywheel.run(() -> m_flywheel.runFlywheelRPM(m_calculator.getCorrectedTargetSpeedRPM())),
         m_hood.run(() -> m_hood.setGoalParams(m_calculator.getCorrectedTargetAngle(), 0.0)));
+  }
+
+  public Command simShootOnTheFlyCommand() {
+    return shooterFuelSim.repeatedlyLaunchFuel(
+        () -> {
+          return Units.MetersPerSecond.of(m_calculator.getCorrectTargetVelocity());
+        },
+        () -> Units.Degrees.of(m_calculator.getCorrectedTargetAngle()),
+        this);
   }
 
   @Override

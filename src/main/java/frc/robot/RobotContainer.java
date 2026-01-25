@@ -34,8 +34,18 @@ import frc.robot.subsystems.shooter.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.shooter.hood.HoodIO;
 import frc.robot.subsystems.shooter.hood.HoodIOSim;
 import frc.robot.subsystems.shooter.hood.HoodSubsystem;
-import frc.robot.subsystems.swerve.*;
-import frc.robot.subsystems.vision.*;
+import frc.robot.subsystems.swerve.GyroIO;
+import frc.robot.subsystems.swerve.GyroIOPigeon2;
+import frc.robot.subsystems.swerve.ModuleIO;
+import frc.robot.subsystems.swerve.ModuleIOSim;
+import frc.robot.subsystems.swerve.ModuleIOSpark;
+import frc.robot.subsystems.swerve.SwerveConstants;
+import frc.robot.subsystems.swerve.SwerveSubsystem;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.fuelSimUtil.FuelSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -220,10 +230,29 @@ public class RobotContainer {
                 () -> -controller.getLeftX(),
                 () -> shotCalculator.getCorrectTargetRotation()));
 
-    // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(swerveSubsystem::stopWithX, swerveSubsystem));
+    // shooterFuelSim.repeatedlyLaunchFuel(
+    // () -> {
+    //   return Units.MetersPerSecond.of(calculator.getCorrectTargetVelocity());
+    // },
+    // () -> Units.Degrees.of(calculator.getCorrectedTargetAngle()),
+    // this));
 
-    // Reset gyro to 0° when B button is pressed
+    // Shoot on the fly when X button is pressed
+    controller.x().whileTrue(shooterSubsystem.simShootOnTheFlyCommand());
+
+    // Shoot on the fly while Y button is held, With drive control
+    controller
+        .y()
+        .whileTrue(
+            Commands.parallel(
+                DriveCommands.joystickDriveAtAngle(
+                    swerveSubsystem,
+                    () -> -controller.getLeftY(),
+                    () -> -controller.getLeftX(),
+                    () -> shotCalculator.getCorrectTargetRotation()),
+                shooterSubsystem.simShootOnTheFlyCommand()));
+
+    // Reset gyro to 0° when B button is pressed
     controller
         .b()
         .onTrue(
