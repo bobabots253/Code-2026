@@ -14,7 +14,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Meters;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -256,25 +256,18 @@ public class RobotContainer {
     FuelSim instance = FuelSim.getInstance();
     instance.spawnStartingFuel();
     instance.registerRobot(
-        SwerveConstants.ROBOT_LENGTH.in(Meter),
-        SwerveConstants.ROBOT_WIDTH.in(Meter),
-        SwerveConstants.BUMPER_HEIGHT.in(Meter),
+        SwerveConstants.ROBOT_LENGTH.in(Meters),
+        SwerveConstants.ROBOT_WIDTH.in(Meters),
+        SwerveConstants.BUMPER_HEIGHT.in(Meters),
         swerveSubsystem::getPose,
         swerveSubsystem::getChassisSpeeds);
     instance.registerIntake(
-            -SwerveConstants.ROBOT_LENGTH.div(2).in(Meter),
-            SwerveConstants.ROBOT_LENGTH.div(2).in(Meter),
-            -SwerveConstants.ROBOT_WIDTH.div(2).plus(Inches.of(7)).in(Meter),
-            -SwerveConstants.ROBOT_WIDTH.div(2).in(Meter),
-            () -> intake.isRightDeployed() && shooterSubsystem.simAbleToIntake(),
-            shooterSubsystem::simIntake);
-    instance.registerIntake(
-            -SwerveConstants.ROBOT_LENGTH.div(2).in(Meter),
-            SwerveConstants.ROBOT_LENGTH.div(2).in(Meter),
-            SwerveConstants.ROBOT_WIDTH.div(2).in(Meter),
-            SwerveConstants.ROBOT_WIDTH.div(2).plus(Inches.of(7)).in(Meter),
-            () -> intake.isLeftDeployed() && shooterSubsystem.simAbleToIntake(),
-            shooterSubsystem::simIntake);
+        SwerveConstants.ROBOT_LENGTH.div(2).in(Meters),
+        SwerveConstants.ROBOT_LENGTH.div(2).plus(Inches.of(5)).in(Meters),
+        SwerveConstants.ROBOT_WIDTH.div(2).unaryMinus().in(Meters),
+        SwerveConstants.ROBOT_WIDTH.div(2).in(Meters),
+        () -> true && shooterSubsystem.simAbleToIntake(),
+        shooterSubsystem::simIntake);
 
     instance.start();
     Commands.runOnce(
