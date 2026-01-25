@@ -40,7 +40,7 @@ public class ShooterSubsystem extends SubsystemBase {
     this.setDefaultCommand(
         shooterFuelSim.repeatedlyLaunchFuel(
             () -> {
-              return Units.MetersPerSecond.of(calculator.getCorrectedTargetSpeedRPM());
+              return Units.MetersPerSecond.of(calculator.getCorrectTargetVelocity());
             },
             () -> Units.Degrees.of(calculator.getCorrectedTargetAngle()),
             this));
@@ -55,11 +55,12 @@ public class ShooterSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     shooterFuelSim.updateFuel(
-        Units.MetersPerSecond.of(m_calculator.getCorrectedTargetSpeedRPM()),
+        Units.MetersPerSecond.of(m_calculator.getCorrectTargetVelocity()),
         Units.Degrees.of(m_calculator.getCorrectedTargetAngle()));
 
     // Log the calculated targets for debugging
     Logger.recordOutput("Shooter/TargetRPM", m_calculator.getCorrectedTargetSpeedRPM());
+    Logger.recordOutput("Shooter/TargetVelocityMPS", m_calculator.getCorrectTargetVelocity());
     Logger.recordOutput("Shooter/TargetAngleDeg", m_calculator.getCorrectedTargetAngle());
   }
 

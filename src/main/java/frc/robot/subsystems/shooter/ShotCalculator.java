@@ -77,6 +77,16 @@ public class ShotCalculator extends SubsystemBase {
                 .getDistance(shooterPose.toPose2d().getTranslation()));
   }
 
+  public double getCorrectTargetVelocity() {
+    Double targetSpeedMPS;
+    return targetSpeedMPS =
+        ShootOnTheFlyConstants.FLYWHEEL_VELOCITY_INTERPOLATOR.get(
+            correctedTargetPose
+                .toPose2d()
+                .getTranslation()
+                .getDistance(shooterPose.toPose2d().getTranslation()));
+  }
+
   public double getCorrectedTargetAngle() {
     Double targetAngle;
     return targetAngle =
