@@ -20,7 +20,7 @@ public class ShootOnTheFlyConstants {
   // Add Robot Transformation
   public static final Transform3d ROBOT_TO_SHOOTER_TRANSFORM =
       new Transform3d(
-          new Translation3d(0.5, 0.0, 0.5), // Meters, forward, left, up
+          new Translation3d(-0.25, 0.0, 0.5), // Meters, forward, left, up
           new Rotation3d(0.0, 0.0, 0.0)); // Radians, roll, pitch, yaw
 
   // Shooting RPMs for Hub Shooting
@@ -29,14 +29,14 @@ public class ShootOnTheFlyConstants {
 
   static {
     // Key: Distance (meters), Value: Shooter Speed (RPM)
-    FLYWHEEL_RPM_INTERPOLATOR.put(1.0, 3400.0); // Touching Hub
-    FLYWHEEL_RPM_INTERPOLATOR.put(1.5, 3400.0);
-    FLYWHEEL_RPM_INTERPOLATOR.put(2.0, 3400.0);
-    FLYWHEEL_RPM_INTERPOLATOR.put(2.5, 3650.0);
-    FLYWHEEL_RPM_INTERPOLATOR.put(3.0, 3900.0);
-    FLYWHEEL_RPM_INTERPOLATOR.put(3.5, 3970.0);
-    FLYWHEEL_RPM_INTERPOLATOR.put(4.0, 4050.0);
-    FLYWHEEL_RPM_INTERPOLATOR.put(4.5, 4225.0);
+    FLYWHEEL_RPM_INTERPOLATOR.put(1.0, 3400.0); // Touching Hub //3400
+    FLYWHEEL_RPM_INTERPOLATOR.put(1.5, 3400.0); // 3400
+    FLYWHEEL_RPM_INTERPOLATOR.put(2.0, 3400.0); // 3400
+    FLYWHEEL_RPM_INTERPOLATOR.put(2.5, 3650.0); // 3650
+    FLYWHEEL_RPM_INTERPOLATOR.put(3.0, 3900.0); // 3900
+    FLYWHEEL_RPM_INTERPOLATOR.put(3.5, 3970.0); // 3970
+    FLYWHEEL_RPM_INTERPOLATOR.put(4.0, 4050.0); // 4050
+    FLYWHEEL_RPM_INTERPOLATOR.put(4.5, 4225.0); // 4225
 
     // Key: Distance (meters), Value: Shooter Velocity (meters per second)
     FLYWHEEL_VELOCITY_INTERPOLATOR.put(1.0, 6.39); // Touching Hub

@@ -68,9 +68,10 @@ public class ShooterSubsystem extends SubsystemBase {
         Units.Degrees.of(m_calculator.getCorrectedTargetAngle()));
 
     // Log the calculated targets for debugging
-    Logger.recordOutput("Shooter/TargetRPM", m_calculator.getCorrectedTargetSpeedRPM());
-    Logger.recordOutput("Shooter/TargetVelocityMPS", m_calculator.getCorrectTargetVelocity());
-    Logger.recordOutput("Shooter/TargetAngleDeg", m_calculator.getCorrectedTargetAngle());
+    Logger.recordOutput("ShooterSubsystem/TargetRPM", m_calculator.getCorrectedTargetSpeedRPM());
+    Logger.recordOutput(
+        "ShooterSubsystem/TargetVelocityMPS", m_calculator.getCorrectTargetVelocity());
+    Logger.recordOutput("ShooterSubsystem/TargetAngleDeg", m_calculator.getCorrectedTargetAngle());
   }
 
   public boolean simAbleToIntake() {

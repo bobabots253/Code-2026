@@ -72,59 +72,59 @@ public class Vision extends FullSubsystem {
   public void periodic() {
     // if (periodicCounter % UPDATE_INTERVAL == 0) {
 
-    long totalStartTimeNano = System.nanoTime();
-    final long TIME_BUDGET_NANO = 30_000_000; // Example budget: 5 ms
+    // long totalStartTimeNano = System.nanoTime();
+    // final long TIME_BUDGET_NANO = 30_000_000; // Example budget: 5 ms
 
-    // Implement timing for each VisionIO process
-    long startTimeNano = System.nanoTime();
+    // // Implement timing for each VisionIO process
+    // long startTimeNano = System.nanoTime();
 
     for (int i = 0; i < io.length; i++) {
 
-      if (System.nanoTime() - totalStartTimeNano > TIME_BUDGET_NANO) {
-        // Stop processing remaining cameras and exit the loop gracefully
-        System.out.println("Vision processing exceeded budget! Breaking loop.");
-        break;
-      }
-      long timeCameraLoopQueueNano = System.nanoTime();
-      long timeIOUpdateInputsNano = System.nanoTime();
+      // if (System.nanoTime() - totalStartTimeNano > TIME_BUDGET_NANO) {
+      //   // Stop processing remaining cameras and exit the loop gracefully
+      //   System.out.println("Vision processing exceeded budget! Breaking loop.");
+      //   break;
+      // }
+      // long timeCameraLoopQueueNano = System.nanoTime();
+      // long timeIOUpdateInputsNano = System.nanoTime();
 
       io[i].updateInputs(inputs[i]);
 
-      long camerLoopDuration = System.nanoTime() - timeCameraLoopQueueNano;
+      // long camerLoopDuration = System.nanoTime() - timeCameraLoopQueueNano;
 
-      if (camerLoopDuration > 25_000_000) {
-        continue;
-      }
+      // if (camerLoopDuration > 25_000_000) {
+      //   continue;
+      // }
 
-      long timeLoggerProcessInputsNano = System.nanoTime();
-      long timeCameraLoggerQueueNano = System.nanoTime();
+      // long timeLoggerProcessInputsNano = System.nanoTime();
+      // long timeCameraLoggerQueueNano = System.nanoTime();
 
       Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
 
-      long cameraLoggerDuration = System.nanoTime() - timeCameraLoggerQueueNano;
+      // long cameraLoggerDuration = System.nanoTime() - timeCameraLoggerQueueNano;
 
-      if (cameraLoggerDuration > 25_000_000) {
-        continue;
-      }
+      // if (cameraLoggerDuration > 25_000_000) {
+      //   continue;
+      // }
 
-      long timeAfterLoggingNano = System.nanoTime();
+      // long timeAfterLoggingNano = System.nanoTime();
 
-      String cameraName = "Vision/Time/Cam" + Integer.toString(i);
-      Logger.recordOutput(
-          cameraName + "/IO_Update",
-          (timeLoggerProcessInputsNano - timeIOUpdateInputsNano) / 1e6); // ms
+      // String cameraName = "Vision/Time/Cam" + Integer.toString(i);
+      // Logger.recordOutput(
+      //     cameraName + "/IO_Update",
+      //     (timeLoggerProcessInputsNano - timeIOUpdateInputsNano) / 1e6); // ms
 
-      Logger.recordOutput(
-          cameraName + "/Logger_Process",
-          (timeAfterLoggingNano - timeLoggerProcessInputsNano) / 1e6); // ms
+      // Logger.recordOutput(
+      //     cameraName + "/Logger_Process",
+      //     (timeAfterLoggingNano - timeLoggerProcessInputsNano) / 1e6); // ms
 
-      Logger.recordOutput(
-          cameraName + "/Total_Loop_Fragment",
-          (timeAfterLoggingNano - timeIOUpdateInputsNano) / 1e6);
+      // Logger.recordOutput(
+      //     cameraName + "/Total_Loop_Fragment",
+      //     (timeAfterLoggingNano - timeIOUpdateInputsNano) / 1e6);
     }
 
-    long ioTimeNano = System.nanoTime();
-    Logger.recordOutput("Vision/Time/InputProcessing", (ioTimeNano - startTimeNano) / 1e6);
+    // long ioTimeNano = System.nanoTime();
+    // Logger.recordOutput("Vision/Time/InputProcessing", (ioTimeNano - startTimeNano) / 1e6);
 
     // Initialize logging values
     List<Pose3d> allTagPoses = new LinkedList<>();
@@ -132,11 +132,11 @@ public class Vision extends FullSubsystem {
     List<Pose3d> allRobotPosesAccepted = new LinkedList<>();
     List<Pose3d> allRobotPosesRejected = new LinkedList<>();
 
-    long processingStartNano = ioTimeNano;
+    // long processingStartNano = ioTimeNano;
 
     // Loop over cameras
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
-      long cameraLoopStartNano = System.nanoTime();
+      // long cameraLoopStartNano = System.nanoTime();
       // Update disconnected alert
       disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
 
@@ -203,15 +203,15 @@ public class Vision extends FullSubsystem {
             observation.timestamp(),
             VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
 
-        long cameraLoopEndNano = System.nanoTime();
-        Logger.recordOutput(
-            "Vision/Time/Camera" + Integer.toString(cameraIndex),
-            (cameraLoopEndNano - cameraLoopStartNano) / 1e6);
+        // long cameraLoopEndNano = System.nanoTime();
+        // Logger.recordOutput(
+        //     "Vision/Time/Camera" + Integer.toString(cameraIndex),
+        //     (cameraLoopEndNano - cameraLoopStartNano) / 1e6);
       }
 
-      long totalProcessingTimeNano = System.nanoTime();
-      Logger.recordOutput(
-          "Vision/Time/TotalProcessing", (totalProcessingTimeNano - processingStartNano) / 1e6);
+      // long totalProcessingTimeNano = System.nanoTime();
+      // Logger.recordOutput(
+      //     "Vision/Time/TotalProcessing", (totalProcessingTimeNano - processingStartNano) / 1e6);
 
       // Log camera datadata
       Logger.recordOutput(
@@ -231,8 +231,8 @@ public class Vision extends FullSubsystem {
       allRobotPosesAccepted.addAll(robotPosesAccepted);
       allRobotPosesRejected.addAll(robotPosesRejected);
 
-      Logger.recordOutput(
-          "Vision/Time/TotalPeriodic", (totalProcessingTimeNano - startTimeNano) / 1e6);
+      // Logger.recordOutput(
+      //     "Vision/Time/TotalPeriodic", (totalProcessingTimeNano - startTimeNano) / 1e6);
     }
 
     // Log summary data
