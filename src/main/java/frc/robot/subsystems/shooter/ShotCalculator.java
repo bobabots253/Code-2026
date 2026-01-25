@@ -52,9 +52,9 @@ public class ShotCalculator extends SubsystemBase {
     double atanParam = deltaY / deltaX;
 
     if (isRedAlliance()) {
-      angleToTargetRad = Math.atan(atanParam) + Math.PI + (Math.PI / 2);
+      angleToTargetRad = Math.atan(atanParam) + Math.PI; // Testing: + (Math.PI / 2)
     } else {
-      angleToTargetRad = Math.atan(atanParam) + (Math.PI / 2);
+      angleToTargetRad = Math.atan(atanParam); // Testing: + (Math.PI / 2)
     }
 
     Logger.recordOutput("ShotCalculator/DeltaX", deltaX);
@@ -71,14 +71,20 @@ public class ShotCalculator extends SubsystemBase {
     Double targetSpeedRPM;
     return targetSpeedRPM =
         ShootOnTheFlyConstants.FLYWHEEL_RPM_INTERPOLATOR.get(
-            correctedTargetPose.getTranslation().getDistance(shooterPose.getTranslation()));
+            correctedTargetPose
+                .toPose2d()
+                .getTranslation()
+                .getDistance(shooterPose.toPose2d().getTranslation()));
   }
 
   public double getCorrectedTargetAngle() {
     Double targetAngle;
     return targetAngle =
         ShootOnTheFlyConstants.HOOD_DEGREES_INTERPOLATOR.get(
-            correctedTargetPose.getTranslation().getDistance(shooterPose.getTranslation()));
+            correctedTargetPose
+                .toPose2d()
+                .getTranslation()
+                .getDistance(shooterPose.toPose2d().getTranslation()));
   }
 
   public Rotation2d getCorrectTargetRotation() {

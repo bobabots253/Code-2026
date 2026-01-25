@@ -13,6 +13,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meter;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -25,7 +26,14 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.shooter.ShotCalculator;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIO;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
+import frc.robot.subsystems.shooter.flywheel.FlywheelSubsystem;
+import frc.robot.subsystems.shooter.hood.HoodIO;
+import frc.robot.subsystems.shooter.hood.HoodIOSim;
+import frc.robot.subsystems.shooter.hood.HoodSubsystem;
 import frc.robot.subsystems.swerve.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.util.fuelSimUtil.FuelSim;
@@ -42,6 +50,9 @@ public class RobotContainer {
   private final SwerveSubsystem swerveSubsystem;
   private final Vision vision;
   private final ShotCalculator shotCalculator;
+  private final HoodSubsystem hoodSubsystem;
+  private final FlywheelSubsystem flywheelSubsystem;
+  private final ShooterSubsystem shooterSubsystem;
 
   // labubu
 
@@ -73,6 +84,17 @@ public class RobotContainer {
                 new VisionIOLimelight(VisionConstants.cameraBlue, swerveSubsystem::getRotation));
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
+
+        hoodSubsystem = new HoodSubsystem(new frc.robot.subsystems.shooter.hood.HoodIOSpark());
+        flywheelSubsystem =
+            new FlywheelSubsystem(new frc.robot.subsystems.shooter.flywheel.FlywheelIOSpark());
+        shooterSubsystem =
+            new ShooterSubsystem(
+                flywheelSubsystem,
+                hoodSubsystem,
+                shotCalculator,
+                swerveSubsystem::getPose,
+                swerveSubsystem::getChassisSpeeds);
         break;
 
       case SIM:
@@ -106,6 +128,15 @@ public class RobotContainer {
                     swerveSubsystem::getPose));
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
+        hoodSubsystem = new HoodSubsystem(new HoodIOSim());
+        flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
+        shooterSubsystem =
+            new ShooterSubsystem(
+                flywheelSubsystem,
+                hoodSubsystem,
+                shotCalculator,
+                swerveSubsystem::getPose,
+                swerveSubsystem::getChassisSpeeds);
 
         configureFuelSim();
         break;
@@ -124,7 +155,15 @@ public class RobotContainer {
             new Vision(swerveSubsystem::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
-
+        hoodSubsystem = new HoodSubsystem(new HoodIOSim());
+        flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
+        shooterSubsystem =
+            new ShooterSubsystem(
+                new FlywheelSubsystem(new FlywheelIO() {}),
+                new HoodSubsystem(new HoodIO() {}),
+                new ShotCalculator(swerveSubsystem),
+                swerveSubsystem::getPose,
+                swerveSubsystem::getChassisSpeeds);
         break;
     }
 
@@ -222,6 +261,20 @@ public class RobotContainer {
         SwerveConstants.BUMPER_HEIGHT.in(Meter),
         swerveSubsystem::getPose,
         swerveSubsystem::getChassisSpeeds);
+    instance.registerIntake(
+            -SwerveConstants.ROBOT_LENGTH.div(2).in(Meter),
+            SwerveConstants.ROBOT_LENGTH.div(2).in(Meter),
+            -SwerveConstants.ROBOT_WIDTH.div(2).plus(Inches.of(7)).in(Meter),
+            -SwerveConstants.ROBOT_WIDTH.div(2).in(Meter),
+            () -> intake.isRightDeployed() && shooterSubsystem.simAbleToIntake(),
+            shooterSubsystem::simIntake);
+    instance.registerIntake(
+            -SwerveConstants.ROBOT_LENGTH.div(2).in(Meter),
+            SwerveConstants.ROBOT_LENGTH.div(2).in(Meter),
+            SwerveConstants.ROBOT_WIDTH.div(2).in(Meter),
+            SwerveConstants.ROBOT_WIDTH.div(2).plus(Inches.of(7)).in(Meter),
+            () -> intake.isLeftDeployed() && shooterSubsystem.simAbleToIntake(),
+            shooterSubsystem::simIntake);
 
     instance.start();
     Commands.runOnce(

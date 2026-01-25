@@ -1,3 +1,3 @@
 package frc.robot.subsystems.shooter.hood;
 
-public class HoodIOSpark {}
+public class HoodIOSpark implements HoodIO {}

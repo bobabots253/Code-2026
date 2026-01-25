@@ -88,7 +88,7 @@ public class HoodSubsystem extends FullSubsystem {
     io.applyOutputs(outputs);
   }
 
-  private void setGoalParams(double angle, double velocity) {
+  public void setGoalParams(double angle, double velocity) {
     goalAngle = angle;
     goalVelocity = velocity;
   }

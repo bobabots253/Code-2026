@@ -1,0 +1,82 @@
+package frc.robot.subsystems.shooter;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.shooter.flywheel.FlywheelSubsystem;
+import frc.robot.subsystems.shooter.hood.HoodSubsystem;
+import frc.robot.util.shooterUtil.ShootOnTheFlyConstants;
+import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
+
+public class ShooterSubsystem extends SubsystemBase {
+  private final FlywheelSubsystem m_flywheel;
+  private final HoodSubsystem m_hood;
+  private final ShotCalculator m_calculator;
+
+  private final shooterFuelSim shooterFuelSim;
+
+  public ShooterSubsystem(
+      FlywheelSubsystem flywheel,
+      HoodSubsystem hood,
+      ShotCalculator calculator,
+      Supplier<Pose2d> poseSupplier,
+      Supplier<ChassisSpeeds> fieldSpeedsSupplier) {
+    this.m_flywheel = flywheel;
+    this.m_hood = hood;
+    this.m_calculator = calculator;
+
+    shooterFuelSim =
+        new shooterFuelSim(
+            () ->
+                new Pose3d(poseSupplier.get())
+                    .transformBy(ShootOnTheFlyConstants.ROBOT_TO_SHOOTER_TRANSFORM),
+            fieldSpeedsSupplier);
+
+    this.setDefaultCommand(
+        shooterFuelSim.repeatedlyLaunchFuel(
+            () -> {
+              return Units.MetersPerSecond.of(calculator.getCorrectedTargetSpeedRPM());
+            },
+            () -> Units.Degrees.of(calculator.getCorrectedTargetAngle()),
+            this));
+  }
+
+  public Command ShootOnTheFlyCommand() {
+    return Commands.parallel(
+        m_flywheel.run(() -> m_flywheel.runFlywheelRPM(m_calculator.getCorrectedTargetSpeedRPM())),
+        m_hood.run(() -> m_hood.setGoalParams(m_calculator.getCorrectedTargetAngle(), 0.0)));
+  }
+
+  @Override
+  public void periodic() {
+    shooterFuelSim.updateFuel(
+        Units.MetersPerSecond.of(m_calculator.getCorrectedTargetSpeedRPM()),
+        Units.Degrees.of(m_calculator.getCorrectedTargetAngle()));
+
+    // Log the calculated targets for debugging
+    Logger.recordOutput("Shooter/TargetRPM", m_calculator.getCorrectedTargetSpeedRPM());
+    Logger.recordOutput("Shooter/TargetAngleDeg", m_calculator.getCorrectedTargetAngle());
+  }
+
+  public boolean simAbleToIntake() {
+    return shooterFuelSim.canIntake();
+  }
+
+  public void simIntake() {
+    shooterFuelSim.intakeFuel();
+  }
+
+  // Broken
+  //   public Command setToSafePosition(){
+  //     return Commands.(
+  //         this.run(() -> {
+  //              m_hood.setGoalParams(45, 0);
+  //         }), m_hood
+  //     );
+  //   }
+}

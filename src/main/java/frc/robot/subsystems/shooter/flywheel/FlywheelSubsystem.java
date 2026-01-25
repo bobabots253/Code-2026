@@ -81,7 +81,7 @@ public class FlywheelSubsystem extends FullSubsystem {
     io.setFlywheelRPM(outputs);
   }
 
-  private void runFlywheelRPM(double setpointRPM) {
+  public void runFlywheelRPM(double setpointRPM) {
     boolean inTolerance =
         Math.abs(velocityRPM - setpointRPM) <= torqueCurrentControlToleranceRPM.get();
     boolean torqueCurrentControl = torqueCurrentDebouncer.calculate(inTolerance);
