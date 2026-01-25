@@ -7,10 +7,11 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 public class HoodIOSim implements HoodIO {
   private static final DCMotor NeoMotorGroup = DCMotor.getNEO(2);
+
   // SingleJointedArmSim for Hood Simulation copied from Mechanical Advantage
   private final SingleJointedArmSim simulateSingleJointedArmSim =
       new SingleJointedArmSim(
-          NeoMotorGroup, 1.0, .004, .33, 0.0, Units.degreesToRadians(85), false, 0, null);
+          NeoMotorGroup, 1.0, .004, .33, 0.0, Units.degreesToRadians(85), false, 0);
 
   private static final double RadToDeg = 180.0 / Math.PI;
   private static final double DegToRad = Math.PI / 180.0;
