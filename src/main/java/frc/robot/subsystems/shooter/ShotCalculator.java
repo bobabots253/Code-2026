@@ -7,15 +7,15 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.fieldSetup;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
+import frc.robot.util.FullSubsystem;
 import frc.robot.util.shooterUtil.ShootOnTheFlyCalculator;
 import frc.robot.util.shooterUtil.ShootOnTheFlyConstants;
 import frc.robot.util.swerveUtil.ChassisAccelerations;
 import org.littletonrobotics.junction.Logger;
 
-public class ShotCalculator extends SubsystemBase {
+public class ShotCalculator extends FullSubsystem {
   private final SwerveSubsystem swerveSubsystem;
 
   private Pose3d targetLocation;
@@ -30,6 +30,9 @@ public class ShotCalculator extends SubsystemBase {
 
   private double distance2D;
   private double distance3D;
+
+  double deltaX;
+  double deltaY;
 
   Double targetSpeedRPM;
   Double targetSpeedMPS;
@@ -54,8 +57,8 @@ public class ShotCalculator extends SubsystemBase {
         ShootOnTheFlyCalculator.calculateEffectiveTargetLocation(
             shooterPose, targetLocation, drivetrainSpeeds, drivetrainAccelerations, 5, 0.001);
 
-    double deltaX = correctedTargetPose.getX() - robotPose.getX();
-    double deltaY = correctedTargetPose.getY() - robotPose.getY();
+    deltaX = correctedTargetPose.getX() - robotPose.getX();
+    deltaY = correctedTargetPose.getY() - robotPose.getY();
     double atanParam = deltaY / deltaX;
 
     if (isRedAlliance()) {
@@ -75,16 +78,6 @@ public class ShotCalculator extends SubsystemBase {
     targetSpeedRPM = ShootOnTheFlyConstants.FLYWHEEL_RPM_INTERPOLATOR.get(distance2D);
     targetSpeedMPS = ShootOnTheFlyConstants.FLYWHEEL_VELOCITY_INTERPOLATOR.get(distance2D);
     targetAngle = ShootOnTheFlyConstants.HOOD_DEGREES_INTERPOLATOR.get(distance2D);
-
-    Logger.recordOutput("ShotCalculator/DeltaX", deltaX);
-    Logger.recordOutput("ShotCalculator/DeltaY", deltaY);
-    Logger.recordOutput("ShotCalculator/AngleToTargetRad", angleToTargetRad);
-    Logger.recordOutput("ShotCalculator/CorrectedTargetPose", correctedTargetPose);
-    Logger.recordOutput("ShotCalculator/Distance2D", distance2D);
-    Logger.recordOutput("ShotCalculator/Distance3D", distance3D);
-    Logger.recordOutput("ShotCalculator/CorrectedTargetSpeedRPM", getCorrectedTargetSpeedRPM());
-    Logger.recordOutput("ShotCalculator/CorrectTargetVelocity", getCorrectTargetVelocity());
-    Logger.recordOutput("ShotCalculator/getCorrectedTargetAngle", getCorrectedTargetAngle());
   }
 
   public Pose2d getCorrectedTargetPose2d() {
@@ -131,5 +124,18 @@ public class ShotCalculator extends SubsystemBase {
         targetLocation = new Pose3d(blueHubTarget, new Rotation3d());
       }
     }
+  }
+
+  @Override
+  public void periodicAfterScheduler() {
+    Logger.recordOutput("ShotCalculator/DeltaX", deltaX);
+    Logger.recordOutput("ShotCalculator/DeltaY", deltaY);
+    Logger.recordOutput("ShotCalculator/AngleToTargetRad", angleToTargetRad);
+    Logger.recordOutput("ShotCalculator/CorrectedTargetPose", correctedTargetPose);
+    Logger.recordOutput("ShotCalculator/Distance2D", distance2D);
+    Logger.recordOutput("ShotCalculator/Distance3D", distance3D);
+    Logger.recordOutput("ShotCalculator/CorrectedTargetSpeedRPM", getCorrectedTargetSpeedRPM());
+    Logger.recordOutput("ShotCalculator/CorrectTargetVelocity", getCorrectTargetVelocity());
+    Logger.recordOutput("ShotCalculator/getCorrectedTargetAngle", getCorrectedTargetAngle());
   }
 }
