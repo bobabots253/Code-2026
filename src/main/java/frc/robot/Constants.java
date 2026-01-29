@@ -27,7 +27,7 @@ public final class Constants {
   }
 
   public static final RobotType robot =
-      RobotType.SIMBOT; // Update this to match what you are testing robot
+      RobotType.LEBOBAJAMES; // Update this to match what you are testing robot
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 

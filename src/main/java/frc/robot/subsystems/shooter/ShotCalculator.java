@@ -8,7 +8,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.FieldSetup;
+import frc.robot.fieldSetup;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.util.shooterUtil.ShootOnTheFlyCalculator;
 import frc.robot.util.shooterUtil.ShootOnTheFlyConstants;
@@ -19,8 +19,8 @@ public class ShotCalculator extends SubsystemBase {
   private final SwerveSubsystem swerveSubsystem;
 
   private Pose3d targetLocation;
-  private Translation3d blueHubTarget = FieldSetup.blueHubCenter;
-  private Translation3d redHubTarget = FieldSetup.redHubCenter;
+  private Translation3d blueHubTarget = fieldSetup.blueHubCenter;
+  private Translation3d redHubTarget = fieldSetup.redHubCenter;
 
   private Pose3d shooterPose = Pose3d.kZero;
   private Pose3d correctedTargetPose = Pose3d.kZero;
@@ -59,9 +59,9 @@ public class ShotCalculator extends SubsystemBase {
     double atanParam = deltaY / deltaX;
 
     if (isRedAlliance()) {
-      angleToTargetRad = Math.atan(atanParam) + Math.PI; // Testing: + (Math.PI / 2)
+      angleToTargetRad = Math.atan(atanParam) - Math.PI + (Math.PI / 2); // Testing: + (Math.PI / 2)
     } else {
-      angleToTargetRad = Math.atan(atanParam); // Testing: + (Math.PI / 2)
+      angleToTargetRad = Math.atan(atanParam) - (Math.PI / 2); // Testing: + (Math.PI / 2)
     }
 
     distance2D =
