@@ -39,12 +39,12 @@ import java.util.function.Supplier;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
-  private static final double ANGLE_KP = 12.0;
+  private static final double ANGLE_KP = 8.0;
   private static final double ANGLE_KD = 0.0;
   private static final double DRIVE_AND_SHOOT_ANGLE_P = 5.0; // experimental value
   private static final double DRIVE_AND_SHOOT_ANGLE_D = 0.4; // experimental value
-  private static final double ANGLE_MAX_VELOCITY = 8.0;
-  private static final double ANGLE_MAX_ACCELERATION = 20.0;
+  private static final double ANGLE_MAX_VELOCITY = 999;
+  private static final double ANGLE_MAX_ACCELERATION = 999;
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
@@ -119,10 +119,7 @@ public class DriveCommands {
     // Create PID controller
     ProfiledPIDController angleController =
         new ProfiledPIDController(
-            ANGLE_KP,
-            0.0,
-            ANGLE_KD,
-            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+            ANGLE_KP, 0.0, ANGLE_KD, new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, 12.5)); //Broken atm
     angleController.enableContinuousInput(-Math.PI, Math.PI);
 
     // Construct command
