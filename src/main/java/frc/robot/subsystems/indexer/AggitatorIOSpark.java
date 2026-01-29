@@ -7,7 +7,6 @@ import java.util.function.DoubleSupplier;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkBase;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -48,7 +47,6 @@ public void updateInputs(AggitatorIOInputs inputs) {
     inputs.AggitatorConnected = aggitatorDebouncer.calculate(!sparkStickyFault);
 }
 public void setPercentOutput(double value) {
-    aggitatorSpark.set(value);
 }
 }
 
