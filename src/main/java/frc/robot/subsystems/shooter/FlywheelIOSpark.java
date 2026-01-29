@@ -129,7 +129,7 @@ public class FlywheelIOSpark implements FlywheelIO {
    public void setKickerRPM(double velocity) {
     double setPoint =
         MathUtil.inputModulus(
-            kickerEncoder.getPosition(), kickerPIDMinOutput, kickerPIDMaxOutput);
+            kickerEncoder.getVelocity(), kickerPIDMinOutput, kickerPIDMaxOutput);
     kickerController.setSetpoint(setPoint, ControlType.kVelocity);
   }
 }
