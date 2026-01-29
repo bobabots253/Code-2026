@@ -23,12 +23,18 @@ public class FlywheelIOSpark implements FlywheelIO {
   private final SparkClosedLoopController flywheelController;
   private final Debouncer flywheelDebouncer = new Debouncer(0.5, Debouncer.DebounceType.kFalling);
   private final RelativeEncoder flywheelEncoder;
-  // private final SimpleMotorFeedforward flywheelFF;
+  private final SparkBase kickerSpark;
+  private final SparkClosedLoopController kickerController;
+  private final Debouncer kickerDebouncer = new Debouncer(0.5, Debouncer.DebounceType.kFalling);
+  private final RelativeEncoder kickerEncoder;
 
   public FlywheelIOSpark() {
     flywheelSpark = new SparkMax(flywheelCanID, MotorType.kBrushless);
     flywheelEncoder = flywheelSpark.getEncoder();
     flywheelController = flywheelSpark.getClosedLoopController();
+    kickerSpark = new SparkMax(kickerCanID, MotorType.kBrushless);
+    kickerEncoder = kickerSpark.getEncoder();
+    kickerController = kickerSpark.getClosedLoopController();
     var flywheelConfig = new SparkMaxConfig();
     flywheelConfig
         .idleMode(IdleMode.kBrake)
@@ -55,7 +61,35 @@ public class FlywheelIOSpark implements FlywheelIO {
         () ->
             flywheelSpark.configure(
                 flywheelConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+    var kickerConfig = new SparkMaxConfig();
+    kickerConfig
+        .idleMode(IdleMode.kBrake)
+        .smartCurrentLimit(kickerCurrentLimit)
+        .voltageCompensation(12.0);
+    kickerConfig
+        .closedLoop
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        .positionWrappingEnabled(true)
+        .positionWrappingInputRange(kickerPIDMinOutput, kickerPIDMaxOutput)
+        .pid(kickerVelocitykP, kickerVelocitykI, kickerVelocitykD);
+    kickerConfig
+        .encoder
+        .inverted(kickerEncoderInverted)
+        .positionConversionFactor(kickerEncoderPositionFactor);
+    kickerConfig
+        .signals
+        .appliedOutputPeriodMs(20)
+        .busVoltagePeriodMs(20)
+        .outputCurrentPeriodMs(20);
+    tryUntilOk(
+        kickerSpark,
+        5,
+        () ->
+            kickerSpark.configure(
+                kickerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
   }
+
+  
 
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
@@ -64,19 +98,38 @@ public class FlywheelIOSpark implements FlywheelIO {
         flywheelSpark,
         new DoubleSupplier[] {flywheelSpark::getAppliedOutput, flywheelSpark::getBusVoltage},
         (values) -> inputs.flywheelAppliedVolts = values[0] * values[1]);
+    
     ifOk(
         flywheelSpark,
         flywheelSpark::getOutputCurrent,
         (value) -> inputs.flywheelCurrentAmps = value);
     inputs.flywheelConnected = flywheelDebouncer.calculate(!sparkStickyFault);
     ifOk(flywheelSpark, flywheelEncoder::getVelocity, (value) -> inputs.flywheelVelocity = value);
-    inputs.flywheelConnected = flywheelDebouncer.calculate(!sparkStickyFault);
+    //kicker
+    ifOk(
+        kickerSpark,
+        new DoubleSupplier[] {kickerSpark::getAppliedOutput, kickerSpark::getBusVoltage},
+        (values) -> inputs.kickerAppliedVolts = values[0] * values[1]);
+    
+    ifOk(
+        kickerSpark,
+        kickerSpark::getOutputCurrent,
+        (value) -> inputs.kickerCurrentAmps = value);
+    inputs.kickerConnected = kickerDebouncer.calculate(!sparkStickyFault);
+    ifOk(kickerSpark, kickerEncoder::getVelocity, (value) -> inputs.kickerVelocity = value);
   }
-
+  @Override
   public void setRPM(double velocity) {
     double setPoint =
         MathUtil.inputModulus(
             flywheelEncoder.getPosition(), flywheelPIDMinOutput, flywheelPIDMaxOutput);
     flywheelController.setSetpoint(setPoint, ControlType.kVelocity);
+  }
+  @Override
+   public void setKickerRPM(double velocity) {
+    double setPoint =
+        MathUtil.inputModulus(
+            kickerEncoder.getPosition(), kickerPIDMinOutput, kickerPIDMaxOutput);
+    kickerController.setSetpoint(setPoint, ControlType.kVelocity);
   }
 }

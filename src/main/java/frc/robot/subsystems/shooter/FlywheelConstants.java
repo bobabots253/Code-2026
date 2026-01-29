@@ -10,4 +10,13 @@ public class FlywheelConstants {
   public static final double flywheelPIDMinOutput = 0.0;
   public static final boolean flywheelEncoderInverted = false;
   public static final double flywheelEncoderPositionFactor = 0;
+  public static final int kickerCanID = 9998;
+  public static final int kickerCurrentLimit = 20;
+  public static final double kickerVelocitykP = 0.0;
+  public static final double kickerVelocitykI = 0.0;
+  public static final double kickerVelocitykD = 0.0;
+  public static final double kickerPIDMaxOutput = 0.0;
+  public static final double kickerPIDMinOutput = 0.0;
+  public static final boolean kickerEncoderInverted = false;
+  public static final double kickerEncoderPositionFactor = 0;
 }
