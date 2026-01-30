@@ -3,19 +3,24 @@ package frc.robot.subsystems.intake;
 import static frc.robot.subsystems.intake.IntakeConstants.*;
 import static frc.robot.util.SparkUtil.*;
 
+import java.util.function.DoubleSupplier;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
+import frc.robot.subsystems.shooter.HoodIO.HoodIOInputs;
 
 public class IntakeIOSpark implements IntakeIO {
     private final SparkBase intakeSpark;
@@ -39,7 +44,6 @@ public class IntakeIOSpark implements IntakeIO {
         .positionWrappingEnabled(true)
         .positionWrappingInputRange(intakePIDMinOutput, intakePIDMaxOutput)
         .pid(intakekP,intakekI,intakekD);
-
         intakeConfig
         .encoder
         .inverted(intakeEncoderInverted)
@@ -52,13 +56,19 @@ public class IntakeIOSpark implements IntakeIO {
             intakeSpark.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters));
 
         
-
-
-    
-
-
-
-
     }
+ @Override
+  public void updateInputs(IntakeIOInputs inputs) {
+    sparkStickyFault = false;
+    ifOk(
+        intakeSpark,
+        new DoubleSupplier[] {intakeSpark::getAppliedOutput, intakeSpark::getBusVoltage},
+        (values) -> inputs.intakeAppliedVolts = values[0] * values[1]);
+    ifOk(intakeSpark, intakeSpark::getOutputCurrent, (value) -> inputs.intakeCurrentAmps = value);
+    inputs.intakeConnected = intakeDebouncer.calculate(!sparkStickyFault);
+    ifOk(intakeSpark, intakeEncoder::getPosition, (value) -> inputs.intakePosition = value);
+  }
+@Override
+  public void setIntakePosition() {}
 }
 
