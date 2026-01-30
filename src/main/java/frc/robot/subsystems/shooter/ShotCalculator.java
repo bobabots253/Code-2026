@@ -114,6 +114,8 @@ public class ShotCalculator extends FullSubsystem {
     return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
   }
 
+  // Return This Util in Constants.java
+  // Periodic Command Scheduler Overflow Handling
   public void updateTargetByAlliance() {
     var alliance = DriverStation.getAlliance();
 
@@ -123,6 +125,8 @@ public class ShotCalculator extends FullSubsystem {
       } else {
         targetLocation = new Pose3d(blueHubTarget, new Rotation3d());
       }
+    } else {
+      targetLocation = new Pose3d(blueHubTarget, new Rotation3d());
     }
   }
 

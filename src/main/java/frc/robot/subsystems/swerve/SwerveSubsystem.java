@@ -319,13 +319,11 @@ public class SwerveSubsystem extends FullSubsystem {
   }
 
   /** Returns the current robot-relative acceleration of the chassis based on odometry. */
-  @AutoLogOutput(key = "SwerveRobotRelativeChassisAccelerations/Measured")
   public ChassisAccelerations getRobotRelativeChassisAccelerations() {
     return robotRelativeChassisAccelerations;
   }
 
   /** Returns the current acceleration of the chassis based on odometry. */
-  @AutoLogOutput(key = "SwerveFieldRelativeChassisAccelerations/Measured")
   public ChassisAccelerations getFieldRelativeChassisAccelerations() {
     return fieldRelativeChassisAccelerations;
   }
@@ -385,25 +383,25 @@ public class SwerveSubsystem extends FullSubsystem {
 
   @Override
   public void periodicAfterScheduler() {
-    Logger.recordOutput(
-        "Drive/robotRelativeChassisAccelerations/Ax",
-        robotRelativeChassisAccelerations.axMetersPerSecondSquared);
-    Logger.recordOutput(
-        "Drive/robotRelativeChassisAccelerations/Ay",
-        robotRelativeChassisAccelerations.ayMetersPerSecondSquared);
-    Logger.recordOutput(
-        "Drive/robotRelativeChassisAccelerations/Omega",
-        robotRelativeChassisAccelerations.omegaRadiansPerSecondSquared);
-    Logger.recordOutput(
-        "Drive/fieldRelativeChassisAccelerations/Ax",
-        fieldRelativeChassisAccelerations.axMetersPerSecondSquared);
-    Logger.recordOutput(
-        "Drive/fieldRelativeChassisAccelerations/Ay",
-        fieldRelativeChassisAccelerations.ayMetersPerSecondSquared);
-    Logger.recordOutput(
-        "Drive/fieldRelativeChassisAccelerations/Omega",
-        fieldRelativeChassisAccelerations.omegaRadiansPerSecondSquared);
+    // Logger.recordOutput(
+    //     "Drive/robotRelativeChassisAccelerations/Ax",
+    //     robotRelativeChassisAccelerations.axMetersPerSecondSquared);
+    // Logger.recordOutput(
+    //     "Drive/robotRelativeChassisAccelerations/Ay",
+    //     robotRelativeChassisAccelerations.ayMetersPerSecondSquared);
+    // Logger.recordOutput(
+    //     "Drive/robotRelativeChassisAccelerations/Omega",
+    //     robotRelativeChassisAccelerations.omegaRadiansPerSecondSquared);
+    // Logger.recordOutput(
+    //     "Drive/fieldRelativeChassisAccelerations/Ax",
+    //     fieldRelativeChassisAccelerations.axMetersPerSecondSquared);
+    // Logger.recordOutput(
+    //     "Drive/fieldRelativeChassisAccelerations/Ay",
+    //     fieldRelativeChassisAccelerations.ayMetersPerSecondSquared);
+    // Logger.recordOutput(
+    //     "Drive/fieldRelativeChassisAccelerations/Omega",
+    //     fieldRelativeChassisAccelerations.omegaRadiansPerSecondSquared);
 
-    System.gc(); // Call if Garbage Collection is needed
+    // System.gc(); // Call if Garbage Collection is needed
   }
 }
