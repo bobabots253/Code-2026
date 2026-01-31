@@ -20,7 +20,6 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
-import frc.robot.subsystems.shooter.HoodIO.HoodIOInputs;
 
 public class IntakeIOSpark implements IntakeIO {
     private final SparkBase intakeSpark;
@@ -57,7 +56,7 @@ public class IntakeIOSpark implements IntakeIO {
 
         
     }
- @Override
+  @Override
   public void updateInputs(IntakeIOInputs inputs) {
     sparkStickyFault = false;
     ifOk(
@@ -68,7 +67,9 @@ public class IntakeIOSpark implements IntakeIO {
     inputs.intakeConnected = intakeDebouncer.calculate(!sparkStickyFault);
     ifOk(intakeSpark, intakeEncoder::getPosition, (value) -> inputs.intakePosition = value);
   }
-@Override
-  public void setIntakePosition() {}
+  @Override
+  public void setIntakePosition(double setpoint) {
+    intakeController.setSetpoint(setpoint, SparkBase.ControlType.kPosition);
+  }
 }
 
