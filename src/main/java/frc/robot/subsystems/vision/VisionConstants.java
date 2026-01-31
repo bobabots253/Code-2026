@@ -7,6 +7,9 @@
 
 package frc.robot.subsystems.vision;
 
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -48,12 +51,20 @@ public class VisionConstants {
       new double[] {
         0.1, // Camera 0
         0.1, 0.5, 0.5
-      }; 
-      //Blue Camera - Cannot be trusted
-      // MT2 on LL4 needs filtering for jumping
-      // Add rotation limit
+      };
+  // Blue Camera - Cannot be trusted
+  // MT2 on LL4 needs filtering for jumping
+  // Add rotation limit
 
   // Multipliers to apply for MegaTag 2 observations
   public static double linearStdDevMegatag2Factor = 0.2; // More stable than full 3D solve
   public static double angularStdDevMegatag2Factor = Double.POSITIVE_INFINITY; // Never Trust
+
+  // Clamping ranges for vision estimates (see units)
+  static final double maxLinearSpeed = 3.0; // Meters per second
+  static final double maxAngularSpeed =
+      DegreesPerSecond.of(720).in(RadiansPerSecond); // Radians per second
+  static final double maxGyroError = 5.0; // Degrees
+  static final double maxTranslationError = 1.0; // Meters
+  static final int LOCK_MODE = 10;
 }

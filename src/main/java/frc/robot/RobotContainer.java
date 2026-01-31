@@ -16,10 +16,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
 import com.pathplanner.lib.auto.AutoBuilder;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -50,6 +47,7 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.fuelSimUtil.FuelSim;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -67,8 +65,8 @@ public class RobotContainer {
   private final ShooterSubsystem shooterSubsystem;
 
   // Dashboard Inputs
-  private final LoggedDashboardChooser<Integer> clampVisionChooser = new LoggedDashboardChooser<>("Clamp Vision Estimates");
-
+  private final LoggedDashboardChooser<Integer> clampVisionChooser =
+      new LoggedDashboardChooser<>("Clamp Vision Estimates");
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -78,6 +76,13 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+    clampVisionChooser.addDefaultOption("Locked", 10);
+    clampVisionChooser.addOption("Unlocked | Purple", 0);
+    clampVisionChooser.addOption("Unlocked | Orange", 1);
+    clampVisionChooser.addOption("Unlocked | Green", 2);
+    clampVisionChooser.addOption("Unlocked | Blue", 3);
+
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -92,6 +97,10 @@ public class RobotContainer {
         vision =
             new Vision(
                 swerveSubsystem::addVisionMeasurement,
+                swerveSubsystem::getPose,
+                swerveSubsystem::getRotation,
+                swerveSubsystem::getChassisSpeeds,
+                clampVisionChooser::get,
                 new VisionIOLimelight(VisionConstants.cameraPurple, swerveSubsystem::getRotation),
                 new VisionIOLimelight(VisionConstants.cameraOrange, swerveSubsystem::getRotation),
                 new VisionIOLimelight(VisionConstants.cameraGreen, swerveSubsystem::getRotation),
@@ -110,12 +119,6 @@ public class RobotContainer {
                 swerveSubsystem::getPose,
                 swerveSubsystem::getChassisSpeeds);
 
-        clampVisionChooser.addDefaultOption("Locked", 10);
-        clampVisionChooser.addOption("Unlocked | Purple", 0);
-        clampVisionChooser.addOption("Unlocked | Orange", 1);
-        clampVisionChooser.addOption("Unlocked | Green", 2);
-        clampVisionChooser.addOption("Unlocked | Blue", 3);
-
         break;
 
       case SIM:
@@ -131,6 +134,10 @@ public class RobotContainer {
         vision =
             new Vision(
                 swerveSubsystem::addVisionMeasurement,
+                swerveSubsystem::getPose,
+                swerveSubsystem::getRotation,
+                swerveSubsystem::getChassisSpeeds,
+                clampVisionChooser::get,
                 new VisionIOPhotonVisionSim(
                     VisionConstants.cameraPurple,
                     VisionConstants.cameraTransformToPurple,
@@ -173,7 +180,14 @@ public class RobotContainer {
                 new ModuleIO() {});
 
         vision =
-            new Vision(swerveSubsystem::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+            new Vision(
+                swerveSubsystem::addVisionMeasurement,
+                swerveSubsystem::getPose,
+                swerveSubsystem::getRotation,
+                swerveSubsystem::getChassisSpeeds,
+                clampVisionChooser::get,
+                new VisionIO() {},
+                new VisionIO() {});
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
         hoodSubsystem = new HoodSubsystem(new HoodIOSim());
@@ -267,7 +281,6 @@ public class RobotContainer {
                                 swerveSubsystem.getPose().getTranslation(), new Rotation2d())),
                     swerveSubsystem)
                 .ignoringDisable(true));
-
   }
 
   public void configureFuelSim() {
@@ -307,6 +320,7 @@ public class RobotContainer {
 
   /**
    * Returns whether vision estimates should be clamped.
+   *
    * @return true if vision estimates should be clamped. Enabled by default.
    */
   public Integer enableVisionClamp() {

@@ -21,6 +21,8 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
@@ -29,10 +31,15 @@ import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import frc.robot.util.FullSubsystem;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends FullSubsystem {
   private final VisionConsumer consumer;
+  private final Supplier<Pose2d> poseSupplier;
+  private final Supplier<Rotation2d> gyroRotationSupplier;
+  private final Supplier<ChassisSpeeds> robotSpeedsSupplier;
+  private final Supplier<Integer> visionClampModeSupplier;
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
@@ -40,8 +47,18 @@ public class Vision extends FullSubsystem {
   // private int periodicCounter = 0;
   // private final int UPDATE_INTERVAL = 3;
 
-  public Vision(VisionConsumer consumer, VisionIO... io) {
+  public Vision(
+      VisionConsumer consumer,
+      Supplier<Pose2d> poseSupplier,
+      Supplier<Rotation2d> gyroRotationSupplier,
+      Supplier<ChassisSpeeds> robotSpeedsSupplier,
+      Supplier<Integer> visionClampModeSupplier,
+      VisionIO... io) {
     this.consumer = consumer;
+    this.poseSupplier = poseSupplier;
+    this.gyroRotationSupplier = gyroRotationSupplier;
+    this.robotSpeedsSupplier = robotSpeedsSupplier;
+    this.visionClampModeSupplier = visionClampModeSupplier;
     this.io = io;
 
     // Initialize inputs
@@ -82,6 +99,17 @@ public class Vision extends FullSubsystem {
     List<Pose3d> allRobotPosesAccepted = new LinkedList<>();
     List<Pose3d> allRobotPosesRejected = new LinkedList<>();
 
+    // Update Robot State
+    Pose2d currentRobotPose = poseSupplier.get();
+    Rotation3d currentGyroRotation = new Rotation3d(gyroRotationSupplier.get());
+    ChassisSpeeds currentSpeeds = robotSpeedsSupplier.get();
+    int clampMode = visionClampModeSupplier.get();
+
+    // Calculate Speed Magnitudes
+    double linearSpeed =
+        Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
+    double angularSpeed = Math.abs(currentSpeeds.omegaRadiansPerSecond);
+
     // Loop over cameras
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
       // Update disconnected alert
@@ -117,6 +145,41 @@ public class Vision extends FullSubsystem {
                 || observation.pose().getY() < 0.0
                 || observation.pose().getY() > aprilTagLayout.getFieldWidth();
 
+        if (!rejectPose) {
+          if (linearSpeed > VisionConstants.maxLinearSpeed
+              || angularSpeed > VisionConstants.maxAngularSpeed) {
+            rejectPose = true;
+          }
+        }
+
+        if (!rejectPose) {
+          if (Math.abs(
+                  Math.toDegrees(
+                      (observation.pose().getRotation().minus(currentGyroRotation).getAngle())))
+              > VisionConstants.maxGyroError) {
+            rejectPose = true;
+          }
+        }
+
+        if (!rejectPose) {
+          if (clampMode == VisionConstants.LOCK_MODE) {
+            if (observation
+                    .pose()
+                    .toPose2d()
+                    .getTranslation()
+                    .getDistance(currentRobotPose.getTranslation())
+                > VisionConstants.maxTranslationError) {
+              rejectPose = true;
+            }
+          } else {
+            // Unlocked (Initialization): Only accept the selected camera index
+            // Note: Allows any distance <-- Edit this later if needed
+            if (cameraIndex != clampMode) {
+              rejectPose = true;
+            }
+          }
+        }
+
         // Add pose to log
         robotPoses.add(observation.pose());
         if (rejectPose) {
@@ -133,7 +196,7 @@ public class Vision extends FullSubsystem {
         // Calculate dynamically standard deviation scalar factor
         double stdDevFactor =
             Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
-        
+
         double linearStdDev = linearStdDevBaseline * stdDevFactor;
         double angularStdDev = angularStdDevBaseline * stdDevFactor;
         if (observation.type() == PoseObservationType.MEGATAG_2) {

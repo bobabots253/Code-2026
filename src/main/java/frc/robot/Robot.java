@@ -115,9 +115,10 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
-    // LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 0); //Confirm these are correct before using IMU modes 1,2,3...
+    // LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 0); //Confirm these are correct
+    // before using IMU modes 1,2,3...
     // LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 0);
-        LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 1);
+    LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 1);
     LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 1);
   }
 
