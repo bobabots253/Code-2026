@@ -201,7 +201,7 @@ public class Vision extends FullSubsystem {
         consumer.accept(
             observation.pose().toPose2d(),
             observation.timestamp(),
-            VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+            VecBuilder.fill(linearStdDev, linearStdDev, 10000000000000.0));
 
         // long cameraLoopEndNano = System.nanoTime();
         // Logger.recordOutput(
