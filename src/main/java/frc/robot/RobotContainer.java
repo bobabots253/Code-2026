@@ -13,7 +13,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -238,19 +237,19 @@ public class RobotContainer {
     // this));
 
     // Shoot on the fly when X button is pressed
-    controller.x().whileTrue(shooterSubsystem.simShootOnTheFlyCommand());
+    // controller.x().whileTrue(shooterSubsystem.simShootOnTheFlyCommand());
 
-    // Shoot on the fly while Y button is held, With drive control
-    controller
-        .y()
-        .whileTrue(
-            Commands.parallel(
-                DriveCommands.joystickDriveAtAngle(
-                    swerveSubsystem,
-                    () -> -controller.getLeftY(),
-                    () -> -controller.getLeftX(),
-                    () -> shotCalculator.getCorrectTargetRotation()),
-                shooterSubsystem.simShootOnTheFlyCommand()));
+    // // Shoot on the fly while Y button is held, With drive control
+    // controller
+    //     .y()
+    //     .whileTrue(
+    //         Commands.parallel(
+    //             DriveCommands.joystickDriveAtAngle(
+    //                 swerveSubsystem,
+    //                 () -> -controller.getLeftY(),
+    //                 () -> -controller.getLeftX(),
+    //                 () -> shotCalculator.getCorrectTargetRotation()),
+    //             shooterSubsystem.simShootOnTheFlyCommand()));
 
     // Reset gyro to 0° when B button is pressed
     controller
@@ -290,13 +289,13 @@ public class RobotContainer {
         SwerveConstants.BUMPER_HEIGHT.in(Meters),
         swerveSubsystem::getPose,
         swerveSubsystem::getChassisSpeeds);
-    instance.registerIntake(
-        SwerveConstants.ROBOT_LENGTH.div(2).in(Meters),
-        SwerveConstants.ROBOT_LENGTH.div(2).plus(Inches.of(5)).in(Meters),
-        SwerveConstants.ROBOT_WIDTH.div(2).unaryMinus().in(Meters),
-        SwerveConstants.ROBOT_WIDTH.div(2).in(Meters),
-        () -> true && shooterSubsystem.simAbleToIntake(),
-        shooterSubsystem::simIntake);
+    // instance.registerIntake(
+    //     SwerveConstants.ROBOT_LENGTH.div(2).in(Meters),
+    //     SwerveConstants.ROBOT_LENGTH.div(2).plus(Inches.of(5)).in(Meters),
+    //     SwerveConstants.ROBOT_WIDTH.div(2).unaryMinus().in(Meters),
+    //     SwerveConstants.ROBOT_WIDTH.div(2).in(Meters),
+    //     () -> true && shooterSubsystem.simAbleToIntake(),
+    //     shooterSubsystem::simIntake);
 
     instance.start();
     Commands.runOnce(

@@ -1,24 +1,20 @@
 package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.shooter.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.shooter.hood.HoodSubsystem;
-import frc.robot.util.shooterUtil.ShootOnTheFlyConstants;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 
 public class ShooterSubsystem extends SubsystemBase {
   private final FlywheelSubsystem m_flywheel;
   private final HoodSubsystem m_hood;
   private final ShotCalculator m_calculator;
 
-  private final shooterFuelSim shooterFuelSim;
+  //   private final shooterFuelSim shooterFuelSim;
 
   public ShooterSubsystem(
       FlywheelSubsystem flywheel,
@@ -30,12 +26,12 @@ public class ShooterSubsystem extends SubsystemBase {
     this.m_hood = hood;
     this.m_calculator = calculator;
 
-    shooterFuelSim =
-        new shooterFuelSim(
-            () ->
-                new Pose3d(poseSupplier.get())
-                    .transformBy(ShootOnTheFlyConstants.ROBOT_TO_SHOOTER_TRANSFORM),
-            fieldSpeedsSupplier);
+    // shooterFuelSim =
+    //     new shooterFuelSim(
+    //         () ->
+    //             new Pose3d(poseSupplier.get())
+    //                 .transformBy(ShootOnTheFlyConstants.ROBOT_TO_SHOOTER_TRANSFORM),
+    //         fieldSpeedsSupplier);
 
     // this.setDefaultCommand(
     //     shooterFuelSim.repeatedlyLaunchFuel(
@@ -52,35 +48,37 @@ public class ShooterSubsystem extends SubsystemBase {
         m_hood.run(() -> m_hood.setGoalParams(m_calculator.getCorrectedTargetAngle(), 0.0)));
   }
 
-  public Command simShootOnTheFlyCommand() {
-    return shooterFuelSim.repeatedlyLaunchFuel(
-        () -> {
-          return Units.MetersPerSecond.of(m_calculator.getCorrectTargetVelocity());
-        },
-        () -> Units.Degrees.of(m_calculator.getCorrectedTargetAngle()),
-        this);
-  }
+  //   public Command simShootOnTheFlyCommand() {
+  //     return shooterFuelSim.repeatedlyLaunchFuel(
+  //         () -> {
+  //           return Units.MetersPerSecond.of(m_calculator.getCorrectTargetVelocity());
+  //         },
+  //         () -> Units.Degrees.of(m_calculator.getCorrectedTargetAngle()),
+  //         this);
+  //   }
 
-  @Override
-  public void periodic() {
-    shooterFuelSim.updateFuel(
-        Units.MetersPerSecond.of(m_calculator.getCorrectTargetVelocity()),
-        Units.Degrees.of(m_calculator.getCorrectedTargetAngle()));
+  //   @Override
+  //   public void periodic() {
+  //     shooterFuelSim.updateFuel(
+  //         Units.MetersPerSecond.of(m_calculator.getCorrectTargetVelocity()),
+  //         Units.Degrees.of(m_calculator.getCorrectedTargetAngle()));
 
-    // Log the calculated targets for debugging
-    Logger.recordOutput("ShooterSubsystem/TargetRPM", m_calculator.getCorrectedTargetSpeedRPM());
-    Logger.recordOutput(
-        "ShooterSubsystem/TargetVelocityMPS", m_calculator.getCorrectTargetVelocity());
-    Logger.recordOutput("ShooterSubsystem/TargetAngleDeg", m_calculator.getCorrectedTargetAngle());
-  }
+  //     // Log the calculated targets for debugging
+  //     Logger.recordOutput("ShooterSubsystem/TargetRPM",
+  // m_calculator.getCorrectedTargetSpeedRPM());
+  //     Logger.recordOutput(
+  //         "ShooterSubsystem/TargetVelocityMPS", m_calculator.getCorrectTargetVelocity());
+  //     Logger.recordOutput("ShooterSubsystem/TargetAngleDeg",
+  // m_calculator.getCorrectedTargetAngle());
+  //   }
 
-  public boolean simAbleToIntake() {
-    return shooterFuelSim.canIntake();
-  }
+  //   public boolean simAbleToIntake() {
+  //     return shooterFuelSim.canIntake();
+  //   }
 
-  public void simIntake() {
-    shooterFuelSim.intakeFuel();
-  }
+  //   public void simIntake() {
+  //     shooterFuelSim.intakeFuel();
+  //   }
 
   // Broken
   //   public Command setToSafePosition(){

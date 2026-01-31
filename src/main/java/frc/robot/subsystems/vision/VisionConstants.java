@@ -49,10 +49,10 @@ public class VisionConstants {
       new double[] {
         0.1, // Camera 0
         0.1, 0.5, 0.5
-      }; 
-      //Blue Camera - Cannot be trusted
-      // MT2 on LL4 needs filtering for jumping
-      // Add rotation limit
+      };
+  // Blue Camera - Cannot be trusted
+  // MT2 on LL4 needs filtering for jumping
+  // Add rotation limit
 
   // Multipliers to apply for MegaTag 2 observations
   public static double linearStdDevMegatag2Factor = 0.2; // More stable than full 3D solve

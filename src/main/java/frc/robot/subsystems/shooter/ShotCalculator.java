@@ -44,6 +44,7 @@ public class ShotCalculator extends FullSubsystem {
 
   @Override
   public void periodic() {
+
     robotPose = swerveSubsystem.getPose();
     updateTargetByAlliance();
 
@@ -62,11 +63,13 @@ public class ShotCalculator extends FullSubsystem {
     double atanParam = deltaY / deltaX;
 
     if (isRedAlliance()) {
-      angleToTargetRad = Math.atan(atanParam) - Math.PI + (Math.PI / 2); // Testing: + (Math.PI / 2)
+      angleToTargetRad =
+          Math.atan(atanParam) - Math.PI + (3 * (Math.PI / 2)); // Testing: + (Math.PI / 2)
     } else {
-      angleToTargetRad = Math.atan(atanParam) - (Math.PI / 2); // Testing: + (Math.PI / 2)
+      angleToTargetRad = Math.atan(atanParam) - (3 * (Math.PI / 2)); // Testing: + (Math.PI / 2)
     }
 
+    Logger.recordOutput("ShotCalculator/CorrectedTargetPose", correctedTargetPose);
     distance2D =
         correctedTargetPose
             .toPose2d()
@@ -141,5 +144,6 @@ public class ShotCalculator extends FullSubsystem {
     Logger.recordOutput("ShotCalculator/CorrectedTargetSpeedRPM", getCorrectedTargetSpeedRPM());
     Logger.recordOutput("ShotCalculator/CorrectTargetVelocity", getCorrectTargetVelocity());
     Logger.recordOutput("ShotCalculator/getCorrectedTargetAngle", getCorrectedTargetAngle());
+    System.out.println("nothing is print heLP");
   }
 }
