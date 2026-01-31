@@ -60,7 +60,15 @@ public class rollerIOSpark implements rollerIO {
     inputs.rollerConnected = rollerDebouncer.calculate(!sparkStickyFault);
 }
 @Override
-public void setrollerOpenLoop(){}
+public void setrollerOpenLoop(double input){
+    rollerSpark.set(input);
+
+
+
+    
+
+
+}
 
 }
 
