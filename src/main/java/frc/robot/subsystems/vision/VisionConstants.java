@@ -38,8 +38,7 @@ public class VisionConstants {
   public static double maxAmbiguity = 0.25;
   public static double maxZError = 0.25;
 
-  // Standard deviation baselines at 1 meter with 1 tag
-  // (Adjusted automatically based on distance and # of tags)
+  // Standard deviation baselines at 1 meter
   public static double linearStdDevBaseline = 0.01; // Meters
   public static double angularStdDevBaseline = 0.03; // Radians
 

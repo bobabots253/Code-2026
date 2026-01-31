@@ -16,7 +16,10 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
 import com.pathplanner.lib.auto.AutoBuilder;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -47,7 +50,6 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.fuelSimUtil.FuelSim;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -64,7 +66,9 @@ public class RobotContainer {
   private final FlywheelSubsystem flywheelSubsystem;
   private final ShooterSubsystem shooterSubsystem;
 
-  // labubu
+  // Dashboard Inputs
+  private final LoggedDashboardChooser<Integer> clampVisionChooser = new LoggedDashboardChooser<>("Clamp Vision Estimates");
+
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -105,6 +109,13 @@ public class RobotContainer {
                 shotCalculator,
                 swerveSubsystem::getPose,
                 swerveSubsystem::getChassisSpeeds);
+
+        clampVisionChooser.addDefaultOption("Locked", 10);
+        clampVisionChooser.addOption("Unlocked | Purple", 0);
+        clampVisionChooser.addOption("Unlocked | Orange", 1);
+        clampVisionChooser.addOption("Unlocked | Green", 2);
+        clampVisionChooser.addOption("Unlocked | Blue", 3);
+
         break;
 
       case SIM:
@@ -230,13 +241,6 @@ public class RobotContainer {
                 () -> -controller.getLeftX(),
                 () -> shotCalculator.getCorrectTargetRotation()));
 
-    // shooterFuelSim.repeatedlyLaunchFuel(
-    // () -> {
-    //   return Units.MetersPerSecond.of(calculator.getCorrectTargetVelocity());
-    // },
-    // () -> Units.Degrees.of(calculator.getCorrectedTargetAngle()),
-    // this));
-
     // Shoot on the fly when X button is pressed
     controller.x().whileTrue(shooterSubsystem.simShootOnTheFlyCommand());
 
@@ -264,21 +268,6 @@ public class RobotContainer {
                     swerveSubsystem)
                 .ignoringDisable(true));
 
-    // PIDController aimController = new PIDController(0.2, 0.0, 0.0);
-    // aimController.enableContinuousInput(-Math.PI, Math.PI);
-    // controller
-    //     .y()
-    //     .whileTrue(
-    //         Commands.startRun(
-    //             () -> {
-    //               aimController.reset();
-    //             },
-    //             () -> {
-    //                 swerveSubsystem.runEnd(() -> {
-    // aimController.calculate(vision.getTargetX(0).getRadians()));
-    //             },
-    //             swerveSubsystem));
-    // }
   }
 
   public void configureFuelSim() {
@@ -314,5 +303,13 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  /**
+   * Returns whether vision estimates should be clamped.
+   * @return true if vision estimates should be clamped. Enabled by default.
+   */
+  public Integer enableVisionClamp() {
+    return clampVisionChooser.get();
   }
 }
