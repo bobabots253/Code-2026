@@ -47,7 +47,7 @@ public class FeederIOSpark implements FeederIO {
     ifOk(
       feederSpark, 
       new DoubleSupplier[] {feederSpark::getAppliedOutput, feederSpark::getBusVoltage}, 
-      (value) -> inputs.feederAppliedVolts = value[0] * value[1]
+      (values) -> inputs.feederAppliedVolts = values[0] * values[1]
     );
     
     ifOk(
