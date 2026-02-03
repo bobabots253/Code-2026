@@ -53,8 +53,16 @@ public class rollerIOSpark implements rollerIO {
         (values) -> inputs.rollerAppliedVolts = values[0] * values[1]);
     ifOk(rollerSpark, rollerSpark::getOutputCurrent, (value) -> inputs.rollerCurrentAmps = value);
     inputs.rollerConnected = rollerDebouncer.calculate(!sparkStickyFault);
-  }
+}
 
-  @Override
-  public void setrollerOpenLoop() {}
+public void setrollerOpenLoop(double input){
+    rollerSpark.set(input);
+
+
+
+    
+
+
+}
+
 }
