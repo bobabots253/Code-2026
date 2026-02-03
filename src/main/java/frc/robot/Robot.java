@@ -110,16 +110,19 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    // Confirm these are correct
+    // before using IMU modes 1,2,3...
+    // LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 0);
+    LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 0);
+    LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 0);
+  }
 
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
-    // LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 0); //Confirm these are correct
-    // before using IMU modes 1,2,3...
-    // LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 0);
-    LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 3);
-    LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 3);
+    // LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 0); // Disable IMU mode
+    // LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 0); // Disable IMU mode
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
@@ -131,14 +134,13 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(autonomousCommand);
     }
+    LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 1);
+    LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 1);
   }
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {
-    LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 3);
-    LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 3);
-  }
+  public void autonomousPeriodic() {}
 
   /** This function is called once when teleop is enabled. */
   @Override
@@ -150,14 +152,13 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+    LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 1);
+    LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 1);
   }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {
-    LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 3);
-    LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 3);
-  }
+  public void teleopPeriodic() {}
 
   /** This function is called once when test mode is enabled. */
   @Override

@@ -83,6 +83,10 @@ public class SwerveSubsystem extends FullSubsystem {
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
 
+  boolean isFlipped =
+      DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red;
+  double yawCorrection = isFlipped ? 180.0 : 0.0;
+
   public SwerveSubsystem(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
@@ -220,6 +224,8 @@ public class SwerveSubsystem extends FullSubsystem {
         Twist2d twist = kinematics.toTwist2d(moduleDeltas);
         rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
       }
+
+      rawGyroRotation = rawGyroRotation.plus(Rotation2d.fromDegrees(yawCorrection));
 
       // Apply update
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
