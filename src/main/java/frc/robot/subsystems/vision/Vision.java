@@ -8,11 +8,9 @@
 package frc.robot.subsystems.vision;
 
 import static frc.robot.subsystems.vision.VisionConstants.angularStdDevBaseline;
-import static frc.robot.subsystems.vision.VisionConstants.angularStdDevMegatag2Factor;
 import static frc.robot.subsystems.vision.VisionConstants.aprilTagLayout;
 import static frc.robot.subsystems.vision.VisionConstants.cameraStdDevFactors;
 import static frc.robot.subsystems.vision.VisionConstants.linearStdDevBaseline;
-import static frc.robot.subsystems.vision.VisionConstants.linearStdDevMegatag2Factor;
 import static frc.robot.subsystems.vision.VisionConstants.maxAmbiguity;
 import static frc.robot.subsystems.vision.VisionConstants.maxZError;
 
@@ -103,7 +101,7 @@ public class Vision extends FullSubsystem {
     Pose2d currentRobotPose = poseSupplier.get();
     Rotation3d currentGyroRotation = new Rotation3d(gyroRotationSupplier.get());
     ChassisSpeeds currentSpeeds = robotSpeedsSupplier.get();
-    int clampMode = visionClampModeSupplier.get();
+    // int clampMode = visionClampModeSupplier.get();
 
     // Calculate Speed Magnitudes
     double linearSpeed =
@@ -161,24 +159,24 @@ public class Vision extends FullSubsystem {
           }
         }
 
-        if (!rejectPose) {
-          if (clampMode == VisionConstants.LOCK_MODE) {
-            if (observation
-                    .pose()
-                    .toPose2d()
-                    .getTranslation()
-                    .getDistance(currentRobotPose.getTranslation())
-                > VisionConstants.maxTranslationError) {
-              rejectPose = true;
-            }
-          } else {
-            // Unlocked (Initialization): Only accept the selected camera index
-            // Note: Allows any distance <-- Edit this later if needed
-            if (cameraIndex != clampMode) {
-              rejectPose = true;
-            }
-          }
-        }
+        // if (!rejectPose) {
+        //   if (clampMode == VisionConstants.LOCK_MODE) {
+        //     if (observation
+        //             .pose()
+        //             .toPose2d()
+        //             .getTranslation()
+        //             .getDistance(currentRobotPose.getTranslation())
+        //         > VisionConstants.maxTranslationError) {
+        //       rejectPose = true;
+        //     }
+        //   } else {
+        //     // Unlocked (Initialization): Only accept the selected camera index
+        //     // Note: Allows any distance <-- Edit this later if needed
+        //     if (cameraIndex != clampMode) {
+        //       rejectPose = true;
+        //     }
+        //   }
+        // }
 
         // Add pose to log
         robotPoses.add(observation.pose());
@@ -199,10 +197,12 @@ public class Vision extends FullSubsystem {
 
         double linearStdDev = linearStdDevBaseline * stdDevFactor;
         double angularStdDev = angularStdDevBaseline * stdDevFactor;
+
         if (observation.type() == PoseObservationType.MEGATAG_2) {
-          linearStdDev *= linearStdDevMegatag2Factor;
-          angularStdDev *= angularStdDevMegatag2Factor;
+          linearStdDev *= VisionConstants.linearStdDevMegatag2Factor;
+          angularStdDev *= VisionConstants.angularStdDevMegatag2Factor;
         }
+
         if (cameraIndex < cameraStdDevFactors.length) {
           linearStdDev *= cameraStdDevFactors[cameraIndex];
           angularStdDev *= cameraStdDevFactors[cameraIndex];
