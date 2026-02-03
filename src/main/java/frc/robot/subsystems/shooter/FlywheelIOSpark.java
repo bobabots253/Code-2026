@@ -76,11 +76,7 @@ public class FlywheelIOSpark implements FlywheelIO {
         .encoder
         .inverted(kickerEncoderInverted)
         .positionConversionFactor(kickerEncoderPositionFactor);
-    kickerConfig
-        .signals
-        .appliedOutputPeriodMs(20)
-        .busVoltagePeriodMs(20)
-        .outputCurrentPeriodMs(20);
+    kickerConfig.signals.appliedOutputPeriodMs(20).busVoltagePeriodMs(20).outputCurrentPeriodMs(20);
     tryUntilOk(
         kickerSpark,
         5,
@@ -89,8 +85,6 @@ public class FlywheelIOSpark implements FlywheelIO {
                 kickerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
   }
 
-  
-
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
     sparkStickyFault = false;
@@ -98,26 +92,24 @@ public class FlywheelIOSpark implements FlywheelIO {
         flywheelSpark,
         new DoubleSupplier[] {flywheelSpark::getAppliedOutput, flywheelSpark::getBusVoltage},
         (values) -> inputs.flywheelAppliedVolts = values[0] * values[1]);
-    
+
     ifOk(
         flywheelSpark,
         flywheelSpark::getOutputCurrent,
         (value) -> inputs.flywheelCurrentAmps = value);
     inputs.flywheelConnected = flywheelDebouncer.calculate(!sparkStickyFault);
     ifOk(flywheelSpark, flywheelEncoder::getVelocity, (value) -> inputs.flywheelVelocity = value);
-    //kicker
+    // kicker
     ifOk(
         kickerSpark,
         new DoubleSupplier[] {kickerSpark::getAppliedOutput, kickerSpark::getBusVoltage},
         (values) -> inputs.kickerAppliedVolts = values[0] * values[1]);
-    
-    ifOk(
-        kickerSpark,
-        kickerSpark::getOutputCurrent,
-        (value) -> inputs.kickerCurrentAmps = value);
+
+    ifOk(kickerSpark, kickerSpark::getOutputCurrent, (value) -> inputs.kickerCurrentAmps = value);
     inputs.kickerConnected = kickerDebouncer.calculate(!sparkStickyFault);
     ifOk(kickerSpark, kickerEncoder::getVelocity, (value) -> inputs.kickerVelocity = value);
   }
+
   @Override
   public void setRPM(double velocity) {
     double setPoint =
@@ -125,11 +117,11 @@ public class FlywheelIOSpark implements FlywheelIO {
             flywheelEncoder.getPosition(), flywheelPIDMinOutput, flywheelPIDMaxOutput);
     flywheelController.setSetpoint(setPoint, ControlType.kVelocity);
   }
+
   @Override
-   public void setKickerRPM(double velocity) {
+  public void setKickerRPM(double velocity) {
     double setPoint =
-        MathUtil.inputModulus(
-            kickerEncoder.getVelocity(), kickerPIDMinOutput, kickerPIDMaxOutput);
+        MathUtil.inputModulus(kickerEncoder.getVelocity(), kickerPIDMinOutput, kickerPIDMaxOutput);
     kickerController.setSetpoint(setPoint, ControlType.kVelocity);
   }
 }

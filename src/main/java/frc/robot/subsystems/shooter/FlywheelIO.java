@@ -18,5 +18,6 @@ public interface FlywheelIO {
   public default void updateInputs(FlywheelIOInputs inputs) {}
 
   public default void setRPM(double velocity) {}
+
   public default void setKickerRPM(double velocity) {}
 }
