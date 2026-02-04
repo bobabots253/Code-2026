@@ -52,7 +52,7 @@ public class IntakeIOSpark implements IntakeIO {
 
 
         
-    }
+    
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
     sparkStickyFault = false;
@@ -70,3 +70,4 @@ public class IntakeIOSpark implements IntakeIO {
     intakeController.setSetpoint(setpoint, SparkBase.ControlType.kPosition);
   }
 
+}
