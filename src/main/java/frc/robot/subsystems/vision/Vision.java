@@ -34,10 +34,8 @@ import org.littletonrobotics.junction.Logger;
 
 public class Vision extends FullSubsystem {
   private final VisionConsumer consumer;
-  private final Supplier<Pose2d> poseSupplier;
   private final Supplier<Rotation2d> gyroRotationSupplier;
   private final Supplier<ChassisSpeeds> robotSpeedsSupplier;
-  private final Supplier<Integer> visionClampModeSupplier;
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
@@ -47,16 +45,12 @@ public class Vision extends FullSubsystem {
 
   public Vision(
       VisionConsumer consumer,
-      Supplier<Pose2d> poseSupplier,
       Supplier<Rotation2d> gyroRotationSupplier,
       Supplier<ChassisSpeeds> robotSpeedsSupplier,
-      Supplier<Integer> visionClampModeSupplier,
       VisionIO... io) {
     this.consumer = consumer;
-    this.poseSupplier = poseSupplier;
     this.gyroRotationSupplier = gyroRotationSupplier;
     this.robotSpeedsSupplier = robotSpeedsSupplier;
-    this.visionClampModeSupplier = visionClampModeSupplier;
     this.io = io;
 
     // Initialize inputs
@@ -98,7 +92,6 @@ public class Vision extends FullSubsystem {
     List<Pose3d> allRobotPosesRejected = new LinkedList<>();
 
     // Update Robot State
-    Pose2d currentRobotPose = poseSupplier.get();
     Rotation3d currentGyroRotation = new Rotation3d(gyroRotationSupplier.get());
     ChassisSpeeds currentSpeeds = robotSpeedsSupplier.get();
     // int clampMode = visionClampModeSupplier.get();

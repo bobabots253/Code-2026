@@ -97,10 +97,8 @@ public class RobotContainer {
         vision =
             new Vision(
                 swerveSubsystem::addVisionMeasurement,
-                swerveSubsystem::getPose,
                 swerveSubsystem::getRotation,
                 swerveSubsystem::getChassisSpeeds,
-                clampVisionChooser::get,
                 new VisionIOLimelight(VisionConstants.cameraPurple, swerveSubsystem::getRotation),
                 new VisionIOLimelight(VisionConstants.cameraOrange, swerveSubsystem::getRotation),
                 new VisionIOLimelight(VisionConstants.cameraGreen, swerveSubsystem::getRotation),
@@ -134,10 +132,8 @@ public class RobotContainer {
         vision =
             new Vision(
                 swerveSubsystem::addVisionMeasurement,
-                swerveSubsystem::getPose,
                 swerveSubsystem::getRotation,
                 swerveSubsystem::getChassisSpeeds,
-                clampVisionChooser::get,
                 new VisionIOPhotonVisionSim(
                     VisionConstants.cameraPurple,
                     VisionConstants.cameraTransformToPurple,
@@ -182,10 +178,8 @@ public class RobotContainer {
         vision =
             new Vision(
                 swerveSubsystem::addVisionMeasurement,
-                swerveSubsystem::getPose,
                 swerveSubsystem::getRotation,
                 swerveSubsystem::getChassisSpeeds,
-                clampVisionChooser::get,
                 new VisionIO() {},
                 new VisionIO() {});
 
