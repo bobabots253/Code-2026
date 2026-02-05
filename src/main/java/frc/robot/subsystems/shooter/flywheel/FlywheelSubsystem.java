@@ -1,9 +1,8 @@
 package frc.robot.subsystems.shooter.flywheel;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj.Alert;
 import frc.robot.util.FullSubsystem;
+import org.littletonrobotics.junction.Logger;
 
 public class FlywheelSubsystem extends FullSubsystem {
 
@@ -25,17 +24,17 @@ public class FlywheelSubsystem extends FullSubsystem {
 
   @Override
   public void periodic() {
-        io.updateInputs(inputs);
-        Logger.processInputs("Flywheels", inputs);
+    io.updateInputs(inputs);
+    Logger.processInputs("Flywheels", inputs);
 
-        masterDisconnected.set(!inputs.masterMotorConnected);
-        followerDisconnected.set(!inputs.followerMotorConnected);
-    }
+    masterDisconnected.set(!inputs.masterMotorConnected);
+    followerDisconnected.set(!inputs.followerMotorConnected);
+  }
 
   private boolean isDrawingHighCurrent() {
     return Math.abs(inputs.masterSupplyCurrentAmps) > 50.0
         || Math.abs(inputs.followerSupplyCurrentAmps) > 50.0;
-    }
+  }
 
   @Override
   public void periodicAfterScheduler() {
