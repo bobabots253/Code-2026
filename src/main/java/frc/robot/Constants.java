@@ -21,8 +21,25 @@ import edu.wpi.first.wpilibj.RobotBase;
  * (log replay from a file).
  */
 public final class Constants {
+  public enum RobotType {
+    LEBOBAJAMES,
+    SIMBOT
+  }
+
+  public static final RobotType robot =
+      RobotType.LEBOBAJAMES; // Update this to match what you are testing robot
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
+
+  public static final boolean tuningMode = false;
+  public static boolean disableHAL = false;
+
+  public static Mode getMode() {
+    return switch (robot) {
+      case LEBOBAJAMES -> RobotBase.isReal() ? Mode.REAL : Mode.REPLAY;
+      case SIMBOT -> Mode.SIM;
+    };
+  }
 
   public static enum Mode {
     /** Running on a real robot. */
@@ -33,5 +50,9 @@ public final class Constants {
 
     /** Replaying from a log file. */
     REPLAY
+  }
+
+  public static void disableHAL() {
+    disableHAL = true;
   }
 }

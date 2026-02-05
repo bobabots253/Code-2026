@@ -13,16 +13,19 @@
 
 package frc.robot.subsystems.swerve;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 
 public class SwerveConstants {
   public static final double maxSpeedMetersPerSec = 5.74; // <- Check
-  public static final double odometryFrequency = 50.0; // Hz, tune
+  public static final double odometryFrequency = 250; // Hz, Test faster than periodic block timing
   public static final double trackWidth = Units.inchesToMeters(26.5);
   public static final double wheelBase = Units.inchesToMeters(26.5);
 
@@ -36,6 +39,15 @@ public class SwerveConstants {
         new Translation2d(-trackWidth / 2.0, wheelBase / 2.0),
         new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0)
       };
+
+  // Fuel Sim Constants using WPILib Distance (interface)
+  public static final Distance BUMPER_THICKNESS = Inches.of(3.75);
+  public static final Distance BUMPER_HEIGHT = Inches.of(6.0);
+  public static final Distance FRAME_LENGTH = Inches.of(26.0);
+  public static final Distance FRAME_WIDTH = Inches.of(26.0);
+
+  public static final Distance ROBOT_LENGTH = FRAME_LENGTH.plus(BUMPER_THICKNESS.times(2));
+  public static final Distance ROBOT_WIDTH = FRAME_WIDTH.plus(BUMPER_THICKNESS.times(2));
 
   // Zeroed rotation values for each module, Setup Step 1: Rotation2d(0.0); |
   public static final Rotation2d frontLeftZeroRotation = new Rotation2d(-(Math.PI / 2));

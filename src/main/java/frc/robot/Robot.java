@@ -13,8 +13,13 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants.Mode;
+import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.util.LimelightHelpers;
+import frc.robot.util.fuelSimUtil.FuelSim;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -105,11 +110,20 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    // Confirm these are correct
+    // before using IMU modes 1,2,3...
+    // LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 0);
+    LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 0);
+    LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 0);
+  }
 
   /** This function is called periodically when disabled. */
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    // LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 0); // Disable IMU mode
+    // LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 0); // Disable IMU mode
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
@@ -120,6 +134,8 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(autonomousCommand);
     }
+    LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 1);
+    LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 1);
   }
 
   /** This function is called periodically during autonomous. */
@@ -136,6 +152,8 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+    LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 1);
+    LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 1);
   }
 
   /** This function is called periodically during operator control. */
@@ -159,5 +177,12 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically whilst in simulation. */
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+    FuelSim.getInstance().updateSim();
+  }
+
+  /** Whether to display alerts related to hardware faults. */
+  public static boolean showHardwareAlerts() {
+    return Constants.getMode() != Mode.SIM && Timer.getTimestamp() > 30.0;
+  }
 }

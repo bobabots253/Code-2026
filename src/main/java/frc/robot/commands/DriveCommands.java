@@ -14,6 +14,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -39,12 +40,12 @@ import java.util.function.Supplier;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
-  private static final double ANGLE_KP = 5.0;
-  private static final double ANGLE_KD = 0.4;
+  private static final double ANGLE_KP = 8.0;
+  private static final double ANGLE_KD = 0.0;
   private static final double DRIVE_AND_SHOOT_ANGLE_P = 5.0; // experimental value
   private static final double DRIVE_AND_SHOOT_ANGLE_D = 0.4; // experimental value
-  private static final double ANGLE_MAX_VELOCITY = 8.0;
-  private static final double ANGLE_MAX_ACCELERATION = 20.0;
+  private static final double ANGLE_MAX_VELOCITY = 999;
+  private static final double ANGLE_MAX_ACCELERATION = 999;
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
@@ -117,12 +118,7 @@ public class DriveCommands {
       Supplier<Rotation2d> rotationSupplier) {
 
     // Create PID controller
-    ProfiledPIDController angleController =
-        new ProfiledPIDController(
-            ANGLE_KP,
-            0.0,
-            ANGLE_KD,
-            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+    PIDController angleController = new PIDController(5, 0.0, 0.0); // Broken atm
     angleController.enableContinuousInput(-Math.PI, Math.PI);
 
     // Construct command
@@ -143,6 +139,7 @@ public class DriveCommands {
                       linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
                       linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                       omega);
+
               boolean isFlipped =
                   DriverStation.getAlliance().isPresent()
                       && DriverStation.getAlliance().get() == Alliance.Red;
@@ -156,18 +153,72 @@ public class DriveCommands {
             drive)
 
         // Reset PID controller when command starts
-        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+        .beforeStarting(() -> angleController.reset()); // (drive.getRotation().getRadians()
   }
 
-  /**
-   * Field relative drive command using joystick for linear control and PID for angular control.
-   * Used to snap and lock rotation to face the hub.
-   */
+  //   /**
+  //    * Field relative drive command using joystick for linear control and PID for angular
+  // control.
+  //    * Used to snap and lock rotation to face the hub.
+  //    */
+  //   public static Command joystickDriveAndShootHub(
+  //       SwerveSubsystem drive,
+  //       DoubleSupplier xSupplier,
+  //       DoubleSupplier ySupplier,
+  //       Pose2d targetPose,
+  //       double driveScalar) {
+
+  //     // Create PID controller
+  //     ProfiledPIDController angleController =
+  //         new ProfiledPIDController(
+  //             DRIVE_AND_SHOOT_ANGLE_P,
+  //             0.0,
+  //             DRIVE_AND_SHOOT_ANGLE_D,
+  //             new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+  //     angleController.enableContinuousInput(-Math.PI, Math.PI);
+
+  //     // Construct command
+  //     return Commands.run(
+  //             () -> {
+  //               // Get linear velocity
+  //               Translation2d linearVelocity =
+  //                   getLinearVelocityFromJoysticks(xSupplier.getAsDouble(),
+  // ySupplier.getAsDouble());
+
+  //               // Calculate angular speed
+  //               double omega =
+  //                   angleController.calculate(
+  //                       drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
+
+  //               // Convert to field relative speeds & send command
+  //               ChassisSpeeds speeds =
+  //                   new ChassisSpeeds(
+  //                       linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec() *
+  // driveScalar,
+  //                       linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec() *
+  // driveScalar,
+  //                       omega);
+  //               boolean isFlipped =
+  //                   DriverStation.getAlliance().isPresent()
+  //                       && DriverStation.getAlliance().get() == Alliance.Red;
+  //               drive.runVelocity(
+  //                   ChassisSpeeds.fromFieldRelativeSpeeds(
+  //                       speeds,
+  //                       isFlipped
+  //                           ? drive.getRotation().plus(new Rotation2d(Math.PI))
+  //                           : drive.getRotation()));
+  //             },
+  //             drive)
+
+  //         // Reset PID controller when command starts
+  //         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+  //   }
+
   public static Command joystickDriveAndShootHub(
       SwerveSubsystem drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
-      Supplier<Rotation2d> rotationSupplier,
+      Pose2d targetPose, // Changed from Rotation2d supplier
       double driveScalar) {
 
     // Create PID controller
@@ -177,29 +228,41 @@ public class DriveCommands {
             0.0,
             DRIVE_AND_SHOOT_ANGLE_D,
             new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+
+    // Use Radians for consistency with getRadians()
     angleController.enableContinuousInput(-Math.PI, Math.PI);
 
-    // Construct command
     return Commands.run(
             () -> {
-              // Get linear velocity
+              // 1. Get current robot state
+              Pose2d currentPose = drive.getPose();
+
+              // 2. Calculate the Angle to Target
+              // We subtract robot translation from target translation to get the heading vector
+              Rotation2d targetAngle =
+                  targetPose.getTranslation().minus(currentPose.getTranslation()).getAngle();
+
+              // 3. Get linear velocity from joysticks
               Translation2d linearVelocity =
                   getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
-              // Calculate angular speed
+              // 4. Calculate angular speed (PID)
               double omega =
                   angleController.calculate(
-                      drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
+                      currentPose.getRotation().getRadians(), targetAngle.getRadians());
 
-              // Convert to field relative speeds & send command
+              // 5. Convert to field relative speeds
               ChassisSpeeds speeds =
                   new ChassisSpeeds(
                       linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec() * driveScalar,
                       linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec() * driveScalar,
                       omega);
+
+              // 6. Handle Alliance Flipping
               boolean isFlipped =
                   DriverStation.getAlliance().isPresent()
                       && DriverStation.getAlliance().get() == Alliance.Red;
+
               drive.runVelocity(
                   ChassisSpeeds.fromFieldRelativeSpeeds(
                       speeds,
@@ -208,8 +271,6 @@ public class DriveCommands {
                           : drive.getRotation()));
             },
             drive)
-
-        // Reset PID controller when command starts
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
 

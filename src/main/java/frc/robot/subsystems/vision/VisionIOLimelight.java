@@ -32,6 +32,7 @@ public class VisionIOLimelight implements VisionIO {
   private final DoubleSubscriber tySubscriber;
   private final DoubleArraySubscriber megatag1Subscriber;
   private final DoubleArraySubscriber megatag2Subscriber;
+  private final DoubleArraySubscriber homeworkSubscriber;
 
   /**
    * Creates a new VisionIOLimelight.
@@ -42,13 +43,27 @@ public class VisionIOLimelight implements VisionIO {
   public VisionIOLimelight(String name, Supplier<Rotation2d> rotationSupplier) {
     var table = NetworkTableInstance.getDefault().getTable(name);
     this.rotationSupplier = rotationSupplier;
-    orientationPublisher = table.getDoubleArrayTopic("robot_orientation_set").publish();
-    latencySubscriber = table.getDoubleTopic("tl").subscribe(0.0);
-    txSubscriber = table.getDoubleTopic("tx").subscribe(0.0);
-    tySubscriber = table.getDoubleTopic("ty").subscribe(0.0);
+    orientationPublisher =
+        table
+            .getDoubleArrayTopic("robot_orientation_set")
+            .publish(); // [yaw,yawrate,pitch,pitchrate,roll,rollrate] - Degrees / Degrees per
+    // second
+    latencySubscriber =
+        table
+            .getDoubleTopic("tl")
+            .subscribe(0.0); // Select pipeline's latency in ms. Total Latency = tl + cl.
+    txSubscriber =
+        table.getDoubleTopic("tx").subscribe(0.0); // Horizontal Offset From Crosshair To Target
+    tySubscriber =
+        table.getDoubleTopic("ty").subscribe(0.0); // Vertical Offset From Crosshair To Target
     megatag1Subscriber = table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
+    // Translation (X,Y,Z) in meters Rotation(Roll,Pitch,Yaw) in degrees, total latency (cl+tl),
+    // tag count, tag span, average tag distance from camera, average tag area ()
+    // Should be "botpose_wpiblue", but don't fix what isn't broken
     megatag2Subscriber =
         table.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
+
+    homeworkSubscriber = table.getDoubleArrayTopic("hw").subscribe(new double[] {});
   }
 
   @Override
@@ -136,7 +151,10 @@ public class VisionIOLimelight implements VisionIO {
     }
   }
 
-  /** Parses the 3D pose from a Limelight botpose array. */
+  /**
+   * Parses the 3D pose from a Limelight botpose array. Rotation3D(units::radian_t roll,
+   * units::radian_t pitch, units::radian_t yaw)
+   */
   private static Pose3d parsePose(double[] rawLLArray) {
     return new Pose3d(
         rawLLArray[0],
