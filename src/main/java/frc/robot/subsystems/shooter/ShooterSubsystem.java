@@ -48,7 +48,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public Command ShootOnTheFlyCommand() {
     return Commands.parallel(
-        m_flywheel.run(() -> m_flywheel.runFlywheelRPM(m_calculator.getCorrectedTargetSpeedRPM())),
+        // m_flywheel.run(() ->
+        // m_flywheel.runFlywheelRPM(m_calculator.getCorrectedTargetSpeedRPM())),
         m_hood.run(() -> m_hood.setGoalParams(m_calculator.getCorrectedTargetAngle(), 0.0)));
   }
 
