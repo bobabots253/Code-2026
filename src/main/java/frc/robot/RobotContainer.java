@@ -29,6 +29,7 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.shooter.ShotCalculator;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIO;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.shooter.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.shooter.hood.HoodIO;
 import frc.robot.subsystems.shooter.hood.HoodIOSim;
@@ -152,7 +153,7 @@ public class RobotContainer {
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
         hoodSubsystem = new HoodSubsystem(new HoodIOSim());
-        // flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
+        flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
         shooterSubsystem =
             new ShooterSubsystem(
                 flywheelSubsystem,
@@ -184,7 +185,7 @@ public class RobotContainer {
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
         hoodSubsystem = new HoodSubsystem(new HoodIOSim());
-        // flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
+        flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
         shooterSubsystem =
             new ShooterSubsystem(
                 new FlywheelSubsystem(new FlywheelIO() {}),

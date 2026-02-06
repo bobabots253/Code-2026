@@ -134,6 +134,7 @@ public class FlywheelIOSpark implements FlywheelIO {
 
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
+    // Find a way to log master and follower connection status
     inputs.masterPositionRads = Units.rotationsToRadians(masterRelativeEncoder.getPosition());
     inputs.masterVelocityRads = masterRelativeEncoder.getVelocity();
     inputs.masterAppliedVolts = masterVortex.getAppliedOutput() * masterVortex.getBusVoltage();
@@ -172,6 +173,7 @@ public class FlywheelIOSpark implements FlywheelIO {
             : (outputs.velocityRadsPerSec > profiledSetpoint ? maxAcceleration : -maxAcceleration);
 
     // Goober FF Model Used: VoltsApplied = kS * Math.signum(v) + kV * v + kA * a
+    // Will be deprecated next year, bruh. GL Josh.
     double ffVolts = ffCalculator.calculate(profiledSetpoint, accel);
 
     // Set the setpoint with the calculated feedforward

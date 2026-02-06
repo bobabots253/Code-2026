@@ -29,10 +29,10 @@ public class HoodSubsystem extends FullSubsystem {
 
   @Setter private BooleanSupplier coastOverride = () -> false;
 
-  private double goalAngle = 0.0;
+  private double goalAngle = 0.0; // Degrees
   private double goalVelocity = 0.0; // USe for Hard Zeroing
 
-  private static double hoodOffset = 0.0;
+  private static double hoodOffset = HoodConstants.hoodOffsetDeg; // Note: DEGREES, not radians
   private boolean hoodZeroed = false;
 
   public HoodSubsystem(HoodIO io) {
@@ -62,7 +62,8 @@ public class HoodSubsystem extends FullSubsystem {
   @Override
   public void periodicAfterScheduler() {
     if (DriverStation.isEnabled() && hoodZeroed) {
-      outputs.positionRad = MathUtil.clamp(goalAngle, minAngle, maxAngle) - hoodOffset;
+      outputs.positionRad =
+          Units.degreesToRadians(MathUtil.clamp(goalAngle, minAngle, maxAngle) - hoodOffset);
       outputs.velocityRadsPerSec = goalVelocity;
       outputs.mode = HoodIOOutputMode.CLOSED_LOOP;
 
@@ -74,6 +75,15 @@ public class HoodSubsystem extends FullSubsystem {
     io.applyOutputs(outputs);
   }
 
+  /**
+   * Sets the goal parameters for the hood subsystem. When GoalParams are passed into
+   * periodicAfterScheduler, the requested position and velocity will be clamped by minAngle and
+   * maxAngle. Additional check, hoodZeroed. Input units in Degrees and Rad/Sec. Output units in
+   * Degrees and Rad/Sec.
+   *
+   * @param angle
+   * @param velocity
+   */
   private void setGoalParams(double angle, double velocity) {
     goalAngle = angle;
     goalVelocity = velocity;
@@ -88,12 +98,12 @@ public class HoodSubsystem extends FullSubsystem {
   public boolean atGoal() {
     return DriverStation.isEnabled()
         && hoodZeroed
-        && Math.abs(getMeasuredAngleRad() - goalAngle)
+        && Math.abs(getMeasuredAngleRad() - Units.degreesToRadians(goalAngle))
             <= Units.degreesToRadians(HoodConstants.toleranceDeg);
   }
 
   private void zero() {
-    hoodOffset = minAngle - inputs.positionRads;
+    hoodOffset = Units.degreesToRadians(minAngle) - inputs.positionRads;
     hoodZeroed = true;
   }
 

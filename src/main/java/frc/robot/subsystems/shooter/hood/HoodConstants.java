@@ -15,13 +15,16 @@ public class HoodConstants {
   public static final double minAngleDeg = 45.0;
   public static final double maxAngleDeg = 85.0;
 
+  public static final double hoodOffsetDeg = 1.0; // Degrees, Solve
+
   public static final double minAngleRad = Math.toRadians(minAngleDeg);
   public static final double maxAngleRad = Math.toRadians(maxAngleDeg);
 
   // Beg Design team for these values
   public static final double masterPositionConversionFactor =
-      1.0; // Motor Rotations -> Hood Radians
-  public static final double masterVelocityConversionFactor = 1.0; // Motor RPM -> Hood Rad/Sec
+      1.0; // Motor Rotations -> Hood Radians, Solve
+  public static final double masterVelocityConversionFactor =
+      1.0; // Motor RPM -> Hood Rad/Sec, Solve
 
   public static final double hoodOffset = Units.degreesToRadians(1.0); // Radians
 }

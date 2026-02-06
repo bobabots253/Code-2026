@@ -30,7 +30,7 @@ public interface HoodIO {
 
   public default void applyOutputs(HoodIOOutputs outputs) {}
 
-  default void runVolts(double masterVolts) {}
+  default void runOpenLoop(double decimalPercentage) {}
 
   default void stop() {}
 }
