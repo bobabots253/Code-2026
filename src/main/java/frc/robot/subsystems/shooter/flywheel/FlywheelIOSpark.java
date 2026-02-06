@@ -33,6 +33,11 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.util.Units;
 
+/**
+ * Flywheel Hardware implementation using SparkFlex
+ * Current System is designed to mimics VelocityTorqueCurrentFOC from PhoenixLib
+ * by using a continously computed Feedforward voltage.
+*/
 public class FlywheelIOSpark implements FlywheelIO {
   // Declare REV motor hardware here
   private final SparkBase masterVortex;
@@ -44,12 +49,11 @@ public class FlywheelIOSpark implements FlywheelIO {
 
   // Declare motor controllers
   private final SparkClosedLoopController masterVortexController;
-  private final SparkClosedLoopController followerVortexController;
 
   private final SimpleMotorFeedforward ffCalculator = new SimpleMotorFeedforward(kS, kV, kA);
   private final SlewRateLimiter slewRateLimiter = new SlewRateLimiter(maxAcceleration);
 
-  private double lastSetpoint = 0.0;
+  // Hardware State Tracking
   private boolean wasCoasting = true;
 
   public FlywheelIOSpark() {
@@ -63,7 +67,6 @@ public class FlywheelIOSpark implements FlywheelIO {
 
     // Initialize motor controllers
     masterVortexController = masterVortex.getClosedLoopController();
-    followerVortexController = followerVortex.getClosedLoopController();
 
     var masterVortexConfig = new SparkFlexConfig();
     masterVortexConfig
@@ -154,6 +157,8 @@ public class FlywheelIOSpark implements FlywheelIO {
         wasCoasting = true;
     } else {
         if (wasCoasting) {
+            // On transition from coasting to velocity control,
+            // reset the slew rate limiter to current velocity to prevent a large jump in ramping.
             slewRateLimiter.reset(masterVortex.getEncoder().getVelocity());
             wasCoasting = false;
         }
@@ -161,17 +166,21 @@ public class FlywheelIOSpark implements FlywheelIO {
 
     // Generate Simple Profiled Setpoint
     double profiledSetpoint = slewRateLimiter.calculate(outputs.velocityRadsPerSec);
-    
-    // Calculate acceleration for the kA term so motors don't flicker when the setpoint changes drastically
+
+    // If still ramping, calculate feedforward with max acceleration. 
+    // If at setpoint, set feedforward to 0 to prevent overshooting.
     double accel = Math.abs(outputs.velocityRadsPerSec - profiledSetpoint) < 1.0 
                      ? 0.0 : (outputs.velocityRadsPerSec > profiledSetpoint ? maxAcceleration : -maxAcceleration);
+
+    // Goober FF Model Used: VoltsApplied = kS * Math.signum(v) + kV * v + kA * a
     double ffVolts = ffCalculator.calculate(profiledSetpoint, accel);
 
     // Set the setpoint with the calculated feedforward
     masterVortexController.setSetpoint(
           profiledSetpoint,
           ControlType.kVelocity,
-          ClosedLoopSlot.kSlot0,
+          ClosedLoopSlot.kSlot0, 
+          // kP should only be used to apply enough voltage to factor IRL discrepancies
           ffVolts,
           SparkClosedLoopController.ArbFFUnits.kVoltage
       );
