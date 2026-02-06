@@ -33,7 +33,7 @@ public class FlywheelSubsystem extends FullSubsystem {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Flywheels", inputs);
+    Logger.processInputs("Flywheel", inputs);
 
     masterDisconnected.set(
         Robot.showHardwareAlerts()
