@@ -28,21 +28,19 @@ public class FlywheelConstants {
   public static final double flywheelReductionRatio = 1.0;
 
   public static final double masterFlywheelEncoderPositionFactor =
-      (2.0 * Math.PI) /  flywheelReductionRatio; // Rotor Rotations -> Wheel Radians
+      (2.0 * Math.PI) / flywheelReductionRatio; // Rotor Rotations -> Wheel Radians
   public static final double masterFlywheelEncoderVelocityFactor =
       (2.0 * Math.PI) / 60.0 / flywheelReductionRatio; // Rotor RPM -> Wheel Rad/Sec
 
   public static final double followerFlywheelEncoderPositionFactor =
-      (2.0 * Math.PI) /  flywheelReductionRatio; // Rotor Rotations -> Wheel Radians
+      (2.0 * Math.PI) / flywheelReductionRatio; // Rotor Rotations -> Wheel Radians
   public static final double followerFlywheelEncoderVelocityFactor =
       (2.0 * Math.PI) / 60.0 / flywheelReductionRatio; // Rotor RPM -> Wheel Rad/Sec
-  
+
   // FF Values collected from SysId Characterization
-  public static final double kS = 0.15; 
-  public static final double kV = 0.12; 
+  public static final double kS = 0.15;
+  public static final double kV = 0.12;
   public static final double kA = 0.05; // Torque Control Substitute
 
   public static final double maxAcceleration = 400.0; // rad/s^2, check with ReCalc
-
-
 }

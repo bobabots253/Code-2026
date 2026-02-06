@@ -1,6 +1,5 @@
 package frc.robot.subsystems.shooter.flywheel;
 
-import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.flywheelReductionRatio;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.followerFlywheelEncoderPositionFactor;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.followerFlywheelEncoderVelocityFactor;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.kA;
@@ -28,16 +27,14 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
-
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.util.Units;
 
 /**
- * Flywheel Hardware implementation using SparkFlex
- * Current System is designed to mimics VelocityTorqueCurrentFOC from PhoenixLib
- * by using a continously computed Feedforward voltage.
-*/
+ * Flywheel Hardware implementation using SparkFlex Current System is designed to mimics
+ * VelocityTorqueCurrentFOC from PhoenixLib by using a continously computed Feedforward voltage.
+ */
 public class FlywheelIOSpark implements FlywheelIO {
   // Declare REV motor hardware here
   private final SparkBase masterVortex;
@@ -109,7 +106,8 @@ public class FlywheelIOSpark implements FlywheelIO {
         .smartCurrentLimit(50) // Amps
         .voltageCompensation(12.0);
     followerVortexConfig
-        .encoder.uvwMeasurementPeriod(10)
+        .encoder
+        .uvwMeasurementPeriod(10)
         .positionConversionFactor(followerFlywheelEncoderPositionFactor)
         .velocityConversionFactor(followerFlywheelEncoderVelocityFactor)
         .uvwMeasurementPeriod(10)
@@ -136,15 +134,13 @@ public class FlywheelIOSpark implements FlywheelIO {
 
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
-    inputs.masterPositionRads =
-        Units.rotationsToRadians(masterRelativeEncoder.getPosition()) / flywheelReductionRatio;
-    inputs.masterVelocityRpm = masterRelativeEncoder.getVelocity() / flywheelReductionRatio;
+    inputs.masterPositionRads = Units.rotationsToRadians(masterRelativeEncoder.getPosition());
+    inputs.masterVelocityRads = masterRelativeEncoder.getVelocity();
     inputs.masterAppliedVolts = masterVortex.getAppliedOutput() * masterVortex.getBusVoltage();
     inputs.masterSupplyCurrentAmps = masterVortex.getOutputCurrent();
 
-    inputs.followerPositionRads =
-        Units.rotationsToRadians(followerRelativeEncoder.getPosition()) / flywheelReductionRatio;
-    inputs.followerVelocityRpm = followerRelativeEncoder.getVelocity() / flywheelReductionRatio;
+    inputs.followerPositionRads = Units.rotationsToRadians(followerRelativeEncoder.getPosition());
+    inputs.followerVelocityRads = followerRelativeEncoder.getVelocity();
     inputs.followerAppliedVolts =
         followerVortex.getAppliedOutput() * followerVortex.getBusVoltage();
     inputs.followerSupplyCurrentAmps = followerVortex.getOutputCurrent();
@@ -153,37 +149,39 @@ public class FlywheelIOSpark implements FlywheelIO {
   @Override
   public void applyOutputs(FlywheelIOOutputs outputs) {
     if (outputs.mode == FlywheelIOOutputMode.COAST) {
-        masterVortex.stopMotor();
-        wasCoasting = true;
+      masterVortex.stopMotor();
+      wasCoasting = true;
+      slewRateLimiter.reset(masterRelativeEncoder.getVelocity());
     } else {
-        if (wasCoasting) {
-            // On transition from coasting to velocity control,
-            // reset the slew rate limiter to current velocity to prevent a large jump in ramping.
-            slewRateLimiter.reset(masterVortex.getEncoder().getVelocity());
-            wasCoasting = false;
-        }
+      if (wasCoasting) {
+        // On transition from coasting to velocity control,
+        // reset the slew rate limiter to current velocity to prevent a large jump in ramping.
+        slewRateLimiter.reset(masterRelativeEncoder.getVelocity());
+        wasCoasting = false;
+      }
     }
 
     // Generate Simple Profiled Setpoint
     double profiledSetpoint = slewRateLimiter.calculate(outputs.velocityRadsPerSec);
 
-    // If still ramping, calculate feedforward with max acceleration. 
+    // If still ramping, calculate feedforward with max acceleration.
     // If at setpoint, set feedforward to 0 to prevent overshooting.
-    double accel = Math.abs(outputs.velocityRadsPerSec - profiledSetpoint) < 1.0 
-                     ? 0.0 : (outputs.velocityRadsPerSec > profiledSetpoint ? maxAcceleration : -maxAcceleration);
+    double accel =
+        Math.abs(outputs.velocityRadsPerSec - profiledSetpoint) < 1.0
+            ? 0.0
+            : (outputs.velocityRadsPerSec > profiledSetpoint ? maxAcceleration : -maxAcceleration);
 
     // Goober FF Model Used: VoltsApplied = kS * Math.signum(v) + kV * v + kA * a
     double ffVolts = ffCalculator.calculate(profiledSetpoint, accel);
 
     // Set the setpoint with the calculated feedforward
     masterVortexController.setSetpoint(
-          profiledSetpoint,
-          ControlType.kVelocity,
-          ClosedLoopSlot.kSlot0, 
-          // kP should only be used to apply enough voltage to factor IRL discrepancies
-          ffVolts,
-          SparkClosedLoopController.ArbFFUnits.kVoltage
-      );
+        profiledSetpoint,
+        ControlType.kVelocity,
+        ClosedLoopSlot.kSlot0,
+        // kP should only be used to apply enough voltage to factor IRL discrepancies
+        ffVolts,
+        SparkClosedLoopController.ArbFFUnits.kVoltage);
   }
 
   @Override
@@ -192,9 +190,9 @@ public class FlywheelIOSpark implements FlywheelIO {
   }
 
   @Override
-  public void runVelocity(double velocity) { // Likely won't work due to FF implementation, but we can try this for funn
-    masterVortexController.setSetpoint(
-        velocity, ControlType.kVelocity);
+  public void runVelocity(
+      double velocity) { // Likely won't work due to FF implementation, but we can try this for funn
+    masterVortexController.setSetpoint(velocity, ControlType.kVelocity);
   }
 
   @Override
