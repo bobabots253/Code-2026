@@ -2,6 +2,8 @@ package frc.robot.subsystems.shooter.flywheel;
 
 import edu.wpi.first.wpilibj.Alert;
 import frc.robot.util.FullSubsystem;
+import lombok.Setter;
+
 import org.littletonrobotics.junction.Logger;
 
 public class FlywheelSubsystem extends FullSubsystem {
@@ -11,7 +13,7 @@ public class FlywheelSubsystem extends FullSubsystem {
 
   private Alert masterDisconnected;
   private Alert followerDisconnected;
-
+  
   private boolean wasClosedLoop = false;
   private boolean closedLoop = false;
 

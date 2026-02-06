@@ -21,13 +21,28 @@ public class FlywheelConstants {
   public static final int sparkMasterFlywheelCanId = 15;
   public static final int sparkFollowerFlywheelCanId = 16;
 
-  public static final double sparkMasterFlyWheelkP = 0.01;
-  public static final double sparkMasterFlyWheelkI = 0.0;
-  public static final double sparkMasterFlyWheelkD = 0.0;
-
-  public static final double sparkMasterFlyWheelkS = 0.0;
-  public static final double sparkMasterFlyWheelkV = 0.0;
-  public static final double sparkMasterFlyWheelkA = 0.0;
+  public static final double sparkMasterFlyWheelkP = 0.0001; // Should be super small
+  public static final double sparkMasterFlyWheelkI = 0.0; // default: 0.0
+  public static final double sparkMasterFlyWheelkD = 0.0; // default: 0.0
 
   public static final double flywheelReductionRatio = 1.0;
+
+  public static final double masterFlywheelEncoderPositionFactor =
+      (2.0 * Math.PI) /  flywheelReductionRatio; // Rotor Rotations -> Wheel Radians
+  public static final double masterFlywheelEncoderVelocityFactor =
+      (2.0 * Math.PI) / 60.0 / flywheelReductionRatio; // Rotor RPM -> Wheel Rad/Sec
+
+  public static final double followerFlywheelEncoderPositionFactor =
+      (2.0 * Math.PI) /  flywheelReductionRatio; // Rotor Rotations -> Wheel Radians
+  public static final double followerFlywheelEncoderVelocityFactor =
+      (2.0 * Math.PI) / 60.0 / flywheelReductionRatio; // Rotor RPM -> Wheel Rad/Sec
+  
+  // FF Values collected from SysId Characterization
+  public static final double kS = 0.15; 
+  public static final double kV = 0.12; 
+  public static final double kA = 0.05; // Torque Control Substitute
+
+  public static final double maxAcceleration = 400.0; // rad/s^2, check with ReCalc
+
+
 }

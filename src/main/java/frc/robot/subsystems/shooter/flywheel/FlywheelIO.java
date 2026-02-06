@@ -21,9 +21,21 @@ public interface FlywheelIO {
     public double followerTorqueCurrentAmps = 0.0;
   }
 
+  public static enum FlywheelIOOutputMode {
+    COAST,
+    VELOCITY_SETPOINT
+  }
+
+  public static class FlywheelIOOutputs {
+    public FlywheelIOOutputMode mode = FlywheelIOOutputMode.COAST;
+    public double velocityRadsPerSec = 0.0;
+  }
+
   default void updateInputs(FlywheelIOInputs inputs) {}
 
-  default void runRPMSetpoint(double masterRPM) {}
+  default void applyOutputs(FlywheelIOOutputs outputs) {}
+
+  default void runVelocity(double velocity) {}
 
   default void runVolts(double masterVolts) {}
 
