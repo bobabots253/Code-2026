@@ -15,6 +15,4 @@ public interface IntakeIO {
   public default void updateInputs(IntakeIOInputs inputs) {}
 
   public default void setIntakePosition(double setpoint) {}
-} 
-    
-
+}
