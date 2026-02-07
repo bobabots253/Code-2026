@@ -55,7 +55,5 @@ public class FeederIOSpark implements FeederIO {
   }
 
   @Override
-  public void setFeederOpenLoop(double output) {
-  
-  }
+  public void setFeederOpenLoop(double output) {}
 }
