@@ -75,6 +75,7 @@ public class HoodSubsystem extends FullSubsystem {
     io.applyOutputs(outputs);
   }
 
+  @SuppressWarnings("unused")
   /**
    * Sets the goal parameters for the hood subsystem. When GoalParams are passed into
    * periodicAfterScheduler, the requested position and velocity will be clamped by minAngle and

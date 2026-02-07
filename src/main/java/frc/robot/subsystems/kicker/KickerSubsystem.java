@@ -1,56 +1,48 @@
-package frc.robot.subsystems.shooter.flywheel;
+package frc.robot.subsystems.kicker;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
-import frc.robot.subsystems.shooter.flywheel.FlywheelIO.FlywheelIOOutputMode;
-import frc.robot.subsystems.shooter.flywheel.FlywheelIO.FlywheelIOOutputs;
+import frc.robot.subsystems.kicker.KickerIO.KickerIOOutputMode;
+import frc.robot.subsystems.kicker.KickerIO.KickerIOOutputs;
 import frc.robot.util.FullSubsystem;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
-public class FlywheelSubsystem extends FullSubsystem {
-
-  private final FlywheelIO io;
-  private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
-  private final FlywheelIOOutputs outputs = new FlywheelIOOutputs();
+public class KickerSubsystem extends FullSubsystem {
+  private final KickerIO io;
+  private final KickerIOInputsAutoLogged inputs = new KickerIOInputsAutoLogged();
+  private final KickerIOOutputs outputs = new KickerIOOutputs();
 
   private final Debouncer masterVortexConnectedDebouncer =
       new Debouncer(0.5, Debouncer.DebounceType.kFalling);
-  private final Debouncer followerVortexConnectedDebouncer =
-      new Debouncer(0.5, Debouncer.DebounceType.kFalling);
-  private Alert masterDisconnected;
-  private Alert followerDisconnected;
+  private Alert masterDisconnectedAlert;
 
-  public FlywheelSubsystem(FlywheelIO io) {
+  public KickerSubsystem(KickerIO io) {
     this.io = io;
 
-    masterDisconnected = new Alert("Master flywheel disconnected!", Alert.AlertType.kWarning);
-    followerDisconnected = new Alert("Follower flywheel disconnected!", Alert.AlertType.kWarning);
+    masterDisconnectedAlert = new Alert("Kicker motor disconnected!", Alert.AlertType.kWarning);
   }
 
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Flywheel", inputs);
+    Logger.processInputs("Kicker", inputs);
 
-    masterDisconnected.set(
+    masterDisconnectedAlert.set(
         Robot.showHardwareAlerts()
             && !masterVortexConnectedDebouncer.calculate(inputs.masterMotorConnected));
-    followerDisconnected.set(
-        Robot.showHardwareAlerts()
-            && !followerVortexConnectedDebouncer.calculate(inputs.followerMotorConnected));
   }
 
   @Override
   public void periodicAfterScheduler() {
-    Logger.recordOutput("Flywheel/Mode", outputs.mode);
+    Logger.recordOutput("Kicker/Mode", outputs.mode);
     io.applyOutputs(outputs);
   }
 
   private void runVelocity(double velocityRadsPerSec) {
-    outputs.mode = FlywheelIOOutputMode.VELOCITY_SETPOINT;
+    outputs.mode = KickerIOOutputMode.VELOCITY_SETPOINT;
     outputs.velocityRadsPerSec = velocityRadsPerSec;
   }
 
@@ -71,8 +63,7 @@ public class FlywheelSubsystem extends FullSubsystem {
 
   @SuppressWarnings("unused")
   private boolean isDrawingHighCurrent() {
-    return Math.abs(inputs.masterSupplyCurrentAmps) > 50.0
-        || Math.abs(inputs.followerSupplyCurrentAmps) > 50.0;
+    return Math.abs(inputs.masterSupplyCurrentAmps) > 50.0;
   }
 
   public double getVelocity() {
@@ -80,7 +71,7 @@ public class FlywheelSubsystem extends FullSubsystem {
   }
 
   private void stop() {
-    outputs.mode = FlywheelIOOutputMode.COAST;
+    outputs.mode = KickerIOOutputMode.COAST;
     outputs.velocityRadsPerSec = 0.0;
   }
 }

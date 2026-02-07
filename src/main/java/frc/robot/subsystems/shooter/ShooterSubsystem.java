@@ -12,6 +12,7 @@ import frc.robot.util.shooterUtil.ShootOnTheFlyConstants;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
+@SuppressWarnings("unused")
 public class ShooterSubsystem extends SubsystemBase {
   private final FlywheelSubsystem m_flywheel;
   private final HoodSubsystem m_hood;
