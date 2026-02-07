@@ -1,14 +1,13 @@
 package frc.robot.subsystems.shooter.hood;
 
-import static frc.robot.subsystems.shooter.hood.HoodConstants.masterPositionConversionFactor;
-import static frc.robot.subsystems.shooter.hood.HoodConstants.masterVelocityConversionFactor;
-import static frc.robot.subsystems.shooter.hood.HoodConstants.sparkMasterFlyWheelkD;
-import static frc.robot.subsystems.shooter.hood.HoodConstants.sparkMasterFlyWheelkI;
-import static frc.robot.subsystems.shooter.hood.HoodConstants.sparkMasterFlyWheelkP;
+import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkMasterFlyWheelkP;
+import static frc.robot.subsystems.shooter.hood.HoodConstants.*;
+
 import static frc.robot.util.SparkUtil.tryUntilOk;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.FeedbackSensor;
@@ -19,12 +18,13 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.util.Units;
 
+// Note: CAD'ed Absolute Encoder is pointless
 public class HoodIOSpark implements HoodIO {
   // Declare REV motor hardware here
   private final SparkBase masterVortex;
 
   // Declare REV encoders hardware here
-  private final AbsoluteEncoder masterAbsoluteEncoder;
+  private final RelativeEncoder masterRelativeEncoder;
 
   // Declare motor controllers
   private final SparkClosedLoopController masterVortexController;
@@ -35,23 +35,32 @@ public class HoodIOSpark implements HoodIO {
         new SparkFlex(HoodConstants.sparkMasterHoodCanId, SparkBase.MotorType.kBrushless);
 
     // Initialize REV encoders hardware here
-    masterAbsoluteEncoder = masterVortex.getAbsoluteEncoder();
+    masterRelativeEncoder = masterVortex.getEncoder();
 
     // Initialize motor controllers here
     masterVortexController = masterVortex.getClosedLoopController();
 
     var masterVortexConfig = new SparkFlexConfig();
-    masterVortexConfig.idleMode(IdleMode.kCoast).smartCurrentLimit(35); // Amps
+    masterVortexConfig
+        .idleMode(IdleMode.kBrake)
+        .inverted(false)
+        .smartCurrentLimit(35);
     masterVortexConfig
         .encoder
-        .positionConversionFactor(masterPositionConversionFactor)
+        .positionConversionFactor(masterPositionConversionFactor) // Rot to Rad // (2.0 * Math.PI) / kTotalReduction
         .velocityConversionFactor(masterVelocityConversionFactor)
+        .inverted(false)
         .uvwMeasurementPeriod(10)
         .uvwAverageDepth(2);
     masterVortexConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .pid(sparkMasterFlyWheelkP, sparkMasterFlyWheelkI, sparkMasterFlyWheelkD);
+        .pid(sparkMasterHoodkP, sparkMasterHoodkI, sparkMasterHoodkD);
+    masterVortexConfig.softLimit
+        .reverseSoftLimitEnabled(true)
+        .reverseSoftLimit(minAngleRad)
+        .forwardSoftLimitEnabled(true)
+        .forwardSoftLimit(maxAngleRad);
     masterVortexConfig
         .signals
         .primaryEncoderPositionAlwaysOn(true)
@@ -69,27 +78,37 @@ public class HoodIOSpark implements HoodIO {
                 masterVortexConfig,
                 ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters));
+
+    // Autohome to a known position, if possible. If not, hope for the best
+    masterRelativeEncoder.setPosition(minAngleRad);
   }
 
   @Override
   public void updateInputs(HoodIOInputs inputs) {
     // Find a way to log master connection status
-    inputs.positionRads = masterAbsoluteEncoder.getPosition();
-    inputs.positionRadsPerSec = masterAbsoluteEncoder.getVelocity();
-    inputs.appliedVoltage = masterVortex.getAppliedOutput();
+    inputs.positionRads = masterRelativeEncoder.getPosition(); // Rot to Rad conversion is done in config
+    inputs.positionRadsPerSec = masterRelativeEncoder.getVelocity();
+    inputs.appliedVoltage = masterVortex.getAppliedOutput() * masterVortex.getBusVoltage();
     inputs.supplyCurrentAmps = masterVortex.getOutputCurrent();
   }
 
   @Override
   public void applyOutputs(HoodIOOutputs outputs) {
+
+    // Safety check to prevent over/under extension
+    // May need additional acceleration limits if the rack teeth start shearing
+    double safeSetpoint = Math.max(minAngleRad, Math.min(maxAngleRad, outputs.positionRad));
+
     switch (outputs.mode) {
       case COAST:
         masterVortex.stopMotor();
+        break;
       case BRAKE:
         masterVortex.stopMotor();
+        break;
       case CLOSED_LOOP:
         masterVortexController.setSetpoint(
-            Units.radiansToRotations(outputs.positionRad),
+            safeSetpoint,
             SparkBase.ControlType.kPosition,
             ClosedLoopSlot.kSlot0);
         break;
