@@ -1,8 +1,8 @@
 package frc.robot.subsystems.intake;
 
 public class IntakeConstants {
-  public static final int intakeCanID = 6767;
-  public static final int intakeCurrentLimit = 20;
+  public static final int intakeCanID = 9;
+  public static final int intakeCurrentLimit = 50;
   public static final double intakePIDMaxOutput = 0.0;
   public static final double intakePIDMinOutput = 0.0;
   public static final double intakekP = 0.0;

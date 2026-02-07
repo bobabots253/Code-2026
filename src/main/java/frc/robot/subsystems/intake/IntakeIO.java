@@ -6,11 +6,24 @@ public interface IntakeIO {
   @AutoLog
   public class IntakeIOInputs {
 
-    public boolean intakeConnected = false;
-    public double intakePosition = 0.0;
-    public double intakeAppliedVolts = 0.0;
-    public double intakeCurrentAmps = 0.0;
+    public boolean intakeConnected = true;
+    public double positionRad = 0.0;
+    public double velocityRad = 0.0;
+    public double appliedVolts = 0.0;
+    public double currentAmps = 0.0;
   }
+
+  public static enum intakeIOOutputMode {
+    COAST,
+    VOLTAGE
+  }
+
+  public class IntakeIOOutputs {
+    public intakeIOOutputMode mode = intakeIOOutputMode.COAST;
+    public double velocityRadiansPerSecond = (0.0);
+  }
+
+  public default void updateOutputs(IntakeIOOutputs outputs) {}
 
   public default void updateInputs(IntakeIOInputs inputs) {}
 

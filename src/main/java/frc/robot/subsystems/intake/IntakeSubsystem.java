@@ -7,10 +7,10 @@ import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.FullSubsystem;
 import org.littletonrobotics.junction.Logger;
 
-public class IntakeSubsystem extends SubsystemBase {
+public class IntakeSubsystem extends FullSubsystem {
   private final rollerIO io;
   private final IntakeIO pivotIo;
   private final Alert pivotDisconnectedAlert;
@@ -56,7 +56,7 @@ public class IntakeSubsystem extends SubsystemBase {
     intakeMotor.set(1.0);
   }
 
-  public void intakeStartsOpposite() {
+  public void extakeStarts() {
     intakeMotor.set(-1.0);
   }
 
@@ -68,5 +68,11 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public Command retractPivot() {
     return null;
+  }
+
+  @Override
+  public void periodicAfterScheduler() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'periodicAfterScheduler'");
   }
 }
