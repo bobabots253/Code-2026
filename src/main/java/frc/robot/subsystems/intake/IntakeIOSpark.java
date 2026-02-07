@@ -50,9 +50,6 @@ public class IntakeIOSpark implements IntakeIO {
                 intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters));
   }
 
-
-        
-    
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
     sparkStickyFault = false;
@@ -65,9 +62,7 @@ public class IntakeIOSpark implements IntakeIO {
     ifOk(intakeSpark, intakeEncoder::getPosition, (value) -> inputs.intakePosition = value);
   }
 
-  
   public void setIntakePosition(double setpoint) {
     intakeController.setSetpoint(setpoint, SparkBase.ControlType.kPosition);
   }
-
 }
