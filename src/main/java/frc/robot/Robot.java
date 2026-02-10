@@ -16,6 +16,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.LimelightHelpers;
@@ -37,6 +38,8 @@ import org.littletonrobotics.urcl.URCL;
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
+  private int amountOfAutos = 3;
+  private AutoCommandPicker[] autoCommands = new AutoCommandPicker[amountOfAutos];
 
   public Robot() {
     // Record metadata
@@ -88,6 +91,11 @@ public class Robot extends LoggedRobot {
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
+    
+    for(int i=0; i<amountOfAutos; i++){
+      autoCommands[i] = new AutoCommandPicker();
+    }
+    
   }
 
   /** This function is called periodically during all modes. */
@@ -129,6 +137,10 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousInit() {
     autonomousCommand = robotContainer.getAutonomousCommand();
+    Command[] commands = new Command[amountOfAutos];
+    for(int i = 0; i < amountOfAutos; i++){
+      commands[i] = autoCommands[i].getCommand();
+    }
 
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
@@ -136,6 +148,8 @@ public class Robot extends LoggedRobot {
     }
     LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 1);
     LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 1);
+    SequentialCommandGroup autoCommand = new SequentialCommandGroup(commands);
+    CommandScheduler.getInstance().schedule(autoCommand);
   }
 
   /** This function is called periodically during autonomous. */

@@ -58,9 +58,15 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final SwerveSubsystem swerveSubsystem;
-  //   private final Vision vision;
+  private final Vision vision;
+  private final ShotCalculator shotCalculator;
+  private final HoodSubsystem hoodSubsystem;
+  private final FlywheelSubsystem flywheelSubsystem;
+  private final ShooterSubsystem shooterSubsystem;
 
-  // labubu
+  // Dashboard Inputs
+  private final LoggedDashboardChooser<Integer> clampVisionChooser =
+      new LoggedDashboardChooser<>("Clamp Vision Estimates");
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -88,12 +94,15 @@ public class RobotContainer {
                 new ModuleIOSpark(2),
                 new ModuleIOSpark(3));
 
-        // vision =
-        //     new Vision(
-        //         swerveSubsystem::addVisionMeasurement,
-        //         new VisionIOLimelight(VisionConstants.FrontLeftLL, swerveSubsystem::getRotation),
-        //         new VisionIOLimelight(VisionConstants.FrontRightLL,
-        // swerveSubsystem::getRotation));
+        vision =
+            new Vision(
+                swerveSubsystem::addVisionMeasurement,
+                swerveSubsystem::getRotation,
+                swerveSubsystem::getChassisSpeeds,
+                new VisionIOLimelight(VisionConstants.cameraPurple, swerveSubsystem::getRotation),
+                new VisionIOLimelight(VisionConstants.cameraOrange, swerveSubsystem::getRotation),
+                new VisionIOLimelight(VisionConstants.cameraGreen, swerveSubsystem::getRotation),
+                new VisionIOLimelight(VisionConstants.cameraBlue, swerveSubsystem::getRotation));
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
 
@@ -107,6 +116,7 @@ public class RobotContainer {
                 shotCalculator,
                 swerveSubsystem::getPose,
                 swerveSubsystem::getChassisSpeeds);
+
         break;
 
       case SIM:
@@ -119,17 +129,40 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim());
 
-        // vision =
-        //     new Vision(
-        //         swerveSubsystem::addVisionMeasurement,
-        //         new VisionIOPhotonVisionSim(
-        //             VisionConstants.FrontLeftLL,
-        //             VisionConstants.robotToFrontLeftLL,
-        //             swerveSubsystem::getPose),
-        //         new VisionIOPhotonVisionSim(
-        //             VisionConstants.FrontRightLL,
-        //             VisionConstants.robotToFrontRightLL,
-        //             swerveSubsystem::getPose));
+        vision =
+            new Vision(
+                swerveSubsystem::addVisionMeasurement,
+                swerveSubsystem::getRotation,
+                swerveSubsystem::getChassisSpeeds,
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.cameraPurple,
+                    VisionConstants.cameraTransformToPurple,
+                    swerveSubsystem::getPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.cameraOrange,
+                    VisionConstants.cameraTransformToOrange,
+                    swerveSubsystem::getPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.cameraGreen,
+                    VisionConstants.cameraTransformToGreen,
+                    swerveSubsystem::getPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.cameraBlue,
+                    VisionConstants.cameraTransformToBlue,
+                    swerveSubsystem::getPose));
+
+        shotCalculator = new ShotCalculator(swerveSubsystem);
+        hoodSubsystem = new HoodSubsystem(new HoodIOSim());
+        flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
+        shooterSubsystem =
+            new ShooterSubsystem(
+                flywheelSubsystem,
+                hoodSubsystem,
+                shotCalculator,
+                swerveSubsystem::getPose,
+                swerveSubsystem::getChassisSpeeds);
+
+        configureFuelSim();
         break;
 
       default:
@@ -142,10 +175,24 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
 
-        // vision =
-        //     new Vision(swerveSubsystem::addVisionMeasurement, new VisionIO() {}, new VisionIO()
-        // {});
+        vision =
+            new Vision(
+                swerveSubsystem::addVisionMeasurement,
+                swerveSubsystem::getRotation,
+                swerveSubsystem::getChassisSpeeds,
+                new VisionIO() {},
+                new VisionIO() {});
 
+        shotCalculator = new ShotCalculator(swerveSubsystem);
+        hoodSubsystem = new HoodSubsystem(new HoodIOSim());
+        flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
+        shooterSubsystem =
+            new ShooterSubsystem(
+                new FlywheelSubsystem(new FlywheelIO() {}),
+                new HoodSubsystem(new HoodIO() {}),
+                new ShotCalculator(swerveSubsystem),
+                swerveSubsystem::getPose,
+                swerveSubsystem::getChassisSpeeds);
         break;
     }
 
@@ -202,8 +249,20 @@ public class RobotContainer {
                 () -> -controller.getLeftX(),
                 () -> shotCalculator.getCorrectTargetRotation()));
 
-    // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(swerveSubsystem::stopWithX, swerveSubsystem));
+    // Shoot on the fly when X button is pressed
+    controller.x().whileTrue(shooterSubsystem.simShootOnTheFlyCommand());
+
+    // Shoot on the fly while Y button is held, With drive control
+    controller
+        .y()
+        .whileTrue(
+            Commands.parallel(
+                DriveCommands.joystickDriveAtAngle(
+                    swerveSubsystem,
+                    () -> -controller.getLeftY(),
+                    () -> -controller.getLeftX(),
+                    () -> shotCalculator.getCorrectTargetRotation()),
+                shooterSubsystem.simShootOnTheFlyCommand()));
 
     // Reset gyro to 0° when B button is pressed
     controller
@@ -216,22 +275,6 @@ public class RobotContainer {
                                 swerveSubsystem.getPose().getTranslation(), new Rotation2d())),
                     swerveSubsystem)
                 .ignoringDisable(true));
-
-    // PIDController aimController = new PIDController(0.2, 0.0, 0.0);
-    // aimController.enableContinuousInput(-Math.PI, Math.PI);
-    // controller
-    //     .y()
-    //     .whileTrue(
-    //         Commands.startRun(
-    //             () -> {
-    //               aimController.reset();
-    //             },
-    //             () -> {
-    //                 swerveSubsystem.run(0.0,
-    // aimController.calculate(vision.getTargetX(0).getRadians()));
-    //             },
-    //             swerveSubsystem));
-    // }
   }
 
   public void configureFuelSim() {
@@ -243,13 +286,13 @@ public class RobotContainer {
         SwerveConstants.BUMPER_HEIGHT.in(Meters),
         swerveSubsystem::getPose,
         swerveSubsystem::getChassisSpeeds);
-    // instance.registerIntake(
-    //     SwerveConstants.ROBOT_LENGTH.div(2).in(Meters),
-    //     SwerveConstants.ROBOT_LENGTH.div(2).plus(Inches.of(5)).in(Meters),
-    //     SwerveConstants.ROBOT_WIDTH.div(2).unaryMinus().in(Meters),
-    //     SwerveConstants.ROBOT_WIDTH.div(2).in(Meters),
-    //     () -> true && shooterSubsystem.simAbleToIntake(),
-    //     shooterSubsystem::simIntake);
+    instance.registerIntake(
+        SwerveConstants.ROBOT_LENGTH.div(2).in(Meters),
+        SwerveConstants.ROBOT_LENGTH.div(2).plus(Inches.of(5)).in(Meters),
+        SwerveConstants.ROBOT_WIDTH.div(2).unaryMinus().in(Meters),
+        SwerveConstants.ROBOT_WIDTH.div(2).in(Meters),
+        () -> true && shooterSubsystem.simAbleToIntake(),
+        shooterSubsystem::simIntake);
 
     instance.start();
     Commands.runOnce(
