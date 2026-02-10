@@ -7,6 +7,9 @@
 
 package frc.robot.subsystems.vision;
 
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -38,17 +41,18 @@ public class VisionConstants {
   public static double maxAmbiguity = 0.25;
   public static double maxZError = 0.25;
 
-  // Standard deviation baselines at 1 meter with 1 tag
-  // (Adjusted automatically based on distance and # of tags)
-  public static double linearStdDevBaseline = 0.01; // Meters
-  public static double angularStdDevBaseline = 10000000000.0; // Radians
+  // Standard deviation baselines at 1 meter
+  public static double linearStdDevBaseline = 0.02; // Meters
+  public static double angularStdDevBaseline = 0.06; // Radians
 
   // Standard deviation multipliers for each camera
   // Manual Variance Weighting: (Adjust to trust some cameras more than others)
   public static double[] cameraStdDevFactors =
       new double[] {
-        0.1, // Camera 0
-        0.1, 0.5, 0.5
+        0.5, // Camera 0
+        0.5, // Camera 1
+        1.0, // Camera 2
+        1.0, // Camera 3
       };
   // Blue Camera - Cannot be trusted
   // MT2 on LL4 needs filtering for jumping
@@ -57,4 +61,12 @@ public class VisionConstants {
   // Multipliers to apply for MegaTag 2 observations
   public static double linearStdDevMegatag2Factor = 0.2; // More stable than full 3D solve
   public static double angularStdDevMegatag2Factor = Double.POSITIVE_INFINITY; // Never Trust
+
+  // Clamping ranges for vision estimates (see units)
+  static final double maxLinearSpeed = 3.0; // Meters per second
+  static final double maxAngularSpeed =
+      DegreesPerSecond.of(360).in(RadiansPerSecond); // Radians per second
+  static final double maxGyroError = 5.0; // Degrees
+  static final double maxTranslationError = 1.0; // Meters
+  static final int LOCK_MODE = 10;
 }

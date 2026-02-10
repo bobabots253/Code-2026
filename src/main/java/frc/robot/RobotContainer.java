@@ -13,6 +13,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -57,11 +58,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final SwerveSubsystem swerveSubsystem;
-  private final Vision vision;
-  private final ShotCalculator shotCalculator;
-  private final HoodSubsystem hoodSubsystem;
-  private final FlywheelSubsystem flywheelSubsystem;
-  private final ShooterSubsystem shooterSubsystem;
+  //   private final Vision vision;
 
   // labubu
 
@@ -73,6 +70,13 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+    clampVisionChooser.addDefaultOption("Locked", 10);
+    clampVisionChooser.addOption("Unlocked | Purple", 0);
+    clampVisionChooser.addOption("Unlocked | Orange", 1);
+    clampVisionChooser.addOption("Unlocked | Green", 2);
+    clampVisionChooser.addOption("Unlocked | Blue", 3);
+
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -84,13 +88,12 @@ public class RobotContainer {
                 new ModuleIOSpark(2),
                 new ModuleIOSpark(3));
 
-        vision =
-            new Vision(
-                swerveSubsystem::addVisionMeasurement,
-                new VisionIOLimelight(VisionConstants.cameraPurple, swerveSubsystem::getRotation),
-                new VisionIOLimelight(VisionConstants.cameraOrange, swerveSubsystem::getRotation),
-                new VisionIOLimelight(VisionConstants.cameraGreen, swerveSubsystem::getRotation),
-                new VisionIOLimelight(VisionConstants.cameraBlue, swerveSubsystem::getRotation));
+        // vision =
+        //     new Vision(
+        //         swerveSubsystem::addVisionMeasurement,
+        //         new VisionIOLimelight(VisionConstants.FrontLeftLL, swerveSubsystem::getRotation),
+        //         new VisionIOLimelight(VisionConstants.FrontRightLL,
+        // swerveSubsystem::getRotation));
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
 
@@ -116,38 +119,17 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim());
 
-        vision =
-            new Vision(
-                swerveSubsystem::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.cameraPurple,
-                    VisionConstants.cameraTransformToPurple,
-                    swerveSubsystem::getPose),
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.cameraOrange,
-                    VisionConstants.cameraTransformToOrange,
-                    swerveSubsystem::getPose),
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.cameraGreen,
-                    VisionConstants.cameraTransformToGreen,
-                    swerveSubsystem::getPose),
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.cameraBlue,
-                    VisionConstants.cameraTransformToBlue,
-                    swerveSubsystem::getPose));
-
-        shotCalculator = new ShotCalculator(swerveSubsystem);
-        hoodSubsystem = new HoodSubsystem(new HoodIOSim());
-        flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
-        shooterSubsystem =
-            new ShooterSubsystem(
-                flywheelSubsystem,
-                hoodSubsystem,
-                shotCalculator,
-                swerveSubsystem::getPose,
-                swerveSubsystem::getChassisSpeeds);
-
-        configureFuelSim();
+        // vision =
+        //     new Vision(
+        //         swerveSubsystem::addVisionMeasurement,
+        //         new VisionIOPhotonVisionSim(
+        //             VisionConstants.FrontLeftLL,
+        //             VisionConstants.robotToFrontLeftLL,
+        //             swerveSubsystem::getPose),
+        //         new VisionIOPhotonVisionSim(
+        //             VisionConstants.FrontRightLL,
+        //             VisionConstants.robotToFrontRightLL,
+        //             swerveSubsystem::getPose));
         break;
 
       default:
@@ -160,19 +142,10 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
 
-        vision =
-            new Vision(swerveSubsystem::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        // vision =
+        //     new Vision(swerveSubsystem::addVisionMeasurement, new VisionIO() {}, new VisionIO()
+        // {});
 
-        shotCalculator = new ShotCalculator(swerveSubsystem);
-        hoodSubsystem = new HoodSubsystem(new HoodIOSim());
-        flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
-        shooterSubsystem =
-            new ShooterSubsystem(
-                new FlywheelSubsystem(new FlywheelIO() {}),
-                new HoodSubsystem(new HoodIO() {}),
-                new ShotCalculator(swerveSubsystem),
-                swerveSubsystem::getPose,
-                swerveSubsystem::getChassisSpeeds);
         break;
     }
 
@@ -229,27 +202,8 @@ public class RobotContainer {
                 () -> -controller.getLeftX(),
                 () -> shotCalculator.getCorrectTargetRotation()));
 
-    // shooterFuelSim.repeatedlyLaunchFuel(
-    // () -> {
-    //   return Units.MetersPerSecond.of(calculator.getCorrectTargetVelocity());
-    // },
-    // () -> Units.Degrees.of(calculator.getCorrectedTargetAngle()),
-    // this));
-
-    // Shoot on the fly when X button is pressed
-    // controller.x().whileTrue(shooterSubsystem.simShootOnTheFlyCommand());
-
-    // // Shoot on the fly while Y button is held, With drive control
-    // controller
-    //     .y()
-    //     .whileTrue(
-    //         Commands.parallel(
-    //             DriveCommands.joystickDriveAtAngle(
-    //                 swerveSubsystem,
-    //                 () -> -controller.getLeftY(),
-    //                 () -> -controller.getLeftX(),
-    //                 () -> shotCalculator.getCorrectTargetRotation()),
-    //             shooterSubsystem.simShootOnTheFlyCommand()));
+    // Switch to X pattern when X button is pressed
+    controller.x().onTrue(Commands.runOnce(swerveSubsystem::stopWithX, swerveSubsystem));
 
     // Reset gyro to 0° when B button is pressed
     controller
@@ -273,7 +227,7 @@ public class RobotContainer {
     //               aimController.reset();
     //             },
     //             () -> {
-    //                 swerveSubsystem.runEnd(() -> {
+    //                 swerveSubsystem.run(0.0,
     // aimController.calculate(vision.getTargetX(0).getRadians()));
     //             },
     //             swerveSubsystem));
@@ -313,5 +267,14 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  /**
+   * Returns whether vision estimates should be clamped.
+   *
+   * @return true if vision estimates should be clamped. Enabled by default.
+   */
+  public Integer enableVisionClamp() {
+    return clampVisionChooser.get();
   }
 }

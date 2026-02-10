@@ -5,21 +5,25 @@ import org.littletonrobotics.junction.AutoLog;
 public interface FlywheelIO {
   @AutoLog
   public static class FlywheelIOInputs {
-    public boolean connected;
-    public double flywheelRPM;
-    public double velocityRadsPerSec;
-    public double appliedVoltage;
-    public double supplyCurrentAmps;
-    public double torqueCurrentAmps;
+    public boolean masterMotorConnected = true;
+    public boolean followerMotorConnected = true;
 
-    public boolean followerConnected;
-    public double followerSupplyCurrentAmps;
+    public double masterPositionRads = 0.0;
+    public double masterVelocityRads = 0.0;
+    public double masterAppliedVolts = 0.0;
+    public double masterSupplyCurrentAmps = 0.0;
+    public double masterTorqueCurrentAmps = 0.0;
+
+    public double followerPositionRads = 0.0;
+    public double followerVelocityRads = 0.0;
+    public double followerAppliedVolts = 0.0;
+    public double followerSupplyCurrentAmps = 0.0;
+    public double followerTorqueCurrentAmps = 0.0;
   }
 
   public static enum FlywheelIOOutputMode {
     COAST,
-    DUTY_CYCLE_BANG_BANG,
-    TORQUE_CURRENT_BANG_BANG
+    VELOCITY_SETPOINT
   }
 
   public static class FlywheelIOOutputs {
@@ -29,5 +33,11 @@ public interface FlywheelIO {
 
   default void updateInputs(FlywheelIOInputs inputs) {}
 
-  default void setFlywheelRPM(FlywheelIOOutputs outputs) {}
+  default void applyOutputs(FlywheelIOOutputs outputs) {}
+
+  default void runVelocity(double velocity) {}
+
+  default void runVolts(double masterVolts) {}
+
+  default void stop() {}
 }

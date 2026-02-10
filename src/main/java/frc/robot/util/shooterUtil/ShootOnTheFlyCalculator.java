@@ -1,6 +1,5 @@
 package frc.robot.util.shooterUtil;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -18,26 +17,8 @@ public class ShootOnTheFlyCalculator {
   public record ShotSolution(double launchPitchRad, double launchSpeed, double flightTimeSeconds) {}
 
   /*
-   * Generates a rough estimate of the time it will take for a projectile to reach a target. This helps seed the
-   * iterative calculation of the effective target location.
-   */
-  public static double getCrappyTimeToShoot(Pose2d robotPose, Pose3d targetPose) {
-
-    Transform3d diff = new Pose3d(robotPose).minus(targetPose);
-    double xyDistance = new Translation2d(diff.getX(), diff.getY()).getNorm();
-    double distance = diff.getTranslation().getNorm();
-
-    double projectileVelocity =
-        ShootOnTheFlyConstants.FLYWHEEL_VELOCITY_INTERPOLATOR.get(xyDistance);
-
-    double time = distance / projectileVelocity;
-
-    return time;
-  }
-  /*
    * Uses actual physics to more accurately estimate the time it will take for a projectile to reach a target.
    *  This helps seed the iterative calculation of the effective target location. Discounting air resistance.
-   * Input: velocity, angle, startHeight, targetHeight
    */
   public static double getTimeToShootUsingPhysics(Pose3d robotPose, Pose3d targetPose) { // GRAVITY
 
@@ -78,18 +59,18 @@ public class ShootOnTheFlyCalculator {
 
     Pose3d correctedTargetPose = new Pose3d();
     for (int i = 0; i < goalPositionIterations; i++) {
-      double virtualGoalX = targetPose.getX();
-      // - shotTime
-      //     / 2
-      //     * (fieldRelRobotVelocity.vxMetersPerSecond
-      //         + fieldRelRobotAcceleration.axMetersPerSecondSquared
-      //             * accelerationCompensationFactor);
-      double virtualGoalY = targetPose.getY();
-      // - shotTime
-      //     / 2
-      //     * (fieldRelRobotVelocity.vyMetersPerSecond
-      //         + fieldRelRobotAcceleration.ayMetersPerSecondSquared
-      //             * accelerationCompensationFactor);
+      double virtualGoalX =
+          targetPose.getX()
+              - shotTime
+                  * (fieldRelRobotVelocity.vxMetersPerSecond
+                      + fieldRelRobotAcceleration.axMetersPerSecondSquared
+                          * accelerationCompensationFactor);
+      double virtualGoalY =
+          targetPose.getY()
+              - shotTime
+                  * (fieldRelRobotVelocity.vyMetersPerSecond
+                      + fieldRelRobotAcceleration.ayMetersPerSecondSquared
+                          * accelerationCompensationFactor);
 
       correctedTargetPose =
           new Pose3d(virtualGoalX, virtualGoalY, targetPose.getZ(), targetPose.getRotation());
