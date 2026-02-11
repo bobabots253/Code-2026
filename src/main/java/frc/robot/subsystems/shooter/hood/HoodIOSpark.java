@@ -1,11 +1,8 @@
 package frc.robot.subsystems.shooter.hood;
 
-import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkMasterFlyWheelkP;
 import static frc.robot.subsystems.shooter.hood.HoodConstants.*;
-
 import static frc.robot.util.SparkUtil.tryUntilOk;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -16,7 +13,6 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import edu.wpi.first.math.util.Units;
 
 // Note: CAD'ed Absolute Encoder is pointless
 public class HoodIOSpark implements HoodIO {
@@ -41,13 +37,11 @@ public class HoodIOSpark implements HoodIO {
     masterVortexController = masterVortex.getClosedLoopController();
 
     var masterVortexConfig = new SparkFlexConfig();
-    masterVortexConfig
-        .idleMode(IdleMode.kBrake)
-        .inverted(false)
-        .smartCurrentLimit(35);
+    masterVortexConfig.idleMode(IdleMode.kBrake).inverted(false).smartCurrentLimit(35);
     masterVortexConfig
         .encoder
-        .positionConversionFactor(masterPositionConversionFactor) // Rot to Rad // (2.0 * Math.PI) / kTotalReduction
+        .positionConversionFactor(
+            masterPositionConversionFactor) // Rot to Rad // (2.0 * Math.PI) / kTotalReduction
         .velocityConversionFactor(masterVelocityConversionFactor)
         .inverted(false)
         .uvwMeasurementPeriod(10)
@@ -56,7 +50,8 @@ public class HoodIOSpark implements HoodIO {
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .pid(sparkMasterHoodkP, sparkMasterHoodkI, sparkMasterHoodkD);
-    masterVortexConfig.softLimit
+    masterVortexConfig
+        .softLimit
         .reverseSoftLimitEnabled(true)
         .reverseSoftLimit(minAngleRad)
         .forwardSoftLimitEnabled(true)
@@ -86,7 +81,8 @@ public class HoodIOSpark implements HoodIO {
   @Override
   public void updateInputs(HoodIOInputs inputs) {
     // Find a way to log master connection status
-    inputs.positionRads = masterRelativeEncoder.getPosition(); // Rot to Rad conversion is done in config
+    inputs.positionRads =
+        masterRelativeEncoder.getPosition(); // Rot to Rad conversion is done in config
     inputs.positionRadsPerSec = masterRelativeEncoder.getVelocity();
     inputs.appliedVoltage = masterVortex.getAppliedOutput() * masterVortex.getBusVoltage();
     inputs.supplyCurrentAmps = masterVortex.getOutputCurrent();
@@ -108,9 +104,7 @@ public class HoodIOSpark implements HoodIO {
         break;
       case CLOSED_LOOP:
         masterVortexController.setSetpoint(
-            safeSetpoint,
-            SparkBase.ControlType.kPosition,
-            ClosedLoopSlot.kSlot0);
+            safeSetpoint, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot0);
         break;
     }
   }

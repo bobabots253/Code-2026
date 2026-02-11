@@ -1,5 +1,3 @@
 package frc.robot.subsystems.intake.roller;
 
-public class RollerIOSpark {
-    
-}
+public class RollerIOSpark {}

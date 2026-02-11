@@ -1,5 +1,3 @@
 package frc.robot.subsystems.intake.pivot;
 
-public class PivotSubsystem {
-    
-}
+public class PivotSubsystem {}
