@@ -3,41 +3,37 @@ package frc.robot.subsystems.shooter.flywheel;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface FlywheelIO {
-  @AutoLog
-  public static class FlywheelIOInputs {
-    public boolean masterMotorConnected = true;
-    public boolean followerMotorConnected = true;
+    @AutoLog
+    public static class FlywheelIOInputs{
+    public boolean flywheelMasterConnected = false;
+    public double flywheelMasterVolts = 0.0;
+    public double flywheelMasterCurrentAmps = 0.0;
+    public double flywheelMasterTorqueCurrent = 0.0;
+    public double flywheelMasterVelocityRad = 0.0;
+    public double flywheelMasterPosRad = 0.0;
 
-    public double masterPositionRads = 0.0;
-    public double masterVelocityRads = 0.0;
-    public double masterAppliedVolts = 0.0;
-    public double masterSupplyCurrentAmps = 0.0;
-    public double masterTorqueCurrentAmps = 0.0;
+    public boolean flywheelFollowerConnected = false;
+    public double flywheelFollowerVolts = 0.0;
+    public double flywheelFollowerCurrentAmps = 0.0;
+    public double flywheelFollowerTorqueCurrent = 0.0;
+    public double flywheelFollowerVelocityRad = 0.0;
+    public double flywheelFollowerPosRad = 0.0;
+    }
+    
+    public static class FlywheelIOOutputs {
+    double velocityRadsPerSec = 0.0; 
+    }
 
-    public double followerPositionRads = 0.0;
-    public double followerVelocityRads = 0.0;
-    public double followerAppliedVolts = 0.0;
-    public double followerSupplyCurrentAmps = 0.0;
-    public double followerTorqueCurrentAmps = 0.0;
-  }
+default void updateInputs(FlywheelIOInputs inputs){}
 
-  public static enum FlywheelIOOutputMode {
-    COAST,
-    VELOCITY_SETPOINT
-  }
+default void applyOutputs(FlywheelIOOutputs outputs){}
 
-  public static class FlywheelIOOutputs {
-    public FlywheelIOOutputMode mode = FlywheelIOOutputMode.COAST;
-    public double velocityRadsPerSec = 0.0;
-  }
+default void runVolts(double volts){}
 
-  default void updateInputs(FlywheelIOInputs inputs) {}
+default void runVelocity(double velocity){}
 
-  default void applyOutputs(FlywheelIOOutputs outputs) {}
+default void stop(){}
 
-  default void runVelocity(double velocity) {}
 
-  default void runVolts(double masterVolts) {}
-
-  default void stop() {}
+    
 }
