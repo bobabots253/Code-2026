@@ -5,32 +5,27 @@ import org.littletonrobotics.junction.AutoLog;
 public interface HoodIO {
   @AutoLog
   public static class HoodIOInputs {
-    public boolean masterMotorConnected = true;
+  public boolean hoodSparkConnected = false;
+  public double hoodCurrentAmps = 0.0;
+  public double hoodCurrentTorque = 0.0;
+  public double hoodPosRad = 0.0;
+  public double hoodVelocityRad = 0.0;
+  public double hoodPosDeg = 0.0;
+}
 
-    public double positionRads = 0.0;
-    public double positionRadsPerSec = 0.0;
-    public double appliedVoltage = 0.0;
-    public double supplyCurrentAmps = 0.0;
-    public double torqueCurrentAmps = 0.0;
-  }
-
-  public static enum HoodIOOutputMode {
-    COAST,
-    BRAKE,
-    CLOSED_LOOP
+  public static enum HoodIOStates {
+    BRAKE_MODE,
+    COAST_MODE, 
+    CLOSED_LOOP_CONTROL;
   }
 
   public static class HoodIOOutputs {
-    public HoodIOOutputMode mode = HoodIOOutputMode.BRAKE;
-    public double positionRad = 0.0;
-    public double velocityRadsPerSec = 0.0;
+  public double hoodSetPosRad = 0.0;
   }
-
-  public default void updateInputs(HoodIOInputs inputs) {}
-
-  public default void applyOutputs(HoodIOOutputs outputs) {}
-
-  default void runOpenLoop(double decimalPercentage) {}
-
-  default void stop() {}
+  
+  default void updateInputs() {}
+  default void applyOutputs() {}
+  default void setPercentVoltage (double decimalPercent) {}
+  default void setPosition (double setpoint) {}
+  default void stop () {}
 }
