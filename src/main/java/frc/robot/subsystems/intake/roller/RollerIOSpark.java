@@ -15,11 +15,11 @@ public class RollerIOSpark implements RollerIO {
   private final SparkBase rollerBase;
 
   public RollerIOSpark() {
-    rollerBase = new SparkMax(11, MotorType.kBrushless);
+    rollerBase = new SparkMax(10, MotorType.kBrushless);
     SparkMaxConfig rollerSparkConfig = new SparkMaxConfig();
     rollerSparkConfig
-        .idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(20)
+        .idleMode(IdleMode.kCoast)
+        .smartCurrentLimit(50)
         .signals
         .appliedOutputPeriodMs(20)
         .busVoltagePeriodMs(20)

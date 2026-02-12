@@ -13,9 +13,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,34 +20,23 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
-import frc.robot.subsystems.shooter.ShooterSubsystem;
-import frc.robot.subsystems.shooter.ShotCalculator;
-import frc.robot.subsystems.shooter.flywheel.FlywheelIO;
-import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
-import frc.robot.subsystems.shooter.flywheel.FlywheelSubsystem;
-import frc.robot.subsystems.shooter.hood.HoodIO;
-import frc.robot.subsystems.shooter.hood.HoodIOSim;
-import frc.robot.subsystems.shooter.hood.HoodSubsystem;
-import frc.robot.subsystems.intake.roller.RollerSubsystem;
-import frc.robot.subsystems.intake.roller.RollerIO;
 import frc.robot.subsystems.intake.roller.RollerIOSpark;
+import frc.robot.subsystems.intake.roller.RollerSubsystem;
+import frc.robot.subsystems.shooter.ShotCalculator;
 import frc.robot.subsystems.swerve.GyroIO;
 import frc.robot.subsystems.swerve.GyroIOPigeon2;
 import frc.robot.subsystems.swerve.ModuleIO;
 import frc.robot.subsystems.swerve.ModuleIOSim;
 import frc.robot.subsystems.swerve.ModuleIOSpark;
-import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import frc.robot.util.fuelSimUtil.FuelSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -64,9 +50,9 @@ public class RobotContainer {
   private final SwerveSubsystem swerveSubsystem;
   private final Vision vision;
   private final ShotCalculator shotCalculator;
-  private final HoodSubsystem hoodSubsystem;
-  private final FlywheelSubsystem flywheelSubsystem;
-  private final ShooterSubsystem shooterSubsystem;
+  //   private final HoodSubsystem hoodSubsystem;
+  //   private final FlywheelSubsystem flywheelSubsystem;
+  //   private final ShooterSubsystem shooterSubsystem;
   private final RollerSubsystem rollerSubsystem;
 
   // Dashboard Inputs
@@ -111,16 +97,16 @@ public class RobotContainer {
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
 
-        hoodSubsystem = new HoodSubsystem(new frc.robot.subsystems.shooter.hood.HoodIOSpark());
-        flywheelSubsystem =
-            new FlywheelSubsystem(new frc.robot.subsystems.shooter.flywheel.FlywheelIOSpark());
-        shooterSubsystem =
-            new ShooterSubsystem(
-                flywheelSubsystem,
-                hoodSubsystem,
-                shotCalculator,
-                swerveSubsystem::getPose,
-                swerveSubsystem::getChassisSpeeds);
+        // hoodSubsystem = new HoodSubsystem(new frc.robot.subsystems.shooter.hood.HoodIOSpark());
+        // flywheelSubsystem =
+        //     new FlywheelSubsystem(new frc.robot.subsystems.shooter.flywheel.FlywheelIOSpark());
+        // shooterSubsystem =
+        //     new ShooterSubsystem(
+        //         flywheelSubsystem,
+        //         hoodSubsystem,
+        //         shotCalculator,
+        //         swerveSubsystem::getPose,
+        //         swerveSubsystem::getChassisSpeeds);
         rollerSubsystem = new RollerSubsystem(new RollerIOSpark());
 
         break;
@@ -158,18 +144,18 @@ public class RobotContainer {
                     swerveSubsystem::getPose));
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
-        hoodSubsystem = new HoodSubsystem(new HoodIOSim());
-        flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
-        shooterSubsystem =
-            new ShooterSubsystem(
-                flywheelSubsystem,
-                hoodSubsystem,
-                shotCalculator,
-                swerveSubsystem::getPose,
-                swerveSubsystem::getChassisSpeeds);
+        // hoodSubsystem = new HoodSubsystem(new HoodIOSim());
+        // flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
+        // shooterSubsystem =
+        //     new ShooterSubsystem(
+        //         flywheelSubsystem,
+        //         hoodSubsystem,
+        //         shotCalculator,
+        //         swerveSubsystem::getPose,
+        //         swerveSubsystem::getChassisSpeeds);
         rollerSubsystem = new RollerSubsystem(new RollerIOSpark());
 
-        configureFuelSim();
+        // configureFuelSim();
         break;
 
       default:
@@ -191,15 +177,15 @@ public class RobotContainer {
                 new VisionIO() {});
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
-        hoodSubsystem = new HoodSubsystem(new HoodIOSim());
-        flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
-        shooterSubsystem =
-            new ShooterSubsystem(
-                new FlywheelSubsystem(new FlywheelIO() {}),
-                new HoodSubsystem(new HoodIO() {}),
-                new ShotCalculator(swerveSubsystem),
-                swerveSubsystem::getPose,
-                swerveSubsystem::getChassisSpeeds);
+        // hoodSubsystem = new HoodSubsystem(new HoodIOSim());
+        // flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
+        // shooterSubsystem =
+        //     new ShooterSubsystem(
+        //         new FlywheelSubsystem(new FlywheelIO() {}),
+        //         new HoodSubsystem(new HoodIO() {}),
+        //         new ShotCalculator(swerveSubsystem),
+        //         swerveSubsystem::getPose,
+        //         swerveSubsystem::getChassisSpeeds);
         rollerSubsystem = new RollerSubsystem(new RollerIOSpark());
         break;
     }
@@ -232,9 +218,9 @@ public class RobotContainer {
     configureButtonBindings();
   }
 
-//   public Command rollerSpeed(double speed) {
-//     return new InstantCommand(rollerSubsystem, ()-> rollerSubsystem.setSpeed());
-//   }
+  //   public Command rollerSpeed(double speed) {
+  //     return new InstantCommand(rollerSubsystem, ()-> rollerSubsystem.setSpeed());
+  //   }
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
@@ -252,27 +238,22 @@ public class RobotContainer {
             () -> -controller.getRightX()));
 
     // Lock to Hub when A button is held
-    controller
-        .a()
-        .whileTrue(rollerSubsystem.setSpeed(0.1))
-        .onFalse(rollerSubsystem.setSpeed(0))
-        .whileFalse(rollerSubsystem.setSpeed(0));
-               
+    controller.a().whileTrue(rollerSubsystem.setSpeed(0.5)).whileFalse(rollerSubsystem.setSpeed(0));
 
     // Shoot on the fly when X button is pressed
-    controller.x().whileTrue(shooterSubsystem.simShootOnTheFlyCommand());
+    // controller.x().whileTrue(shooterSubsystem.simShootOnTheFlyCommand());
 
     // Shoot on the fly while Y button is held, With drive control
-    controller
-        .y()
-        .whileTrue(
-            Commands.parallel(
-                DriveCommands.joystickDriveAtAngle(
-                    swerveSubsystem,
-                    () -> -controller.getLeftY(),
-                    () -> -controller.getLeftX(),
-                    () -> shotCalculator.getCorrectTargetRotation()),
-                shooterSubsystem.simShootOnTheFlyCommand()));
+    // controller
+    //     .y()
+    //     .whileTrue(
+    //         Commands.parallel(
+    //             DriveCommands.joystickDriveAtAngle(
+    //                 swerveSubsystem,
+    //                 () -> -controller.getLeftY(),
+    //                 () -> -controller.getLeftX(),
+    //                 () -> shotCalculator.getCorrectTargetRotation()),
+    //             shooterSubsystem.simShootOnTheFlyCommand()));
 
     // Reset gyro to 0° when B button is pressed
     controller
@@ -287,31 +268,31 @@ public class RobotContainer {
                 .ignoringDisable(true));
   }
 
-  public void configureFuelSim() {
-    FuelSim instance = FuelSim.getInstance();
-    instance.spawnStartingFuel();
-    instance.registerRobot(
-        SwerveConstants.ROBOT_LENGTH.in(Meters),
-        SwerveConstants.ROBOT_WIDTH.in(Meters),
-        SwerveConstants.BUMPER_HEIGHT.in(Meters),
-        swerveSubsystem::getPose,
-        swerveSubsystem::getChassisSpeeds);
-    instance.registerIntake(
-        SwerveConstants.ROBOT_LENGTH.div(2).in(Meters),
-        SwerveConstants.ROBOT_LENGTH.div(2).plus(Inches.of(5)).in(Meters),
-        SwerveConstants.ROBOT_WIDTH.div(2).unaryMinus().in(Meters),
-        SwerveConstants.ROBOT_WIDTH.div(2).in(Meters),
-        () -> true && shooterSubsystem.simAbleToIntake(),
-        shooterSubsystem::simIntake);
+  //   public void configureFuelSim() {
+  //     FuelSim instance = FuelSim.getInstance();
+  //     instance.spawnStartingFuel();
+  //     instance.registerRobot(
+  //         SwerveConstants.ROBOT_LENGTH.in(Meters),
+  //         SwerveConstants.ROBOT_WIDTH.in(Meters),
+  //         SwerveConstants.BUMPER_HEIGHT.in(Meters),
+  //         swerveSubsystem::getPose,
+  //         swerveSubsystem::getChassisSpeeds);
+  //     instance.registerIntake(
+  //         SwerveConstants.ROBOT_LENGTH.div(2).in(Meters),
+  //         SwerveConstants.ROBOT_LENGTH.div(2).plus(Inches.of(5)).in(Meters),
+  //         SwerveConstants.ROBOT_WIDTH.div(2).unaryMinus().in(Meters),
+  //         SwerveConstants.ROBOT_WIDTH.div(2).in(Meters),
+  //         () -> true && shooterSubsystem.simAbleToIntake(),
+  //         shooterSubsystem::simIntake);
 
-    instance.start();
-    Commands.runOnce(
-            () -> {
-              FuelSim.getInstance().clearFuel();
-              FuelSim.getInstance().spawnStartingFuel();
-            })
-        .schedule();
-  }
+  // instance.start();
+  // Commands.runOnce(
+  //         () -> {
+  //           FuelSim.getInstance().clearFuel();
+  //           FuelSim.getInstance().spawnStartingFuel();
+  //         })
+  //     .schedule();
+  //   }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
