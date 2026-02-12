@@ -108,12 +108,19 @@ var flywheelFollowerConfig = new SparkFlexConfig();
   }
 
   @Override
-  public void runVelocity(double velocity) {
-    double setPoint =
-        MathUtil.inputModulus(
-            flywheelMasterEncoder.getPosition(), flywheelPIDMinOutput, flywheelPIDMaxOutput);
-    flywheelController.setSetpoint(setPoint, ControlType.kVelocity);
-  }
+  public void applyOutputs(FlywheelIOOutputs outputs) {
+    switch (outputs.mode) {
+        case COAST:
+            flywheelMasterVortex.stopMotor();
+            break;
+        case VOLTAGE:
+            flywheelMasterVortex.set(1);
+            break;
+        case CLOSED_LOOP:
+            flywheelController.setSetpoint(outputs.velocityRadsPerSec,ControlType.kVelocity);
+            break;
+    }
   
   
+}
 }

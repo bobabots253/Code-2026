@@ -20,8 +20,16 @@ public interface FlywheelIO {
     public double flywheelFollowerPosRad = 0.0;
     }
     
+
+    public static enum FlywheelOutputMode{
+        CLOSED_LOOP,
+        VOLTAGE,
+        COAST;
+    }
+
     public static class FlywheelIOOutputs {
     double velocityRadsPerSec = 0.0; 
+    FlywheelOutputMode mode = FlywheelOutputMode.COAST;
     }
 
 default void updateInputs(FlywheelIOInputs inputs){}
