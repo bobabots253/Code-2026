@@ -238,7 +238,11 @@ public class RobotContainer {
             () -> -controller.getRightX()));
 
     // Lock to Hub when A button is held
-    controller.a().whileTrue(rollerSubsystem.setSpeed(0.5)).whileFalse(rollerSubsystem.setSpeed(0));
+    controller
+        .a()
+        .whileTrue(rollerSubsystem.setVoltage(-6.0))
+        .whileFalse(rollerSubsystem.setVoltage(0));
+    // .whileFalse(rollerSubsystem.setVoltage(0));
 
     // Shoot on the fly when X button is pressed
     // controller.x().whileTrue(shooterSubsystem.simShootOnTheFlyCommand());

@@ -18,8 +18,8 @@ public class RollerSubsystem extends FullSubsystem {
     Logger.processInputs("Intake roller log", inputs);
   }
 
-  public Command setSpeed(double speed) {
-    return run(() -> io.setRollerOpenLoop(speed));
+  public Command setVoltage(double voltage) {
+    return run(() -> io.setRollerOpenLoop(voltage));
   }
 
   @Override

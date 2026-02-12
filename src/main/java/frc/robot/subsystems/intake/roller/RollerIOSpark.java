@@ -41,7 +41,8 @@ public class RollerIOSpark implements RollerIO {
   }
 
   @Override
-  public void setRollerOpenLoop(double speed) {
-    rollerBase.set(speed);
+  /** USE VOLTS as a Double */
+  public void setRollerOpenLoop(double voltage) {
+    rollerBase.setVoltage(voltage);
   }
 }
