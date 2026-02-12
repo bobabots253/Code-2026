@@ -4,6 +4,8 @@ import frc.robot.util.FullSubsystem;
 import org.littletonrobotics.junction.Logger;
 // lalalalalalala
 
+import edu.wpi.first.wpilibj2.command.Command;
+
 public class RollerSubsystem extends FullSubsystem {
   private final RollerIO io;
   private final RollerIOInputsAutoLogged inputs = new RollerIOInputsAutoLogged();
@@ -17,8 +19,8 @@ public class RollerSubsystem extends FullSubsystem {
     Logger.processInputs("Intake roller log", inputs);
   }
 
-  public void setSpeed(double speed) {
-    io.setRollerOpenLoop(speed);
+  public Command setSpeed(double speed) {
+    return runOnce(() -> io.setRollerOpenLoop(speed));
   }
 
   @Override

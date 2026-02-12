@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
@@ -34,6 +35,9 @@ import frc.robot.subsystems.shooter.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.shooter.hood.HoodIO;
 import frc.robot.subsystems.shooter.hood.HoodIOSim;
 import frc.robot.subsystems.shooter.hood.HoodSubsystem;
+import frc.robot.subsystems.intake.roller.RollerSubsystem;
+import frc.robot.subsystems.intake.roller.RollerIO;
+import frc.robot.subsystems.intake.roller.RollerIOSpark;
 import frc.robot.subsystems.swerve.GyroIO;
 import frc.robot.subsystems.swerve.GyroIOPigeon2;
 import frc.robot.subsystems.swerve.ModuleIO;
@@ -63,6 +67,7 @@ public class RobotContainer {
   private final HoodSubsystem hoodSubsystem;
   private final FlywheelSubsystem flywheelSubsystem;
   private final ShooterSubsystem shooterSubsystem;
+  private final RollerSubsystem rollerSubsystem;
 
   // Dashboard Inputs
   private final LoggedDashboardChooser<Integer> clampVisionChooser =
@@ -116,6 +121,7 @@ public class RobotContainer {
                 shotCalculator,
                 swerveSubsystem::getPose,
                 swerveSubsystem::getChassisSpeeds);
+        rollerSubsystem = new RollerSubsystem(new RollerIOSpark());
 
         break;
 
@@ -161,6 +167,7 @@ public class RobotContainer {
                 shotCalculator,
                 swerveSubsystem::getPose,
                 swerveSubsystem::getChassisSpeeds);
+        rollerSubsystem = new RollerSubsystem(new RollerIOSpark());
 
         configureFuelSim();
         break;
@@ -193,6 +200,7 @@ public class RobotContainer {
                 new ShotCalculator(swerveSubsystem),
                 swerveSubsystem::getPose,
                 swerveSubsystem::getChassisSpeeds);
+        rollerSubsystem = new RollerSubsystem(new RollerIOSpark());
         break;
     }
 
@@ -224,6 +232,10 @@ public class RobotContainer {
     configureButtonBindings();
   }
 
+//   public Command rollerSpeed(double speed) {
+//     return new InstantCommand(rollerSubsystem, ()-> rollerSubsystem.setSpeed());
+//   }
+
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
@@ -242,12 +254,10 @@ public class RobotContainer {
     // Lock to Hub when A button is held
     controller
         .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                swerveSubsystem,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> shotCalculator.getCorrectTargetRotation()));
+        .whileTrue(rollerSubsystem.setSpeed(0.1))
+        .onFalse(rollerSubsystem.setSpeed(0))
+        .whileFalse(rollerSubsystem.setSpeed(0));
+               
 
     // Shoot on the fly when X button is pressed
     controller.x().whileTrue(shooterSubsystem.simShootOnTheFlyCommand());
