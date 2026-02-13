@@ -3,7 +3,6 @@ package frc.robot.subsystems.intake.pivot;
 import static frc.robot.subsystems.intake.pivot.PivotConstants.*;
 import static frc.robot.util.SparkUtil.*;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -13,11 +12,8 @@ import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.math.filter.Debouncer;
-import java.util.function.DoubleSupplier;
 
 public class PivotIOSpark implements PivotIO {
   /*
@@ -28,7 +24,7 @@ public class PivotIOSpark implements PivotIO {
 
   // Declare REV motor hardware
   private final SparkBase pivotVortex;
-  
+
   // Declare relative encoder
   private final RelativeEncoder pivotEncoder;
 
@@ -41,45 +37,38 @@ public class PivotIOSpark implements PivotIO {
     pivotController = pivotVortex.getClosedLoopController();
 
     SparkMaxConfig pivotConfig = new SparkMaxConfig();
+    pivotConfig.idleMode(IdleMode.kBrake).inverted(false).smartCurrentLimit(pivotCurrentLimit);
     pivotConfig
-      .idleMode(IdleMode.kBrake)
-      .inverted(false)
-      .smartCurrentLimit(pivotCurrentLimit);
+        .encoder
+        .inverted(false)
+        .positionConversionFactor(pivotPositionConversionFactor)
+        .velocityConversionFactor(pivotVelocityConversionFactor)
+        .uvwMeasurementPeriod(10)
+        .uvwAverageDepth(2);
     pivotConfig
-      .encoder
-      .inverted(false)
-      .positionConversionFactor(pivotPositionConversionFactor)
-      .velocityConversionFactor(pivotVelocityConversionFactor)
-      .uvwMeasurementPeriod(10)
-      .uvwAverageDepth(2);
-    pivotConfig
-      .closedLoop
-      .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-      .positionWrappingEnabled(true)
-      .pid(pivotkP, pivotkI, pivotkD);
-      
+        .closedLoop
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        .positionWrappingEnabled(true)
+        .pid(pivotkP, pivotkI, pivotkD);
+
     // add soft limits
 
     pivotConfig
-      .signals
-      .primaryEncoderPositionAlwaysOn(true)
-      .primaryEncoderPositionPeriodMs(20)
-      .primaryEncoderVelocityAlwaysOn(true)
-      .primaryEncoderVelocityPeriodMs(20)
-      .appliedOutputPeriodMs(20)
-      .busVoltagePeriodMs(20)
-      .outputCurrentPeriodMs(20);
-      
+        .signals
+        .primaryEncoderPositionAlwaysOn(true)
+        .primaryEncoderPositionPeriodMs(20)
+        .primaryEncoderVelocityAlwaysOn(true)
+        .primaryEncoderVelocityPeriodMs(20)
+        .appliedOutputPeriodMs(20)
+        .busVoltagePeriodMs(20)
+        .outputCurrentPeriodMs(20);
+
     tryUntilOk(
-      pivotVortex, 
-      5, 
-      () -> 
-        pivotVortex.configure(
-          pivotConfig, 
-          ResetMode.kResetSafeParameters, 
-          PersistMode.kPersistParameters
-        )
-    );
+        pivotVortex,
+        5,
+        () ->
+            pivotVortex.configure(
+                pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
   }
 
   @Override
@@ -98,7 +87,8 @@ public class PivotIOSpark implements PivotIO {
         pivotVortex.stopMotor();
         break;
       case RUNNING:
-        pivotController.setSetpoint(setpoint, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        pivotController.setSetpoint(
+            setpoint, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot0);
         break;
       case BRAKE:
         pivotVortex.stopMotor();

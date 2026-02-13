@@ -240,7 +240,7 @@ public class RobotContainer {
     // Lock to Hub when A button is held
     controller
         .a()
-        .whileTrue(rollerSubsystem.setVoltage(-6.0))
+        .whileTrue(rollerSubsystem.setVoltage(-12.0))
         .whileFalse(rollerSubsystem.setVoltage(0));
     // .whileFalse(rollerSubsystem.setVoltage(0));
 
