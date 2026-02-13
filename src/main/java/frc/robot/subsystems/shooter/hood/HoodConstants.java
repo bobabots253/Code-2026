@@ -4,7 +4,7 @@ import edu.wpi.first.math.util.Units;
 
 public class HoodConstants {
   public static final int sparkMasterHoodCanId = 14;
-
+  public static final int hoodCurrentLimit = 45;
   public static final double sparkMasterHoodkP = 0.01;
   public static final double sparkMasterHoodkI = 0.00;
   public static final double sparkMasterHoodkD = 0.00;
@@ -22,7 +22,7 @@ public class HoodConstants {
   private static final double kMotorToPinionReduction = 1.0;
   // Pinion Rotations per 1 full 360-degree Pivot Rotation
   private static final double kPinionToPivotReduction = 1.0;
-  private static final double kTotalReduction = kMotorToPinionReduction * kPinionToPivotReduction;
+  static final double kTotalReduction = kMotorToPinionReduction * kPinionToPivotReduction;
 
   public static final double minAngleRad = Math.toRadians(minAngleDeg);
   public static final double maxAngleRad = Math.toRadians(maxAngleDeg);

@@ -1,5 +1,3 @@
 package frc.robot.subsystems.agitator;
 
-public class AgitatorIO {
-    
-}
+public class AgitatorIO {}

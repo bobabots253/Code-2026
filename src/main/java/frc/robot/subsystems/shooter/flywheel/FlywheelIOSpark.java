@@ -1,28 +1,25 @@
 package frc.robot.subsystems.shooter.flywheel;
-import static frc.robot.util.SparkUtil.*;
+
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.*;
+import static frc.robot.util.SparkUtil.*;
 
-import java.util.function.DoubleSupplier;
-
+import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.PersistMode;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
+import java.util.function.DoubleSupplier;
 
-
-public class FlywheelIOSpark implements FlywheelIO{
-private final SparkBase flywheelMasterVortex;
-private final SparkBase flywheelFollowerVortex;
+public class FlywheelIOSpark implements FlywheelIO {
+  private final SparkBase flywheelMasterVortex;
+  private final SparkBase flywheelFollowerVortex;
   private final SparkClosedLoopController flywheelController;
   private final Debouncer flywheelDebouncer = new Debouncer(0.5, Debouncer.DebounceType.kFalling);
   private final RelativeEncoder flywheelMasterEncoder;
@@ -59,14 +56,16 @@ private final SparkBase flywheelFollowerVortex;
         5,
         () ->
             flywheelMasterVortex.configure(
-                flywheelMasterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
-    
-var flywheelFollowerConfig = new SparkFlexConfig();
+                flywheelMasterConfig,
+                ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters));
+
+    var flywheelFollowerConfig = new SparkFlexConfig();
     flywheelFollowerConfig
         .idleMode(IdleMode.kBrake)
         .smartCurrentLimit(flywheelCurrentLimit)
         .voltageCompensation(12.0)
-        .follow(flywheelMasterVortex,true);
+        .follow(flywheelMasterVortex, true);
     flywheelFollowerConfig
         .encoder
         .inverted(flywheelEncoderInverted)
@@ -81,15 +80,19 @@ var flywheelFollowerConfig = new SparkFlexConfig();
         5,
         () ->
             flywheelFollowerVortex.configure(
-                flywheelFollowerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
-    
+                flywheelFollowerConfig,
+                ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters));
   }
+
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
     sparkStickyFault = false;
     ifOk(
         flywheelMasterVortex,
-        new DoubleSupplier[] {flywheelMasterVortex::getAppliedOutput, flywheelMasterVortex::getBusVoltage},
+        new DoubleSupplier[] {
+          flywheelMasterVortex::getAppliedOutput, flywheelMasterVortex::getBusVoltage
+        },
         (values) -> inputs.flywheelMasterVolts = values[0] * values[1]);
     inputs.flywheelMasterCurrentAmps = flywheelMasterVortex.getOutputCurrent();
     inputs.flywheelMasterPosRad = flywheelMasterEncoder.getPosition();
@@ -98,29 +101,28 @@ var flywheelFollowerConfig = new SparkFlexConfig();
 
     ifOk(
         flywheelFollowerVortex,
-        new DoubleSupplier[] {flywheelFollowerVortex::getAppliedOutput, flywheelFollowerVortex::getBusVoltage},
+        new DoubleSupplier[] {
+          flywheelFollowerVortex::getAppliedOutput, flywheelFollowerVortex::getBusVoltage
+        },
         (values) -> inputs.flywheelFollowerVolts = values[0] * values[1]);
     inputs.flywheelFollowerCurrentAmps = flywheelFollowerVortex.getOutputCurrent();
     inputs.flywheelFollowerPosRad = flywheelFollowerEncoder.getPosition();
     inputs.flywheelFollowerVelocityRad = flywheelFollowerEncoder.getVelocity();
     inputs.flywheelFollowerConnected = flywheelDebouncer.calculate(!sparkStickyFault);
-    
   }
 
   @Override
   public void applyOutputs(FlywheelIOOutputs outputs) {
     switch (outputs.mode) {
-        case COAST:
-            flywheelMasterVortex.stopMotor();
-            break;
-        case VOLTAGE:
-            flywheelMasterVortex.set(1);
-            break;
-        case CLOSED_LOOP:
-            flywheelController.setSetpoint(outputs.velocityRadsPerSec,ControlType.kVelocity);
-            break;
+      case COAST:
+        flywheelMasterVortex.stopMotor();
+        break;
+      case VOLTAGE:
+        flywheelMasterVortex.set(1);
+        break;
+      case CLOSED_LOOP:
+        flywheelController.setSetpoint(outputs.velocityRadsPerSec, ControlType.kVelocity);
+        break;
     }
-  
-  
-}
+  }
 }
