@@ -14,15 +14,16 @@ public interface HoodIO {
   }
 
   public static enum HoodIOMode {
-    ACCELERATION_CONTROL,
     BRAKE,
     CLOSED_LOOP_CONTROL,
+    PROFILED_CONTROL,
     VOLTAGE;
   }
 
   public static class HoodIOOutputs {
     public HoodIOMode mode = HoodIOMode.BRAKE;
     public double hoodSetPosRad = 0.0;
+    public double hoodSetVelocityRad = 0.0;
   }
 
   default void updateInputs(HoodIOInputsAutoLogged inputs) {}

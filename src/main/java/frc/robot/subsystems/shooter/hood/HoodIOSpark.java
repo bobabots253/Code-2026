@@ -19,6 +19,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -30,6 +31,7 @@ public class HoodIOSpark implements HoodIO {
   private final RelativeEncoder hoodEncoder;
   private final SparkClosedLoopController hoodController;
   private final ProfiledPIDController profiledHoodController;
+  private final SimpleMotorFeedforward hoodFF = new SimpleMotorFeedforward(sparkHoodProfiledkS, sparkHoodProfiledkV);
   private final Debouncer hoodDebounce;
 
   public HoodIOSpark() {
@@ -39,7 +41,7 @@ public class HoodIOSpark implements HoodIO {
     hoodController = hoodSpark.getClosedLoopController();
 
     profiledHoodController = new ProfiledPIDController(sparkHoodProfiledkP, sparkHoodProfiledkI, sparkHoodProfiledkD, 
-      new TrapezoidProfile.Constraints(sparkHoodMaxAccel, sparkHoodMaxVelocity), 0.01);
+      new TrapezoidProfile.Constraints(sparkHoodMaxAccel, sparkHoodMaxVelocity), 0.02);
 
     var hoodConfig = new SparkMaxConfig();
     hoodConfig
@@ -85,10 +87,13 @@ public class HoodIOSpark implements HoodIO {
         break;
       case VOLTAGE:
         setPercentVoltage(0.1);
+        break;
       case CLOSED_LOOP_CONTROL:
-        setPosition(Units.degreesToRotations(outputs.hoodSetPosRad));
-      case ACCELERATION_CONTROL: 
-        setPosition(Units.degreesToRotations(outputs.hoodSetPosRad));
+        setClosedLoopControl(outputs);
+        break;
+      case PROFILED_CONTROL: 
+          setClosedLoopControl(outputs);
+          break;
     }
   }
 
@@ -99,16 +104,14 @@ public class HoodIOSpark implements HoodIO {
   // public Boolean isWithinRange(Boolean withinRange) {
   //   ? 
   // }
-  public void setPosition(HoodIOOutputs outputs) {
-      switch (outputs.mode) {
-       case CLOSED_LOOP_CONTROL:
+  public void setClosedLoopControl(HoodIOOutputs outputs) {
+      if (outputs.mode == HoodIOMode.CLOSED_LOOP_CONTROL) {
         hoodController.setSetpoint(outputs.hoodSetPosRad, ControlType.kPosition);
-        break;
-      case ACCELERATION_CONTROL:
-        hoodSpark.setVoltage(profiledHoodController.calculate((hoodEncoder.getPosition() - hoodOffset), outputs.hoodSetPosRad));
-        break;
+      } else if (outputs.mode == HoodIOMode.PROFILED_CONTROL)
+       hoodSpark.setVoltage(profiledHoodController.calculate((hoodEncoder.getPosition() - hoodOffset), 
+        outputs.hoodSetPosRad + hoodFF.calculate(outputs.hoodSetVelocityRad)));
+
     }
-  }
   
   public Boolean atAngle(Boolean atAngle, double setpoint) {
     return atAngle;

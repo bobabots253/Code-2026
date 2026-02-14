@@ -12,6 +12,8 @@ public class HoodConstants {
   public static final double sparkHoodProfiledkP = 0.01;
   public static final double sparkHoodProfiledkI = 0.00;
   public static final double sparkHoodProfiledkD = 0.00;
+  public static final double sparkHoodProfiledkS = 0.00;
+  public static final double sparkHoodProfiledkV = 0.00;
   public static final double sparkHoodMaxAccel = 0.0;
   public static final double sparkHoodMaxVelocity = 0.0;
 

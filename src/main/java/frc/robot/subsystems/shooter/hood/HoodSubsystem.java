@@ -4,6 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,6 +28,7 @@ public class HoodSubsystem extends FullSubsystem {
   private final Debouncer hoodDebouncer = new Debouncer(0.2, DebounceType.kFalling);
   private double hoodOffset = 0.0;
   private double goalAngle = 0.0;
+  private double goalVelocity = 0.0;
   private Boolean hoodZeroed = false;
   public HoodSubsystem(HoodIO hoodIO) {
     
@@ -50,6 +52,7 @@ public class HoodSubsystem extends FullSubsystem {
     Logger.recordOutput("Hood / Outputs", outputs.mode);
     hoodIO.applyOutputs(outputs);
     outputs.hoodSetPosRad = MathUtil.clamp(goalAngle, minAngleRad, maxAngleRad) - hoodOffset;
+    outputs.hoodSetVelocityRad = goalVelocity;
   }
 
   public void zeroHood(){
@@ -57,8 +60,9 @@ public class HoodSubsystem extends FullSubsystem {
     hoodZeroed = true;
   }
 
-  public void setGoalPos(double angle) {
+  public void setGoalParams(double angle, double velocity) {
     angle = goalAngle;
+    velocity = goalVelocity;
   }
 
   @AutoLogOutput(key = "Hood Position (Deg)")
@@ -79,8 +83,8 @@ public class HoodSubsystem extends FullSubsystem {
   //   return run (() -> )
   // }
 
-  public Command staticTarget(DoubleSupplier angle) {
-    return run(()->setGoalPos(angle.getAsDouble()));
+  public Command staticTarget(DoubleSupplier angle, DoubleSupplier velocity) {
+    return run(()->setGoalParams(angle.getAsDouble(), velocity.getAsDouble()));
   }
 
   public Command zero() {
