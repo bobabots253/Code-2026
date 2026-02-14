@@ -13,7 +13,7 @@ public interface RollerIO {
 
   public default void updateInputs(RollerIOInputs inputs) {}
 
-  public default void setRollerOpenLoop(double speed) {}
+  public default void setRollerOpenLoop(double voltage) {}
 }
 
 

@@ -50,7 +50,7 @@ public class SwerveConstants {
   public static final Distance ROBOT_WIDTH = FRAME_WIDTH.plus(BUMPER_THICKNESS.times(2));
 
   // Zeroed rotation values for each module, Setup Step 1: Rotation2d(0.0); |
-  public static final Rotation2d frontLeftZeroRotation = new Rotation2d(-(Math.PI / 2));
+  public static final Rotation2d frontLeftZeroRotation = new Rotation2d((3 * Math.PI / 2));
   public static final Rotation2d frontRightZeroRotation = new Rotation2d();
   public static final Rotation2d backLeftZeroRotation = new Rotation2d((Math.PI));
   public static final Rotation2d backRightZeroRotation = new Rotation2d((Math.PI / 2));

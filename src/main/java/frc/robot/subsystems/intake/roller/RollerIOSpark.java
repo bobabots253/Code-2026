@@ -26,8 +26,8 @@ public class RollerIOSpark implements RollerIO {
 
     SparkMaxConfig rollerSparkConfig = new SparkMaxConfig();
     rollerSparkConfig
-        .idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(20)
+        .idleMode(IdleMode.kCoast)
+        .smartCurrentLimit(50)
         .signals
         .appliedOutputPeriodMs(20)
         .busVoltagePeriodMs(20)

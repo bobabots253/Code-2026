@@ -1,10 +1,9 @@
 package frc.robot.subsystems.intake.roller;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.util.FullSubsystem;
 import org.littletonrobotics.junction.Logger;
 // lalalalalalala
-
-import edu.wpi.first.wpilibj2.command.Command;
 
 public class RollerSubsystem extends FullSubsystem {
   private final RollerIO io;
@@ -20,8 +19,8 @@ public class RollerSubsystem extends FullSubsystem {
     
   }
 
-  public Command setSpeed(double speed) {
-    return runOnce(() -> io.setRollerOpenLoop(speed));
+  public Command setVoltage(double voltage) {
+    return run(() -> io.setRollerOpenLoop(voltage));
   }
 
   @Override
