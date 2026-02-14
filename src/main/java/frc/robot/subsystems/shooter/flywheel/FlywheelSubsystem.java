@@ -88,8 +88,8 @@ private void runVelocity(double velocityRadsPerSec){
     return runEnd(() -> runVelocity(velocity.getAsDouble()),this::stop);
   }
 
-   public Command runVolts(DoubleSupplier volts){
-    return runEnd(() -> runVelocity(volts.getAsDouble()),this::stop);
+   public Command runVoltage(DoubleSupplier volts){
+    return runEnd(() -> runVolts(volts.getAsDouble()),this::stop);
   }
 
   // public Command runCalculatedVelocity(){

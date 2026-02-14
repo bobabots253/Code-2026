@@ -19,4 +19,7 @@ public class FlywheelConstants {
   public static final double flywheelEncoderVelocityFactor =
       (2.0 * Math.PI) / 60 / flywheelReduction;
   public static final double flywheelTolerance = 1.00;
+  public static final double kS = 0.015;
+  public static final double kV = 0.015;
+  public static final double kA = 0.015;
 }

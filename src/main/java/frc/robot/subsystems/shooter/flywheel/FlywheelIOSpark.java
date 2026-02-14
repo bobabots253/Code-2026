@@ -16,6 +16,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
 import edu.wpi.first.math.controller.BangBangController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
 import java.util.function.DoubleSupplier;
 
@@ -26,6 +27,8 @@ public class FlywheelIOSpark implements FlywheelIO {
   private final Debouncer flywheelDebouncer = new Debouncer(0.5, Debouncer.DebounceType.kFalling);
   private final RelativeEncoder flywheelMasterEncoder;
   private final RelativeEncoder flywheelFollowerEncoder;
+    private final SimpleMotorFeedforward ffCalculator = new SimpleMotorFeedforward(kS, kV, kA);
+
 
   public FlywheelIOSpark() {
     flywheelMasterVortex = new SparkFlex(flywheelMasterCanID, MotorType.kBrushless);
@@ -113,19 +116,23 @@ public class FlywheelIOSpark implements FlywheelIO {
         flywheelMasterVortex.stopMotor();
         break;
       case VOLTAGE:
-        runVolts(0.5);
+        runVolts(6);
         break;
       case BANG_BANG:
-      runVelocity(outputs.velocityRadsPerSec);
+      runVelocityBangBang(outputs.velocityRadsPerSec);
         break;
     }
+    
   }
+@Override
 public void runVolts(double volts) {
-    flywheelMasterVortex.set(volts);
+    flywheelMasterVortex.setVoltage(volts);
 }
 
-public void runVelocity(double velocityRadsPerSec){
-    flywheelMasterVortex.set(flywheelController.calculate(flywheelMasterEncoder.getVelocity(), velocityRadsPerSec));
+public void runVelocityBangBang(double velocityRadsPerSec){
+    double ffVolts = ffCalculator.calculate(velocityRadsPerSec);
+    flywheelMasterVortex.set(flywheelController.calculate(flywheelMasterEncoder.getVelocity(), velocityRadsPerSec + 0.9 * ffVolts));
+
 }
 
 
