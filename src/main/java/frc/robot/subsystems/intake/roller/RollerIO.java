@@ -9,7 +9,20 @@ public interface RollerIO {
     public double rollerAppliedVolts = 0.0;
     public double rollerCurrentAmps = 0.0;
     public boolean RollerBeamBreak = false;
+    public boolean RollerConnected = false;
   }
+
+   public static enum RollerIOOutputMode {
+    COAST,
+    VOLTAGE;
+  }
+
+  public class RollerIOOutputs {
+    public RollerIOOutputMode mode = RollerIOOutputMode.COAST;
+    public double rollerSpeed = (0.0);
+  }
+
+  public default void updateOutputs(RollerIOOutputs outputs) {}
 
   public default void updateInputs(RollerIOInputs inputs) {}
 
