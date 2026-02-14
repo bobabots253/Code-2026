@@ -14,13 +14,15 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+
+import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.filter.Debouncer;
 import java.util.function.DoubleSupplier;
 
 public class FlywheelIOSpark implements FlywheelIO {
   private final SparkBase flywheelMasterVortex;
   private final SparkBase flywheelFollowerVortex;
-  private final SparkClosedLoopController flywheelController;
+  private final BangBangController flywheelController = new BangBangController(flywheelTolerance);
   private final Debouncer flywheelDebouncer = new Debouncer(0.5, Debouncer.DebounceType.kFalling);
   private final RelativeEncoder flywheelMasterEncoder;
   private final RelativeEncoder flywheelFollowerEncoder;
@@ -30,18 +32,11 @@ public class FlywheelIOSpark implements FlywheelIO {
     flywheelFollowerVortex = new SparkFlex(flywheelFollowerCanID, MotorType.kBrushless);
     flywheelMasterEncoder = flywheelMasterVortex.getEncoder();
     flywheelFollowerEncoder = flywheelFollowerVortex.getEncoder();
-    flywheelController = flywheelMasterVortex.getClosedLoopController();
     var flywheelMasterConfig = new SparkFlexConfig();
     flywheelMasterConfig
         .idleMode(IdleMode.kBrake)
         .smartCurrentLimit(flywheelCurrentLimit)
         .voltageCompensation(12.0);
-    flywheelMasterConfig
-        .closedLoop
-        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .positionWrappingEnabled(true)
-        .positionWrappingInputRange(flywheelPIDMinOutput, flywheelPIDMaxOutput)
-        .pid(flywheelVelocitykP, flywheelVelocitykI, flywheelVelocitykD);
     flywheelMasterConfig
         .encoder
         .inverted(flywheelEncoderInverted)
@@ -118,11 +113,22 @@ public class FlywheelIOSpark implements FlywheelIO {
         flywheelMasterVortex.stopMotor();
         break;
       case VOLTAGE:
-        flywheelMasterVortex.set(1);
+        runVolts(0.5);
         break;
-      case CLOSED_LOOP:
-        flywheelController.setSetpoint(outputs.velocityRadsPerSec, ControlType.kVelocity);
+      case BANG_BANG:
+      runVelocity(outputs.velocityRadsPerSec);
         break;
     }
   }
+public void runVolts(double volts) {
+    flywheelMasterVortex.set(volts);
 }
+
+public void runVelocity(double velocityRadsPerSec){
+    flywheelMasterVortex.set(flywheelController.calculate(flywheelMasterEncoder.getVelocity(), velocityRadsPerSec));
+}
+
+
+}
+
+

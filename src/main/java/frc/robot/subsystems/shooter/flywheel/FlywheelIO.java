@@ -21,7 +21,7 @@ public interface FlywheelIO {
   }
 
   public static enum FlywheelOutputMode {
-    CLOSED_LOOP,
+    BANG_BANG,
     VOLTAGE,
     COAST;
   }

@@ -1,5 +1,7 @@
 package frc.robot.subsystems.shooter.flywheel;
 
+import frc.robot.fieldSetup;
+
 public class FlywheelConstants {
   public static final int flywheelMasterCanID = 15;
   public static final int flywheelFollowerCanID = 16;
@@ -16,4 +18,5 @@ public class FlywheelConstants {
   public static final double flywheelEncoderPositionFactor = (2.0 * Math.PI) / flywheelReduction;
   public static final double flywheelEncoderVelocityFactor =
       (2.0 * Math.PI) / 60 / flywheelReduction;
+  public static final double flywheelTolerance = 1.00;
 }
