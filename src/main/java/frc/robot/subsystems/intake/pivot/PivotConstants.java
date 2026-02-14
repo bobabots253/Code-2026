@@ -3,7 +3,7 @@ package frc.robot.subsystems.intake.pivot;
 public class PivotConstants {
   public static final int pivotCanID = 9;
   public static final int pivotCurrentLimit = 50; // amps
-  public static final double pivotkP = 0.05;
+  public static final double pivotkP = 0.8;
   // big distance, big speed; small distance, small speed
   // start small 0.001, then step up slowly
   public static final double pivotkI = 0.0; // forgettable

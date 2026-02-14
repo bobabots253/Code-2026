@@ -250,7 +250,7 @@ public class RobotContainer {
         .whileFalse(rollerSubsystem.setVoltage(0));
     // .whileFalse(rollerSubsystem.setVoltage(0));
 
-    controller.x().whileTrue(pivotSubsystem.runTrackTargetCommand(-1.2));
+    controller.x().whileTrue(pivotSubsystem.runTrackTargetCommand(-2.185));
     controller.b().whileTrue(pivotSubsystem.runTrackTargetCommand(0));
 
     // Shoot on the fly when X button is pressed
