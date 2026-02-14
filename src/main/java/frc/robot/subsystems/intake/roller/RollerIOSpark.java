@@ -1,6 +1,7 @@
 package frc.robot.subsystems.intake.roller;
 
 import static frc.robot.util.SparkUtil.tryUntilOk;
+import static frc.robot.subsystems.intake.roller.RollerConstants.*;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
@@ -8,14 +9,21 @@ import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import edu.wpi.first.wpilibj.DigitalInput;
+
 import com.revrobotics.spark.config.SparkMaxConfig;
 import frc.robot.subsystems.intake.roller.RollerIO.RollerIOInputs;
 
 public class RollerIOSpark implements RollerIO {
-  private final SparkBase rollerBase;
+  private final DigitalInput rollerBeamBreak;
+  private final SparkBase rollerSpark;
 
   public RollerIOSpark() {
-    rollerBase = new SparkMax(10, MotorType.kBrushless);
+    rollerSpark = new SparkMax(11, MotorType.kBrushless);
+    rollerBeamBreak = new DigitalInput(beamBreakChannel); 
+
+
     SparkMaxConfig rollerSparkConfig = new SparkMaxConfig();
     rollerSparkConfig
         .idleMode(IdleMode.kCoast)
@@ -25,10 +33,10 @@ public class RollerIOSpark implements RollerIO {
         .busVoltagePeriodMs(20)
         .outputCurrentPeriodMs(20);
     tryUntilOk(
-        rollerBase,
+        rollerSpark,
         5,
         () ->
-            rollerBase.configure(
+            rollerSpark.configure(
                 rollerSparkConfig,
                 ResetMode.kResetSafeParameters,
                 PersistMode.kNoPersistParameters));
@@ -36,13 +44,30 @@ public class RollerIOSpark implements RollerIO {
 
   @Override
   public void updateInputs(RollerIOInputs inputs) {
-    inputs.rollerCurrentAmps = rollerBase.getOutputCurrent();
-    inputs.rollerAppliedVolts = rollerBase.getAppliedOutput() * rollerBase.getBusVoltage();
+    inputs.rollerCurrentAmps = rollerSpark.getOutputCurrent();
+    inputs.rollerAppliedVolts = rollerSpark.getAppliedOutput() * rollerSpark.getBusVoltage();
+    inputs.RollerBeamBreak = rollerBeamBreak.get();
   }
 
   @Override
-  /** USE VOLTS as a Double */
-  public void setRollerOpenLoop(double voltage) {
-    rollerBase.setVoltage(voltage);
+  public void setRollerOpenLoop(double speed) {
+    rollerSpark.set(speed);
+  }
+
+  public void updateOutputs(RollerIOOutputs outputs) {
+    switch (outputs.mode) {
+      case COAST:
+      rollerSpark.stopMotor();
+      break;
+      case VOLTAGE:
+      rollerSpark.set(outputs.rollerSpeed);
+      break;
+    }
+  }
+
+  public boolean hasFuel() {
+    return rollerBeamBreak.get();
   }
 }
+
+
