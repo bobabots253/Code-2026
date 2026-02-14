@@ -40,7 +40,7 @@ public class PivotIOSpark implements PivotIO {
     pivotConfig.idleMode(IdleMode.kBrake).inverted(false).smartCurrentLimit(pivotCurrentLimit);
     pivotConfig
         .encoder
-        .inverted(false)
+        // .inverted(true)
         .positionConversionFactor(pivotPositionConversionFactor)
         .velocityConversionFactor(pivotVelocityConversionFactor)
         .uvwMeasurementPeriod(10)
@@ -104,5 +104,10 @@ public class PivotIOSpark implements PivotIO {
   @Override
   public void stop() {
     setPercentageOpenLoop(0.0);
+  }
+
+  @Override
+  public void lazyClosedLoop(double target) {
+    pivotController.setSetpoint(target, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
 }

@@ -30,4 +30,6 @@ public interface PivotIO {
   public default void setPercentageOpenLoop(double decimalPercentage) {}
 
   public default void stop() {}
+
+  public default void lazyClosedLoop(double target) {}
 }

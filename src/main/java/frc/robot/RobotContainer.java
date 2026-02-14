@@ -14,15 +14,16 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.subsystems.intake.pivot.PivotIO;
+import frc.robot.subsystems.intake.pivot.PivotIOSim;
+import frc.robot.subsystems.intake.pivot.PivotIOSpark;
+import frc.robot.subsystems.intake.pivot.PivotSubsystem;
 import frc.robot.subsystems.intake.roller.RollerIOSpark;
 import frc.robot.subsystems.intake.roller.RollerSubsystem;
 import frc.robot.subsystems.shooter.ShotCalculator;
@@ -53,6 +54,7 @@ public class RobotContainer {
   //   private final HoodSubsystem hoodSubsystem;
   //   private final FlywheelSubsystem flywheelSubsystem;
   //   private final ShooterSubsystem shooterSubsystem;
+  private final PivotSubsystem pivotSubsystem;
   private final RollerSubsystem rollerSubsystem;
 
   // Dashboard Inputs
@@ -107,6 +109,7 @@ public class RobotContainer {
         //         shotCalculator,
         //         swerveSubsystem::getPose,
         //         swerveSubsystem::getChassisSpeeds);
+        pivotSubsystem = new PivotSubsystem(new PivotIOSpark());
         rollerSubsystem = new RollerSubsystem(new RollerIOSpark());
 
         break;
@@ -153,6 +156,7 @@ public class RobotContainer {
         //         shotCalculator,
         //         swerveSubsystem::getPose,
         //         swerveSubsystem::getChassisSpeeds);
+        pivotSubsystem = new PivotSubsystem(new PivotIOSim());
         rollerSubsystem = new RollerSubsystem(new RollerIOSpark());
 
         // configureFuelSim();
@@ -186,6 +190,8 @@ public class RobotContainer {
         //         new ShotCalculator(swerveSubsystem),
         //         swerveSubsystem::getPose,
         //         swerveSubsystem::getChassisSpeeds);
+        pivotSubsystem = new PivotSubsystem(new PivotIO() {});
+
         rollerSubsystem = new RollerSubsystem(new RollerIOSpark());
         break;
     }
@@ -244,6 +250,9 @@ public class RobotContainer {
         .whileFalse(rollerSubsystem.setVoltage(0));
     // .whileFalse(rollerSubsystem.setVoltage(0));
 
+    controller.x().whileTrue(pivotSubsystem.runTrackTargetCommand(-1.2));
+    controller.b().whileTrue(pivotSubsystem.runTrackTargetCommand(0));
+
     // Shoot on the fly when X button is pressed
     // controller.x().whileTrue(shooterSubsystem.simShootOnTheFlyCommand());
 
@@ -260,16 +269,17 @@ public class RobotContainer {
     //             shooterSubsystem.simShootOnTheFlyCommand()));
 
     // Reset gyro to 0° when B button is pressed
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        swerveSubsystem.setPose(
-                            new Pose2d(
-                                swerveSubsystem.getPose().getTranslation(), new Rotation2d())),
-                    swerveSubsystem)
-                .ignoringDisable(true));
+    //     controller
+    //         .b()
+    //         .onTrue(
+    //             Commands.runOnce(
+    //                     () ->
+    //                         swerveSubsystem.setPose(
+    //                             new Pose2d(
+    //                                 swerveSubsystem.getPose().getTranslation(), new
+    // Rotation2d())),
+    //                     swerveSubsystem)
+    //                 .ignoringDisable(true));
   }
 
   //   public void configureFuelSim() {
