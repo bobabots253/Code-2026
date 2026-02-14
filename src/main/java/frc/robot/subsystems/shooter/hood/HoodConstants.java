@@ -5,15 +5,20 @@ import edu.wpi.first.math.util.Units;
 public class HoodConstants {
   public static final int sparkMasterHoodCanId = 14;
   public static final int hoodCurrentLimit = 45;
-  public static final double sparkMasterHoodkP = 0.01;
-  public static final double sparkMasterHoodkI = 0.00;
-  public static final double sparkMasterHoodkD = 0.00;
+  public static final double sparkHoodkP = 0.01;
+  public static final double sparkHoodkI = 0.00;
+  public static final double sparkHoodkD = 0.00;
+
+  public static final double sparkHoodProfiledkP = 0.01;
+  public static final double sparkHoodProfiledkI = 0.00;
+  public static final double sparkHoodProfiledkD = 0.00;
+  public static final double sparkHoodMaxAccel = 0.0;
+  public static final double sparkHoodMaxVelocity = 0.0;
+
 
   public static final double toleranceDeg = 1.0;
   public static final double toleranceRad = Units.degreesToRadians(toleranceDeg);
 
-  public static final double minAngleDeg = 45.0;
-  public static final double maxAngleDeg = 85.0;
 
   public static final double hoodOffsetDeg = 1.0; // Degrees, Solve
 
@@ -24,8 +29,8 @@ public class HoodConstants {
   private static final double kPinionToPivotReduction = 1.0;
   static final double kTotalReduction = kMotorToPinionReduction * kPinionToPivotReduction;
 
-  public static final double minAngleRad = Math.toRadians(minAngleDeg);
-  public static final double maxAngleRad = Math.toRadians(maxAngleDeg);
+  public static final double minAngleRad = Units.degreesToRadians(45);
+  public static final double maxAngleRad = Units.degreesToRadians(45);
 
   // Beg Design team for these values
   public static final double masterPositionConversionFactor =

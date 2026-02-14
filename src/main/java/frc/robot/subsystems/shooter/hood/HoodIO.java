@@ -14,6 +14,7 @@ public interface HoodIO {
   }
 
   public static enum HoodIOMode {
+    ACCELERATION_CONTROL,
     BRAKE,
     CLOSED_LOOP_CONTROL,
     VOLTAGE;
@@ -21,7 +22,7 @@ public interface HoodIO {
 
   public static class HoodIOOutputs {
     public HoodIOMode mode = HoodIOMode.BRAKE;
-    public double hoodSetPosDeg = 0.0;
+    public double hoodSetPosRad = 0.0;
   }
 
   default void updateInputs(HoodIOInputsAutoLogged inputs) {}
@@ -31,4 +32,5 @@ public interface HoodIO {
   default void setPercentVoltage(double decimalPercent) {}
 
   default void setPosition(double setpoint) {}
+
 }

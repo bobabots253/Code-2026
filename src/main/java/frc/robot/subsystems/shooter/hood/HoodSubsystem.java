@@ -1,12 +1,22 @@
 package frc.robot.subsystems.shooter.hood;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Robot;
 import frc.robot.subsystems.shooter.hood.HoodIO.HoodIOOutputs;
 import frc.robot.util.FullSubsystem;
+
+import static frc.robot.subsystems.shooter.hood.HoodConstants.*;
+
+import java.util.function.DoubleSupplier;
+
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class HoodSubsystem extends FullSubsystem {
@@ -15,8 +25,13 @@ public class HoodSubsystem extends FullSubsystem {
   private final HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
   private final HoodIOOutputs outputs = new HoodIOOutputs();
   private final Debouncer hoodDebouncer = new Debouncer(0.2, DebounceType.kFalling);
-
+  private double hoodOffset = 0.0;
+  private double goalAngle = 0.0;
+  private Boolean hoodZeroed = false;
   public HoodSubsystem(HoodIO hoodIO) {
+    
+   
+
     this.hoodIO = hoodIO;
     hoodDisconnected = new Alert("Hood Motor Disconnected", AlertType.kError);
   }
@@ -34,5 +49,41 @@ public class HoodSubsystem extends FullSubsystem {
   public void periodicAfterScheduler() {
     Logger.recordOutput("Hood / Outputs", outputs.mode);
     hoodIO.applyOutputs(outputs);
+    outputs.hoodSetPosRad = MathUtil.clamp(goalAngle, minAngleRad, maxAngleRad) - hoodOffset;
+  }
+
+  public void zeroHood(){
+    hoodOffset = minAngleRad - inputs.hoodPosRad;
+    hoodZeroed = true;
+  }
+
+  public void setGoalPos(double angle) {
+    angle = goalAngle;
+  }
+
+  @AutoLogOutput(key = "Hood Position (Deg)")
+  public double getHoodAngle(){
+    return Units.radiansToDegrees(inputs.hoodPosRad + hoodOffset);
+  }
+
+  @AutoLogOutput
+  public boolean hoodAtGoal() {
+    return DriverStation.isEnabled()
+        && hoodZeroed
+        && Math.abs(getHoodAngle() - goalAngle)
+            <= Units.degreesToRadians(toleranceDeg);
+
+    }
+
+  // public Command trackTarget() {
+  //   return run (() -> )
+  // }
+
+  public Command staticTarget(DoubleSupplier angle) {
+    return run(()->setGoalPos(angle.getAsDouble()));
+  }
+
+  public Command zero() {
+    return runOnce(this::zeroHood).ignoringDisable(true);
   }
 }
