@@ -77,7 +77,8 @@ public class HoodIOSpark implements HoodIO {
         (values) -> inputs.hoodVolts = values[0] * values[1]);
     ifOk(hoodSpark, hoodSpark::getOutputCurrent, (value) -> inputs.hoodCurrentAmps = value);
     inputs.hoodSparkConnected = hoodDebounce.calculate(!sparkStickyFault);
-    ifOk(hoodSpark, hoodEncoder::getPosition, (value) -> inputs.hoodPosRad = value);
+    inputs.hoodPosRad = Units.rotationsToRadians(hoodEncoder.getPosition()); 
+    inputs.hoodVelocityRad = Units.rotationsToRadians(hoodEncoder.getVelocity());
   }
 
   public void applyOutputs(HoodIOOutputs outputs) {
@@ -92,7 +93,7 @@ public class HoodIOSpark implements HoodIO {
         setClosedLoopControl(outputs);
         break;
       case PROFILED_CONTROL: 
-          setClosedLoopControl(outputs);
+          setProfiledControl(outputs);
           break;
     }
   }
@@ -101,20 +102,16 @@ public class HoodIOSpark implements HoodIO {
     hoodSpark.set(decimalPercent);
   }
 
-  // public Boolean isWithinRange(Boolean withinRange) {
-  //   ? 
-  // }
   public void setClosedLoopControl(HoodIOOutputs outputs) {
-      if (outputs.mode == HoodIOMode.CLOSED_LOOP_CONTROL) {
         hoodController.setSetpoint(outputs.hoodSetPosRad, ControlType.kPosition);
-      } else if (outputs.mode == HoodIOMode.PROFILED_CONTROL)
+      }
+
+public void setProfiledControl(HoodIOOutputs outputs) {
        hoodSpark.setVoltage(profiledHoodController.calculate((hoodEncoder.getPosition() - hoodOffset), 
         outputs.hoodSetPosRad + hoodFF.calculate(outputs.hoodSetVelocityRad)));
-
     }
   
   public Boolean atAngle(Boolean atAngle, double setpoint) {
     return atAngle;
   }
   }
-//}

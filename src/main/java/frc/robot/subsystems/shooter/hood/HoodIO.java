@@ -10,7 +10,6 @@ public interface HoodIO {
     public double hoodCurrentAmps = 0.0;
     public double hoodPosRad = 0.0;
     public double hoodVelocityRad = 0.0;
-    public double hoodPosDeg = 0.0;
   }
 
   public static enum HoodIOMode {

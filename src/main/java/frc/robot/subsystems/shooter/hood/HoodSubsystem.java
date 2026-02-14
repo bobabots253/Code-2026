@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Robot;
+import frc.robot.subsystems.shooter.hood.HoodIO.HoodIOMode;
 import frc.robot.subsystems.shooter.hood.HoodIO.HoodIOOutputs;
 import frc.robot.util.FullSubsystem;
 
@@ -65,6 +66,22 @@ public class HoodSubsystem extends FullSubsystem {
     velocity = goalVelocity;
   }
 
+  public void runVoltage() {
+    outputs.mode = HoodIOMode.VOLTAGE;
+  }
+
+  public void runClosedLoop() {
+    outputs.mode = HoodIOMode.CLOSED_LOOP_CONTROL;
+  }
+
+public void runProfiled() {
+    outputs.mode = HoodIOMode.PROFILED_CONTROL;
+  }
+
+   public void stop() {
+    outputs.mode = HoodIOMode.BRAKE;
+  }
+
   @AutoLogOutput(key = "Hood Position (Deg)")
   public double getHoodAngle(){
     return Units.radiansToDegrees(inputs.hoodPosRad + hoodOffset);
@@ -84,10 +101,14 @@ public class HoodSubsystem extends FullSubsystem {
   // }
 
   public Command staticTarget(DoubleSupplier angle, DoubleSupplier velocity) {
-    return run(()->setGoalParams(angle.getAsDouble(), velocity.getAsDouble()));
+    return runEnd(()->setGoalParams(angle.getAsDouble(), velocity.getAsDouble()), this::stop);
   }
 
   public Command zero() {
     return runOnce(this::zeroHood).ignoringDisable(true);
+  }
+
+  public Command stopCommand() {
+    return runOnce(this::stop);
   }
 }
