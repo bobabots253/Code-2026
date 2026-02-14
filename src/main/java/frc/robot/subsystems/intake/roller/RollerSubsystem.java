@@ -17,6 +17,7 @@ public class RollerSubsystem extends FullSubsystem {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Intake roller log", inputs);
+    
   }
 
   public Command setSpeed(double speed) {

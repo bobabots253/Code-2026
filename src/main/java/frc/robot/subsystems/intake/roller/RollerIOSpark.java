@@ -1,6 +1,7 @@
 package frc.robot.subsystems.intake.roller;
 
 import static frc.robot.util.SparkUtil.tryUntilOk;
+import static frc.robot.subsystems.intake.roller.RollerConstants.*;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
@@ -8,14 +9,21 @@ import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import edu.wpi.first.wpilibj.DigitalInput;
+
 import com.revrobotics.spark.config.SparkMaxConfig;
 import frc.robot.subsystems.intake.roller.RollerIO.RollerIOInputs;
 
 public class RollerIOSpark implements RollerIO {
+  private final DigitalInput rollerBeamBreak;
   private final SparkBase rollerBase;
 
   public RollerIOSpark() {
     rollerBase = new SparkMax(11, MotorType.kBrushless);
+    rollerBeamBreak = new DigitalInput(beamBreakChannel); 
+
+
     SparkMaxConfig rollerSparkConfig = new SparkMaxConfig();
     rollerSparkConfig
         .idleMode(IdleMode.kBrake)
@@ -38,10 +46,17 @@ public class RollerIOSpark implements RollerIO {
   public void updateInputs(RollerIOInputs inputs) {
     inputs.rollerCurrentAmps = rollerBase.getOutputCurrent();
     inputs.rollerAppliedVolts = rollerBase.getAppliedOutput() * rollerBase.getBusVoltage();
+    inputs.RollerBeamBreak = rollerBeamBreak.get();
   }
 
   @Override
   public void setRollerOpenLoop(double speed) {
     rollerBase.set(speed);
   }
+
+  public boolean hasFuel() {
+    return rollerBeamBreak.get();
+  }
 }
+
+
