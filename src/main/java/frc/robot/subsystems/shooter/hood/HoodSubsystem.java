@@ -41,7 +41,7 @@ public class HoodSubsystem extends FullSubsystem {
     Logger.processInputs("Hood / Inputs", inputs);
 
     hoodDisconnected.set(
-        Robot.showHardwareAlerts() && !hoodDebouncer.calculate(inputs.hoodSparkConnected));
+        Robot.showHardwareAlerts() && !hoodDebouncer.calculate(inputs.masterNeoHoodConnected));
   }
 
   @Override
