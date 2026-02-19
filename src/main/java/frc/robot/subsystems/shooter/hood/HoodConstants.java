@@ -17,10 +17,8 @@ public class HoodConstants {
   public static final double sparkHoodMaxAccel = 0.0;
   public static final double sparkHoodMaxVelocity = 0.0;
 
-
   public static final double toleranceDeg = 1.0;
   public static final double toleranceRad = Units.degreesToRadians(toleranceDeg);
-
 
   public static final double hoodOffsetDeg = 1.0; // Degrees, Solve
 

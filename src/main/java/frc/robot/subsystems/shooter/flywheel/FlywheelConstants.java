@@ -1,7 +1,5 @@
 package frc.robot.subsystems.shooter.flywheel;
 
-import frc.robot.fieldSetup;
-
 public class FlywheelConstants {
   public static final int flywheelMasterCanID = 15;
   public static final int flywheelFollowerCanID = 16;

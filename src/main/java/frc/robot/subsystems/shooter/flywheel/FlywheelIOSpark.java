@@ -6,15 +6,11 @@ import static frc.robot.util.SparkUtil.*;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
-import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
-
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
@@ -27,8 +23,7 @@ public class FlywheelIOSpark implements FlywheelIO {
   private final Debouncer flywheelDebouncer = new Debouncer(0.5, Debouncer.DebounceType.kFalling);
   private final RelativeEncoder flywheelMasterEncoder;
   private final RelativeEncoder flywheelFollowerEncoder;
-    private final SimpleMotorFeedforward ffCalculator = new SimpleMotorFeedforward(kS, kV, kA);
-
+  private final SimpleMotorFeedforward ffCalculator = new SimpleMotorFeedforward(kS, kV, kA);
 
   public FlywheelIOSpark() {
     flywheelMasterVortex = new SparkFlex(flywheelMasterCanID, MotorType.kBrushless);
@@ -119,23 +114,20 @@ public class FlywheelIOSpark implements FlywheelIO {
         runVolts(6);
         break;
       case BANG_BANG:
-      runVelocityBangBang(outputs.velocityRadsPerSec);
+        runVelocityBangBang(outputs.velocityRadsPerSec);
         break;
     }
-    
   }
-@Override
-public void runVolts(double volts) {
+
+  @Override
+  public void runVolts(double volts) {
     flywheelMasterVortex.setVoltage(volts);
-}
+  }
 
-public void runVelocityBangBang(double velocityRadsPerSec){
+  public void runVelocityBangBang(double velocityRadsPerSec) {
     double ffVolts = ffCalculator.calculate(velocityRadsPerSec);
-    flywheelMasterVortex.set(flywheelController.calculate(flywheelMasterEncoder.getVelocity(), velocityRadsPerSec + 0.9 * ffVolts));
-
+    flywheelMasterVortex.set(
+        flywheelController.calculate(
+            flywheelMasterEncoder.getVelocity(), velocityRadsPerSec + 0.9 * ffVolts));
+  }
 }
-
-
-}
-
-
