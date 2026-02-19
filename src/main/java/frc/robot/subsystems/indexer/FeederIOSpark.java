@@ -56,4 +56,5 @@ public class FeederIOSpark implements FeederIO {
 
   @Override
   public void setFeederOpenLoop(double output) {}
+  feederSpark.set(output)
 }

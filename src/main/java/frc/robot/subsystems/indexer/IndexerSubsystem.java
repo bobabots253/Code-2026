@@ -1,5 +1,4 @@
 package frc.robot.subsystems.indexer;
-
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -35,12 +34,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
   public boolean hasFuel(){
     return beamBreakSensor.get();
   }
-  public Command runFeeder;{
-    if (hasFuel()){
-      
-    }
-    else{
-      System.out.println("No Fuel in Feeder");    
-    }
+  public Command runFeeder(){
+ return (FeederIOSpark.setFeederOpenLoop.unless(() -> !hasFuel.onTrue()));
   }
-}
+  }
