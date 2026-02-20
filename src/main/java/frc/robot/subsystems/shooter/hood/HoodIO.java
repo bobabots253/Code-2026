@@ -30,5 +30,4 @@ public interface HoodIO {
 
   default void runOpenLoop(double decimalPercentage) {}
 
-  default void stop() {}
 }

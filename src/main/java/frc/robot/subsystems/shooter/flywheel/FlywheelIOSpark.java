@@ -13,9 +13,7 @@ import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkMaste
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkMasterFlyWheelkI;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkMasterFlyWheelkP;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkMasterFlywheelCanId;
-import static frc.robot.util.SparkUtil.ifOk;
-import static frc.robot.util.SparkUtil.sparkStickyFault;
-import static frc.robot.util.SparkUtil.tryUntilOk;
+import static frc.robot.util.SparkUtil.*;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
@@ -81,10 +79,10 @@ public class FlywheelIOSpark implements FlywheelIO {
         .voltageCompensation(12.0);
     masterVortexConfig
         .encoder
-        .positionConversionFactor(masterFlywheelEncoderPositionFactor)
-        .velocityConversionFactor(masterFlywheelEncoderVelocityFactor)
-        .uvwMeasurementPeriod(10)
-        .uvwAverageDepth(2);
+        .positionConversionFactor(masterFlywheelEncoderPositionFactor) // Only used for logging
+        .velocityConversionFactor(masterFlywheelEncoderVelocityFactor) // THE USER MUST GET THIS RIGHT
+        .uvwMeasurementPeriod(10) // Measurement = Postion / deltaTime, this edits deltaTime to parameter
+        .uvwAverageDepth(2); // Does not affect positional control
     masterVortexConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
@@ -92,7 +90,7 @@ public class FlywheelIOSpark implements FlywheelIO {
     masterVortexConfig
         .signals
         .primaryEncoderPositionAlwaysOn(true)
-        .primaryEncoderPositionPeriodMs((int) (5))
+        .primaryEncoderPositionPeriodMs(5)
         .primaryEncoderVelocityAlwaysOn(true)
         .primaryEncoderVelocityPeriodMs(20)
         .appliedOutputPeriodMs(20)
@@ -110,8 +108,8 @@ public class FlywheelIOSpark implements FlywheelIO {
     var followerVortexConfig = new SparkFlexConfig();
     followerVortexConfig
         .idleMode(IdleMode.kCoast)
-        .follow(masterVortex, true)
-        .smartCurrentLimit(50) // Amps
+        .follow(masterVortex, true) // Confirm this inversion before running full speed
+        .smartCurrentLimit(50) // Amps, Max Out reasonable value for most power
         .voltageCompensation(12.0);
     followerVortexConfig
         .encoder
@@ -123,7 +121,7 @@ public class FlywheelIOSpark implements FlywheelIO {
     followerVortexConfig
         .signals
         .primaryEncoderPositionAlwaysOn(true)
-        .primaryEncoderPositionPeriodMs((int) (5))
+        .primaryEncoderPositionPeriodMs(5)
         .primaryEncoderVelocityAlwaysOn(true)
         .primaryEncoderVelocityPeriodMs(20)
         .appliedOutputPeriodMs(20)
@@ -189,8 +187,10 @@ public class FlywheelIOSpark implements FlywheelIO {
 
   @Override
   public void applyOutputs(FlywheelIOOutputs outputs) {
+    // TO-DO: Enforce Max Output RPM: 75% of Vortex Free-Speed RPM
+
     if (outputs.mode == FlywheelIOOutputMode.COAST) {
-      masterVortex.stopMotor();
+      masterVortex.stopMotor(); // Internal REV API calls "set(0);"
       wasCoasting = true;
       slewRateLimiter.reset(masterRelativeEncoder.getVelocity());
     } else {

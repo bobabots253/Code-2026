@@ -15,9 +15,6 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class HoodSubsystem extends FullSubsystem {
-  private static final double minAngle = Units.degreesToRadians(45);
-  private static final double maxAngle = Units.degreesToRadians(85);
-
   private final HoodIO io;
   private final HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
   private final HoodIOOutputs outputs = new HoodIOOutputs();

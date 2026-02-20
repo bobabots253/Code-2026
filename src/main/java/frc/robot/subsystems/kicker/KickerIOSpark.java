@@ -10,9 +10,7 @@ import static frc.robot.subsystems.kicker.KickerConstants.sparkMasterKicker;
 import static frc.robot.subsystems.kicker.KickerConstants.sparkMasterKickerkD;
 import static frc.robot.subsystems.kicker.KickerConstants.sparkMasterKickerkI;
 import static frc.robot.subsystems.kicker.KickerConstants.sparkMasterKickerkP;
-import static frc.robot.util.SparkUtil.ifOk;
-import static frc.robot.util.SparkUtil.sparkStickyFault;
-import static frc.robot.util.SparkUtil.tryUntilOk;
+import static frc.robot.util.SparkUtil.*;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
@@ -24,6 +22,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -33,16 +32,16 @@ import java.util.function.DoubleSupplier;
 
 public class KickerIOSpark implements KickerIO {
   // Declare REV motor hardware here
-  private final SparkBase masterVortex;
+  private final SparkBase masterNEO;
 
   // Declare REV encoders hardware here
   private final RelativeEncoder masterRelativeEncoder;
 
   // Declare motor controllers
-  private final SparkClosedLoopController masterVortexController;
+  private final SparkClosedLoopController masterNEOController;
 
   // Declare WPILib Debouncer for Motor Disconnection Alerts here
-  private final Debouncer masterVortexDebouncer =
+  private final Debouncer masterNEODebouncer =
       new Debouncer(0.25, Debouncer.DebounceType.kFalling);
 
   private final SimpleMotorFeedforward ffCalculator = new SimpleMotorFeedforward(kS, kV, kA);
@@ -53,44 +52,44 @@ public class KickerIOSpark implements KickerIO {
 
   public KickerIOSpark() {
     // Initialize REV motor hardware here
-    masterVortex = new SparkFlex(sparkMasterKicker, MotorType.kBrushless);
+    masterNEO = new SparkMax(sparkMasterKicker, MotorType.kBrushless);
 
     // Initialize REV encoders hardware here
-    masterRelativeEncoder = masterVortex.getEncoder();
+    masterRelativeEncoder = masterNEO.getEncoder();
 
     // Initialize motor controllers here
-    masterVortexController = masterVortex.getClosedLoopController();
+    masterNEOController = masterNEO.getClosedLoopController();
 
-    var masterVortexConfig = new SparkFlexConfig();
-    masterVortexConfig
+    var masterNEOConfig = new SparkFlexConfig();
+    masterNEOConfig
         .idleMode(IdleMode.kCoast)
         .smartCurrentLimit(50) // Amps
         .voltageCompensation(12.0);
-    masterVortexConfig
+    masterNEOConfig
         .encoder
         .positionConversionFactor(masterKickerEncoderPositionFactor)
         .velocityConversionFactor(masterKickerEncoderVelocityFactor)
         .uvwMeasurementPeriod(10)
         .uvwAverageDepth(2);
-    masterVortexConfig
+    masterNEOConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .pid(sparkMasterKickerkP, sparkMasterKickerkI, sparkMasterKickerkD);
-    masterVortexConfig
+    masterNEOConfig
         .signals
         .primaryEncoderPositionAlwaysOn(true)
-        .primaryEncoderPositionPeriodMs((int) (5))
+        .primaryEncoderPositionPeriodMs(5)
         .primaryEncoderVelocityAlwaysOn(true)
         .primaryEncoderVelocityPeriodMs(20)
         .appliedOutputPeriodMs(20)
         .busVoltagePeriodMs(20)
         .outputCurrentPeriodMs(20);
     tryUntilOk(
-        masterVortex,
+        masterNEO,
         5,
         () ->
-            masterVortex.configure(
-                masterVortexConfig,
+            masterNEO.configure(
+                masterNEOConfig,
                 ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters));
   }
@@ -101,23 +100,23 @@ public class KickerIOSpark implements KickerIO {
     // Use SparkStickyFaults to track motor connectivity (See SparkUtil for Implementation)
     sparkStickyFault = false;
     ifOk(
-        masterVortex,
+        masterNEO,
         masterRelativeEncoder::getPosition,
         (value) -> inputs.masterPositionRads = value);
     ifOk(
-        masterVortex,
+        masterNEO,
         masterRelativeEncoder::getVelocity,
         (value) -> inputs.masterVelocityRads = value);
     ifOk(
-        masterVortex,
-        new DoubleSupplier[] {masterVortex::getAppliedOutput, masterVortex::getBusVoltage},
+        masterNEO,
+        new DoubleSupplier[] {masterNEO::getAppliedOutput, masterNEO::getBusVoltage},
         (values) -> inputs.masterAppliedVolts = values[0] * values[1]);
     ifOk(
-        masterVortex,
-        masterVortex::getAppliedOutput,
+        masterNEO,
+        masterNEO::getAppliedOutput,
         (value) -> inputs.masterSupplyCurrentAmps = value);
     inputs.masterMotorConnected =
-        masterVortexDebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
+        masterNEODebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
   }
 
   @Override
@@ -125,7 +124,7 @@ public class KickerIOSpark implements KickerIO {
     // Utilize the same code logic from the flywheel
     // See src\main\java\frc\robot\subsystems\shooter\flywheel\FlywheelIOSpark.java
     if (outputs.mode == KickerIOOutputMode.COAST) {
-      masterVortex.stopMotor();
+      masterNEO.stopMotor();
       wasCoasting = true;
       slewRateLimiter.reset(masterRelativeEncoder.getVelocity());
     } else {
@@ -144,7 +143,7 @@ public class KickerIOSpark implements KickerIO {
 
     double ffVolts = ffCalculator.calculate(profiledSetpoint, accel);
 
-    masterVortexController.setSetpoint(
+    masterNEOController.setSetpoint(
         profiledSetpoint,
         ControlType.kVelocity,
         ClosedLoopSlot.kSlot0,
@@ -155,17 +154,17 @@ public class KickerIOSpark implements KickerIO {
 
   @Override
   public void runVolts(double masterVolts) {
-    masterVortex.setVoltage(masterVolts);
+    masterNEO.setVoltage(masterVolts);
   }
 
   @Override
   public void runVelocity(
       double velocity) { // Likely won't work due to FF implementation, but we can try this for funn
-    masterVortexController.setSetpoint(velocity, ControlType.kVelocity);
+    masterNEOController.setSetpoint(velocity, ControlType.kVelocity);
   }
 
   @Override
   public void stop() {
-    masterVortex.stopMotor();
+    masterNEO.stopMotor();
   }
 }

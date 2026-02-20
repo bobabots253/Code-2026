@@ -1,9 +1,8 @@
 package frc.robot.subsystems.shooter.hood;
 
 import static frc.robot.subsystems.shooter.hood.HoodConstants.*;
-import static frc.robot.util.SparkUtil.ifOk;
-import static frc.robot.util.SparkUtil.sparkStickyFault;
-import static frc.robot.util.SparkUtil.tryUntilOk;
+import static frc.robot.util.SparkUtil.*;
+
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
@@ -43,15 +42,18 @@ public class HoodIOSpark implements HoodIO {
     masterNEOController = masterNEO.getClosedLoopController();
 
     var masterNEOConfig = new SparkMaxConfig();
-    masterNEOConfig.idleMode(IdleMode.kBrake).inverted(false).smartCurrentLimit(35);
+    masterNEOConfig
+        .idleMode(IdleMode.kBrake)
+        .inverted(false)
+        .smartCurrentLimit(35); // Current Limit reduced for safety
     masterNEOConfig
         .encoder
         .positionConversionFactor(
-            masterPositionConversionFactor) // Rot to Rad // (2.0 * Math.PI) / kTotalReduction
-        .velocityConversionFactor(masterVelocityConversionFactor)
+            masterPositionConversionFactor) // THE USER MUST GET THIS RIGHT
+        .velocityConversionFactor(masterVelocityConversionFactor) // Only used for logging
         .inverted(false)
-        .uvwMeasurementPeriod(10)
-        .uvwAverageDepth(2);
+        .uvwMeasurementPeriod(10) // Measurement = Postion / deltaTime, this edits deltaTime to parameter
+        .uvwAverageDepth(2); // Does not affect positional control
     masterNEOConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
@@ -65,7 +67,7 @@ public class HoodIOSpark implements HoodIO {
     masterNEOConfig
         .signals
         .primaryEncoderPositionAlwaysOn(true)
-        .primaryEncoderPositionPeriodMs((int) (20))
+        .primaryEncoderPositionPeriodMs(20)
         .primaryEncoderVelocityAlwaysOn(true)
         .primaryEncoderVelocityPeriodMs(20)
         .appliedOutputPeriodMs(20)
@@ -79,11 +81,12 @@ public class HoodIOSpark implements HoodIO {
                 masterNEOConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
 
     // Assuming you never call reset position when you aren't supposed to
+    // IF you know that we auto-zero on enable, then implement setPosition call to reset pos.
   }
 
   @Override
   public void updateInputs(HoodIOInputs inputs) {
-    // Update all the FlywheelIO inputs for the master motor
+    // Update all the HoodIO inputs for the master motor
     // Use SparkStickyFaults to track motor connectivity (See SparkUtil for Implementation)
     sparkStickyFault = false;
     ifOk(
@@ -112,17 +115,23 @@ public class HoodIOSpark implements HoodIO {
 
     switch (outputs.mode) {
       case BRAKE:
-        masterNEO.stopMotor();
+        masterNEO.stopMotor(); // Internal REV API calls "set(0);"
         break;
       case CLOSED_LOOP:
         masterNEOController.setSetpoint(
+            // kSlot0 is the default setting slot called in the config for pid
             safeSetpoint, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot0);
         break;
     }
   }
 
-  // Utility for ensuring correct direction and possibly for characterization
-  // Use like <0.01 for testing if motor is going to be a V1.1
+  /**
+   * Utility for ensuring correct direction and possibly for characterization.
+   * Use like <0.01 for testing if motor is going to be a V1.1.
+   * Preferably do NOT use.
+   *  Instead use the state based system found in HoodSubsystem
+   * and edit the corresponding constructor arguement
+   */
   @Override
   public void runOpenLoop(double decimalPercentage) {
     masterNEO.set(decimalPercentage);

@@ -15,7 +15,7 @@ public class HoodConstants {
   public static final double minAngleDeg = 45.0;
   public static final double maxAngleDeg = 85.0;
 
-  public static final double hoodOffsetRad = Units.degreesToRadians(1.0); // Radians, Solve
+  public static final double hoodOffsetRad = Units.degreesToRadians(0.0); // Radians, Solve
 
   // Gear Ratio Calculations
   // Motor Rotations per Pinion Rotation
