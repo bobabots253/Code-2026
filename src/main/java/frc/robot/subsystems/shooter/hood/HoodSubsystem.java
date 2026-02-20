@@ -44,11 +44,11 @@ public class HoodSubsystem extends FullSubsystem {
     DEBUGGING(() -> HoodConstants.debuggingAngle);
 
     // Required Arguement for each enum state
-    private final DoubleSupplier velocityRadsPerSec;
+    private final DoubleSupplier angleRads;
 
     /** Returns the current target angle for this goal state. */
     private double getGoal() {
-      return velocityRadsPerSec.getAsDouble();
+      return angleRads.getAsDouble();
     }
   }
 
