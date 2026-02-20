@@ -49,7 +49,6 @@ public class FlywheelSubsystem extends FullSubsystem {
 
   private void runVolts(double volts) {
     outputs.mode = FlywheelOutputMode.VOLTAGE;
-    outputs.volts = volts;
   }
 
   private void runVelocity(double velocityRadsPerSec) {

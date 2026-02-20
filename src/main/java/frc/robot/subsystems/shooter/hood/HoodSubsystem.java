@@ -41,7 +41,7 @@ public class HoodSubsystem extends FullSubsystem {
     Logger.processInputs("Hood / Inputs", inputs);
 
     hoodDisconnected.set(
-        Robot.showHardwareAlerts() && !hoodDebouncer.calculate(inputs.hoodSparkConnected));
+        Robot.showHardwareAlerts() && !hoodDebouncer.calculate(inputs.masterNeoHoodConnected));
   }
 
   @Override
@@ -58,19 +58,23 @@ public class HoodSubsystem extends FullSubsystem {
   }
 
   public void setGoalParams(double angle, double velocity) {
-    angle = goalAngle;
-    velocity = goalVelocity;
+    goalAngle = angle;
+    goalVelocity = velocity;
   }
 
-  public void runVoltage() {
+public void setGoalParams(double angle) {
+    goalAngle = angle;
+  }
+
+  public void modeVoltage() {
     outputs.mode = HoodIOMode.VOLTAGE;
   }
 
-  public void runClosedLoop() {
+  public void modeClosedLoop() {
     outputs.mode = HoodIOMode.CLOSED_LOOP_CONTROL;
   }
 
-  public void runProfiled() {
+  public void modeProfiled() {
     outputs.mode = HoodIOMode.PROFILED_CONTROL;
   }
 
@@ -94,8 +98,8 @@ public class HoodSubsystem extends FullSubsystem {
   //   return run (() -> )
   // }
 
-  public Command staticTarget(DoubleSupplier angle, DoubleSupplier velocity) {
-    return runEnd(() -> setGoalParams(angle.getAsDouble(), velocity.getAsDouble()), this::stop);
+  public Command staticTarget(DoubleSupplier angle) {
+    return runEnd(() -> setGoalParams(angle.getAsDouble()), this::stop);
   }
 
   public Command zero() {

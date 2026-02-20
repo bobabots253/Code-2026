@@ -17,22 +17,13 @@ import edu.wpi.first.math.filter.Debouncer;
 import java.util.function.DoubleSupplier;
 
 public class FlywheelIOSpark implements FlywheelIO {
-  private final SparkBase masterVortex;
-  private final SparkBase followerVortex;
-  private final BangBangController flywheelController =
-      new BangBangController(
-          flywheelTolerance); // creates new Bang Bang Controller with tolerance of 1.
-  private final Debouncer flywheelDebouncer =
-      new Debouncer(
-          0.5,
-          Debouncer.DebounceType
-              .kFalling); // creates debouncer so we aren't constantl checking values
-  private final RelativeEncoder flywheelMasterRelativeEncoder;
-  private final RelativeEncoder flywheelFollowerRelativeEncoder;
-  private final SimpleMotorFeedforward ffCalculator =
-      new SimpleMotorFeedforward(
-          kS, kV,
-          kA); // new feedforward, used to calculate ffvolts later on. Constants are placeholders.
+  private final SparkBase flywheelMasterVortex;
+  private final SparkBase flywheelFollowerVortex;
+  private final BangBangController flywheelController = new BangBangController(flywheelTolerance); //creates new Bang Bang Controller with tolerance of 1. 
+  private final Debouncer flywheelDebouncer = new Debouncer(0.5, Debouncer.DebounceType.kFalling); // creates debouncer so we aren't constantl checking values
+  private final RelativeEncoder flywheelMasterEncoder;
+  private final RelativeEncoder flywheelFollowerEncoder;
+  private final SimpleMotorFeedforward ffCalculator = new SimpleMotorFeedforward(kS, kV, kA);// new feedforward, used to calculate ffvolts later on. Constants are placeholders.
 
   public FlywheelIOSpark() {
     masterVortex =
@@ -152,12 +143,9 @@ public class FlywheelIOSpark implements FlywheelIO {
         break;
     }
   }
-
-  @Override
-  public void runVolts(
-      double volts) { // method to run voltage mode. Can be called indpendently of outputs, but also
-    // runs in outputs.
-    masterVortex.setVoltage(volts);
+@Override
+public void runVolts(double volts) { // method to run voltage mode. Can be called indpendently of outputs, but also runs in outputs.
+    flywheelMasterVortex.setVoltage(volts);
   }
 
   public void runVelocityBangBang(
