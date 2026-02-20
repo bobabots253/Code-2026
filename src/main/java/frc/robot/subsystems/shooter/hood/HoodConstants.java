@@ -38,5 +38,5 @@ public class HoodConstants {
   public static final double masterVelocityConversionFactor =
       (2.0 * Math.PI) / (60.0 * kTotalReduction); // Motor RPM -> Hood Rad/Sec, Solve
 
-  public static final double hoodOffset = Units.degreesToRadians(1.0); // Radians
+  public static double hoodOffset = Units.degreesToRadians(1.0); // Radians
 }

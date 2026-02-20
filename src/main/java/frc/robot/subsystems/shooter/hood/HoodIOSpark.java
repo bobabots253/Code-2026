@@ -25,7 +25,7 @@ import edu.wpi.first.math.util.Units;
 import java.util.function.DoubleSupplier;
 
 public class HoodIOSpark implements HoodIO {
-  //masterNeo is a big NEO
+  // masterNeo is a big NEO
   private final SparkBase masterNeo;
   private final RelativeEncoder hoodEncoder;
   private final SparkClosedLoopController hoodController;
@@ -49,9 +49,7 @@ public class HoodIOSpark implements HoodIO {
             0.02);
 
     var hoodConfig = new SparkMaxConfig();
-    hoodConfig
-        .idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(hoodCurrentLimit);
+    hoodConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(hoodCurrentLimit);
     hoodConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
@@ -60,11 +58,12 @@ public class HoodIOSpark implements HoodIO {
         .pid(sparkHoodkP, sparkHoodkI, sparkHoodkD);
     hoodConfig
         .encoder
-        .positionConversionFactor(kTotalReduction)
+        .positionConversionFactor(masterPositionConversionFactor)
+        .velocityConversionFactor(masterVelocityConversionFactor)
         .uvwAverageDepth(2)
         .uvwMeasurementPeriod(10);
     hoodConfig
-      .signals
+        .signals
         .primaryEncoderPositionAlwaysOn(true)
         .primaryEncoderPositionPeriodMs(5)
         .primaryEncoderVelocityAlwaysOn(true)
@@ -89,9 +88,9 @@ public class HoodIOSpark implements HoodIO {
         new DoubleSupplier[] {masterNeo::getAppliedOutput, masterNeo::getBusVoltage},
         (values) -> inputs.hoodVolts = values[0] * values[1]);
     ifOk(masterNeo, masterNeo::getOutputCurrent, (value) -> inputs.hoodCurrentAmps = value);
-    inputs.masterNeoHoodConnected = hoodDebounce.calculate(!sparkStickyFault);
-    inputs.hoodPosRad = Units.rotationsToRadians(hoodEncoder.getPosition());
-    inputs.hoodVelocityRad = Units.rotationsToRadians(hoodEncoder.getVelocity());
+    inputs.masterNeoConnected = hoodDebounce.calculate(!sparkStickyFault);
+    inputs.hoodPosRad = hoodEncoder.getPosition();
+    inputs.hoodVelocityRad = hoodEncoder.getVelocity();
   }
 
   public void applyOutputs(HoodIOOutputs outputs) {
@@ -110,11 +109,12 @@ public class HoodIOSpark implements HoodIO {
         break;
     }
   }
+
   @Override
   public void setPercentVoltage(double decimalPercent) {
     masterNeo.set(decimalPercent);
   }
-  
+
   @Override
   public void setClosedLoopControl(HoodIOOutputs outputs) {
     hoodController.setSetpoint(outputs.hoodSetPosRad, ControlType.kPosition);
@@ -125,6 +125,11 @@ public class HoodIOSpark implements HoodIO {
     masterNeo.setVoltage(
         profiledHoodController.calculate(
             (hoodEncoder.getPosition() - hoodOffset),
-            outputs.hoodSetPosRad + hoodFF.calculate(outputs.hoodSetVelocityRad)));
+            outputs.hoodSetPosRad )+ hoodFF.calculate(outputs.hoodSetVelocityRad));
+  }
+@Override
+    public void zeroHood(HoodIOInputs inputs) {
+    hoodOffset = minAngleRad - inputs.hoodPosRad;
+    hoodEncoder.setPosition(0.0);
   }
 }

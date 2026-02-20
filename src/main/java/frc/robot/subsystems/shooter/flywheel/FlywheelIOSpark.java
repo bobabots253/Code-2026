@@ -17,13 +17,23 @@ import edu.wpi.first.math.filter.Debouncer;
 import java.util.function.DoubleSupplier;
 
 public class FlywheelIOSpark implements FlywheelIO {
-  private final SparkBase masterVortex; //initializing the SparkFlexes for the shooter flywheel
+  private final SparkBase masterVortex; // initializing the SparkFlexes for the shooter flywheel
   private final SparkBase followerVortex;
-  private final BangBangController flywheelController = new BangBangController(flywheelTolerance); //creates new Bang Bang Controller with tolerance of 1. 
-  private final Debouncer flywheelDebouncer = new Debouncer(0.5, Debouncer.DebounceType.kFalling); // creates debouncer so we aren't constantl checking values
-  private final RelativeEncoder flywheelMasterRelativeEncoder; //initializing the relative encoders for the shooter flywheel
+  private final BangBangController flywheelController =
+      new BangBangController(
+          flywheelTolerance); // creates new Bang Bang Controller with tolerance of 1.
+  private final Debouncer flywheelDebouncer =
+      new Debouncer(
+          0.5,
+          Debouncer.DebounceType
+              .kFalling); // creates debouncer so we aren't constantl checking values
+  private final RelativeEncoder
+      flywheelMasterRelativeEncoder; // initializing the relative encoders for the shooter flywheel
   private final RelativeEncoder flywheelFollowerRelativeEncoder;
-  private final SimpleMotorFeedforward ffCalculator = new SimpleMotorFeedforward(kS, kV, kA);// new feedforward, used to calculate ffvolts later on. Constants are placeholders.
+  private final SimpleMotorFeedforward ffCalculator =
+      new SimpleMotorFeedforward(
+          kS, kV,
+          kA); // new feedforward, used to calculate ffvolts later on. Constants are placeholders.
 
   public FlywheelIOSpark() {
     masterVortex =
@@ -32,26 +42,29 @@ public class FlywheelIOSpark implements FlywheelIO {
             MotorType.kBrushless); // creating 2 SparkFLexes to run the shooter.
     followerVortex = new SparkFlex(flywheelFollowerCanID, MotorType.kBrushless);
     flywheelMasterRelativeEncoder =
-        masterVortex.getEncoder(); // relative encoders to track velocity. Does not get the velocity, just specifies that the encoder tracks it.
+        masterVortex
+            .getEncoder(); // relative encoders to track velocity. Does not get the velocity, just
+    // specifies that the encoder tracks it.
     flywheelFollowerRelativeEncoder = followerVortex.getEncoder();
-    
+
     var flywheelMasterConfig = new SparkFlexConfig(); // master config
     flywheelMasterConfig
         .idleMode(IdleMode.kCoast) // idle mode is coast
         .smartCurrentLimit(
             flywheelCurrentLimit) // sets current limit to vortex current limit, 50 amps
-        .voltageCompensation(12.0); // compensates for the drop in voltage when we draw more current to power the motor.
+        .voltageCompensation(
+            12.0); // compensates for the drop in voltage when we draw more current to power the
+    // motor.
     flywheelMasterConfig
         .encoder
         .inverted(flywheelEncoderInverted)
-        .positionConversionFactor(
-            flywheelEncoderPositionFactor)
+        .positionConversionFactor(flywheelEncoderPositionFactor)
         .uvwMeasurementPeriod(10)
         .uvwAverageDepth(2); // converts encoder velocities from rotations to radians
     flywheelMasterConfig
         .signals // sets signals to collect every 20ms to calculate inputs and encoder values
         .primaryEncoderPositionAlwaysOn(true)
-        .primaryEncoderPositionPeriodMs(5) //calls every 5 ms
+        .primaryEncoderPositionPeriodMs(5) // calls every 5 ms
         .primaryEncoderVelocityAlwaysOn(true)
         .primaryEncoderVelocityPeriodMs(20)
         .appliedOutputPeriodMs(20)
@@ -72,10 +85,11 @@ public class FlywheelIOSpark implements FlywheelIO {
         .smartCurrentLimit(flywheelCurrentLimit)
         .voltageCompensation(12.0)
         .follow(masterVortex, true);
-        
+
     flywheelFollowerConfig
         .encoder
-        .inverted(true) // this encoder spins in the opposite direction, so we invert to compensate this
+        .inverted(
+            true) // this encoder spins in the opposite direction, so we invert to compensate this
         .velocityConversionFactor(flywheelEncoderVelocityFactor)
         .uvwMeasurementPeriod(10)
         .uvwAverageDepth(2);
@@ -112,16 +126,16 @@ public class FlywheelIOSpark implements FlywheelIO {
                     * values[
                         1]); // calculates values for volts by multiplying duty cycle by bus voltage
     inputs.flywheelMasterCurrentAmps = masterVortex.getOutputCurrent(); // gets amps input
-    inputs.flywheelMasterVelocityRad = flywheelMasterRelativeEncoder.getVelocity(); // gets velocity input
+    inputs.flywheelMasterVelocityRad =
+        flywheelMasterRelativeEncoder.getVelocity(); // gets velocity input
     inputs.flywheelMasterConnected =
         flywheelDebouncer.calculate(
-            !sparkStickyFault); // checks for errors that persist for more than 0.5 sec to get connected input
+            !sparkStickyFault); // checks for errors that persist for more than 0.5 sec to get
+    // connected input
 
     ifOk( // same as above but for follower.
         followerVortex,
-        new DoubleSupplier[] {
-          followerVortex::getAppliedOutput, followerVortex::getBusVoltage
-        },
+        new DoubleSupplier[] {followerVortex::getAppliedOutput, followerVortex::getBusVoltage},
         (values) -> inputs.flywheelFollowerVolts = values[0] * values[1]);
     inputs.flywheelFollowerCurrentAmps = followerVortex.getOutputCurrent();
     inputs.flywheelFollowerVelocityRad = flywheelFollowerRelativeEncoder.getVelocity();
@@ -143,8 +157,11 @@ public class FlywheelIOSpark implements FlywheelIO {
         break;
     }
   }
-@Override
-public void runVolts(double volts) { // method to run voltage mode. Can be called indpendently of outputs, but also runs in outputs.
+
+  @Override
+  public void runVolts(
+      double volts) { // method to run voltage mode. Can be called indpendently of outputs, but also
+    // runs in outputs.
     masterVortex.setVoltage(volts);
   }
 
@@ -164,6 +181,6 @@ public void runVolts(double volts) { // method to run voltage mode. Can be calle
     // compensate for the high power/ unpredictability of the bang bang controller, as recommended
     // on WPILib docs.
     // uses the relative encoder from earlier to measure this velocity
-    //NOTE: This won't work, since it can't slow the motor down
+    // NOTE: This won't work, since it can't slow the motor down
   }
 }
