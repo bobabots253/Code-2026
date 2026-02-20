@@ -4,6 +4,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Robot;
 import frc.robot.RobotState;
 import frc.robot.subsystems.shooter.hood.HoodIO.HoodIOOutputMode;
 import frc.robot.subsystems.shooter.hood.HoodIO.HoodIOOutputs;
@@ -66,6 +67,8 @@ public class HoodSubsystem extends FullSubsystem {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Hood", inputs);
+
+    masterDisconnected.set(Robot.showHardwareAlerts() && (!inputs.masterMotorConnected));
 
     // Force IDLE state if the robot is disabled so it doesn't snap to last hood angle on enable
     if (DriverStation.isDisabled()) {

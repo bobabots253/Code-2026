@@ -1,6 +1,6 @@
 package frc.robot.subsystems.intake.roller;
 
-import static frc.robot.util.SparkUtil.tryUntilOk;
+import static frc.robot.util.SparkUtil.*;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
@@ -10,6 +10,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.filter.Debouncer;
+import java.util.function.DoubleSupplier;
 
 public class RollerIOSpark implements RollerIO {
   // Declare REV motor hardware here
@@ -37,5 +38,35 @@ public class RollerIOSpark implements RollerIO {
                 masterSparkMaxConfig,
                 ResetMode.kResetSafeParameters,
                 PersistMode.kNoPersistParameters));
+  }
+
+  @Override
+  public void updateInputs(RollerIOInputs inputs) {
+
+    // Update all the RollerIO inputs for the master motor
+    // Use SparkStickyFaults to track motor connectivity (See SparkUtil for Implementation)
+    sparkStickyFault = false;
+    ifOk(
+        masterNEO,
+        new DoubleSupplier[] {masterNEO::getAppliedOutput, masterNEO::getBusVoltage},
+        (values) -> inputs.masterAppliedVolts = values[0] * values[1]);
+    ifOk(masterNEO, masterNEO::getAppliedOutput, (value) -> inputs.masterSupplyCurrentAmps = value);
+    inputs.masterMotorConnected =
+        masterNEODebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
+  }
+
+  @Override
+  public void applyOutputs(RollerIOOutputs outputs) {
+
+    double setpoint = outputs.voltage;
+
+    switch (outputs.mode) {
+      case BRAKE:
+        masterNEO.stopMotor();
+        break;
+      case VOLTAGE:
+        masterNEO.setVoltage(setpoint);
+        break;
+    }
   }
 }
