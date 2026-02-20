@@ -1,17 +1,15 @@
 package frc.robot.subsystems.shooter.hood;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Robot;
+import frc.robot.RobotState;
 import frc.robot.subsystems.shooter.hood.HoodIO.HoodIOOutputMode;
 import frc.robot.subsystems.shooter.hood.HoodIO.HoodIOOutputs;
 import frc.robot.util.FullSubsystem;
-import java.util.function.BooleanSupplier;
-import lombok.Setter;
+import java.util.function.DoubleSupplier;
+import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -23,104 +21,134 @@ public class HoodSubsystem extends FullSubsystem {
   private final HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
   private final HoodIOOutputs outputs = new HoodIOOutputs();
 
-  private Debouncer masterVortexConnectedDebouncer =
-      new Debouncer(0.5, Debouncer.DebounceType.kFalling);
-  private Alert motorDisconnectedAlert;
+  private Alert masterDisconnected;
 
-  @Setter private BooleanSupplier coastOverride = () -> false;
+  @RequiredArgsConstructor
+  /*
+   * Defines all possible states for the hood. Each goal state has a DoubleSupplier arguement that updates from Robot State
+   */
+  public enum Goal {
+    // Stop ClosedLoopControl on the Hood, Remains in Brake Mode
+    IDLE(() -> 0.0),
+    // Angular setpoint calculated by the ShotCalculator for the Hub.
+    PREPARE_HUB(() -> RobotState.getInstance().getCustomShotData().correctedTargetAngle()),
+    // Currently mirrors PREPARE_HUB but I added it so it can edited/tuned separately
+    SHOOT(
+        () ->
+            RobotState.getInstance()
+                .getCustomShotData()
+                .correctedTargetAngle()), // Change if Necessary
+    // Static angle for juggling them balls into our own hopper LOL
+    JUGGLE(() -> HoodConstants.jugglingAngle),
+    // Static angular state for subsystem testing
+    DEBUGGING(() -> HoodConstants.debuggingAngle);
 
-  private double goalAngle = 0.0; // Degrees
-  private double goalVelocity = 0.0; // USe for Hard Zeroing
+    // Required Arguement for each enum state
+    private final DoubleSupplier velocityRadsPerSec;
 
-  private static double hoodOffset = HoodConstants.hoodOffsetDeg; // Note: DEGREES, not radians
-  private boolean hoodZeroed = false;
+    /** Returns the current target angle for this goal state. */
+    private double getGoal() {
+      return velocityRadsPerSec.getAsDouble();
+    }
+  }
+
+  @AutoLogOutput(key = "Hood/Goal")
+  private Goal currentGoal = Goal.IDLE;
 
   public HoodSubsystem(HoodIO io) {
     this.io = io;
 
-    motorDisconnectedAlert = new Alert("Hood motor disconnected!", Alert.AlertType.kWarning);
+    masterDisconnected = new Alert("Hood motor disconnected!", Alert.AlertType.kWarning);
+
+    setDefaultCommand(runOnce(() -> setGoal(Goal.IDLE)).withName("Hood Idle"));
   }
 
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Hood", inputs);
 
-    motorDisconnectedAlert.set(
-        Robot.showHardwareAlerts()
-            && !masterVortexConnectedDebouncer.calculate(inputs.masterMotorConnected));
+    // Force IDLE state if the robot is disabled so it doesn't snap to last hood angle on enable
+    if (DriverStation.isDisabled()) {
+      setGoal(Goal.IDLE);
+    }
 
-    // Brake Mode when disabled
-    if (DriverStation.isDisabled() || !hoodZeroed) {
-      outputs.mode = HoodIOOutputMode.BRAKE;
-
-      if (coastOverride.getAsBoolean()) {
-        outputs.mode = HoodIOOutputMode.COAST;
-      }
+    // Re-poll the supplier every loop to handle new shot calculations
+    if (currentGoal == Goal.IDLE) {
+      stop();
+    } else {
+      runAngular(currentGoal.getGoal());
     }
   }
 
   @Override
   public void periodicAfterScheduler() {
-    if (DriverStation.isEnabled() && hoodZeroed) {
-      outputs.positionRad =
-          Units.degreesToRadians(MathUtil.clamp(goalAngle, minAngle, maxAngle) - hoodOffset);
-      outputs.velocityRadsPerSec = goalVelocity;
-      outputs.mode = HoodIOOutputMode.CLOSED_LOOP;
-
-      // Log state
-      Logger.recordOutput("Hood/Profile/GoalPositionRad", goalAngle);
-      Logger.recordOutput("Hood/Profile/GoalVelocityRadPerSec", goalVelocity);
-    }
-
+    Logger.recordOutput("Hood/Mode", outputs.mode);
     io.applyOutputs(outputs);
   }
 
-  @SuppressWarnings("unused")
   /**
-   * Sets the goal parameters for the hood subsystem. When GoalParams are passed into
-   * periodicAfterScheduler, the requested position and velocity will be clamped by minAngle and
-   * maxAngle. Additional check, hoodZeroed. Input units in Degrees and Rad/Sec. Output units in
-   * Degrees and Rad/Sec.
+   * Sets the current goal state for the subsystem.
    *
-   * @param angle
-   * @param velocity
+   * @param desiredGoal The new goal to "transition" to.
    */
-  private void setGoalParams(double angle, double velocity) {
-    goalAngle = angle;
-    goalVelocity = velocity;
+  private void setGoal(Goal desiredGoal) {
+    this.currentGoal = desiredGoal;
+  }
+
+  @AutoLogOutput(key = "Hood/AtGoal")
+  /**
+   * Returns true if the hood is within the angular tolerance. Note: IDLE check catches the
+   * exception because I'm lazy
+   */
+  public boolean atGoal() {
+    return currentGoal == Goal.IDLE
+        || Math.abs(getAngle() - currentGoal.getGoal()) <= HoodConstants.closedLoopAngularTolerance;
+  }
+
+  /**
+   * Update the io for angular closed loop control and applies the new angular setpoint
+   *
+   * @param angleRads the new angular setpoint.
+   */
+  private void runAngular(double angleRads) {
+    outputs.mode = HoodIOOutputMode.CLOSED_LOOP;
+    outputs.positionRad = angleRads;
   }
 
   @AutoLogOutput(key = "Hood/MeasuredAngleRads")
-  public double getMeasuredAngleRad() {
-    return inputs.positionRads + hoodOffset;
+  public double getAngle() {
+    return inputs.masterPositionRads;
   }
 
-  @AutoLogOutput
-  public boolean atGoal() {
-    return DriverStation.isEnabled()
-        && hoodZeroed
-        && Math.abs(getMeasuredAngleRad() - Units.degreesToRadians(goalAngle))
-            <= Units.degreesToRadians(HoodConstants.toleranceDeg);
+  public Command shootCommand() {
+    return startEnd(() -> setGoal(Goal.SHOOT), () -> setGoal(Goal.IDLE)).withName("Hood Shoot");
   }
 
-  private void zero() {
-    hoodOffset = Units.degreesToRadians(minAngle) - inputs.positionRads;
-    hoodZeroed = true;
+  public Command prepareHubCommand() {
+    return startEnd(() -> setGoal(Goal.PREPARE_HUB), () -> setGoal(Goal.IDLE))
+        .withName("Hood Prepare Hub");
   }
 
-  // public Command runTrackTargetCommand() {
-  //   return runEnd(
-  //       () ->
-  //         setGoalParams(ShotCalculator.getInstance()...getHoodAngle()),
-  //        this::stop);
-  // }
+  public Command juggleCommand() {
+    return startEnd(() -> setGoal(Goal.JUGGLE), () -> setGoal(Goal.IDLE)).withName("Hood Juggle");
+  }
 
-  // public Command runFixedCommand(DoubleSupplier angle, DoubleSupplier velocity) {
-  //   return runEnd(() -> setGoalParams(ShotCalculator.getInstance()...getHoodAngle(),
-  // this::stop));
-  // }
+  public Command runDebuggingCommand() {
+    return startEnd(() -> setGoal(Goal.DEBUGGING), () -> setGoal(Goal.IDLE)).withName("Hood Debug");
+  }
 
-  public Command zeroCommand() {
-    return runOnce(this::zero).ignoringDisable(true);
+  public Command stopCommand() {
+    return runOnce(this::stop);
+  }
+
+  /**
+   * Manual override command to run a specific velocity. Note: This bypasses the "state machine".
+   */
+  public Command runSetAngularCommand(DoubleSupplier angle) {
+    return runEnd(() -> runAngular(angle.getAsDouble()), this::stop);
+  }
+
+  private void stop() {
+    outputs.mode = HoodIOOutputMode.BRAKE;
   }
 }

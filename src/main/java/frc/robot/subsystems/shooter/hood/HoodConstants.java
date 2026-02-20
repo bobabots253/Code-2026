@@ -9,19 +9,19 @@ public class HoodConstants {
   public static final double sparkMasterHoodkI = 0.00;
   public static final double sparkMasterHoodkD = 0.00;
 
-  public static final double toleranceDeg = 1.0;
+  public static final double toleranceDeg = 1.0; // Do NOT use Degrees when plugging in
   public static final double toleranceRad = Units.degreesToRadians(toleranceDeg);
 
   public static final double minAngleDeg = 45.0;
   public static final double maxAngleDeg = 85.0;
 
-  public static final double hoodOffsetDeg = 1.0; // Degrees, Solve
+  public static final double hoodOffsetRad = Units.degreesToRadians(1.0); // Radians, Solve
 
   // Gear Ratio Calculations
   // Motor Rotations per Pinion Rotation
-  private static final double kMotorToPinionReduction = 1.0;
+  private static final double kMotorToPinionReduction = 1.0; // Solve
   // Pinion Rotations per 1 full 360-degree Pivot Rotation
-  private static final double kPinionToPivotReduction = 1.0;
+  private static final double kPinionToPivotReduction = 1.0; // Solve
   private static final double kTotalReduction = kMotorToPinionReduction * kPinionToPivotReduction;
 
   public static final double minAngleRad = Math.toRadians(minAngleDeg);
@@ -34,4 +34,12 @@ public class HoodConstants {
       (2.0 * Math.PI) / (60.0 * kTotalReduction); // Motor RPM -> Hood Rad/Sec, Solve
 
   public static final double hoodOffset = Units.degreesToRadians(1.0); // Radians
+
+  // Temporary holding for subsystem variables
+  public static final double jugglingAngle =
+      Units.degreesToRadians(0.0); // Check interpolator for values
+  public static final double debuggingAngle = Units.degreesToRadians(0.0); // Change as needed
+
+  public static final double closedLoopAngularTolerance =
+      Units.degreesToRadians(1.0); // Change to heuristic value
 }

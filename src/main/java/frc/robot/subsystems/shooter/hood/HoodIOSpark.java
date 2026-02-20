@@ -1,6 +1,8 @@
 package frc.robot.subsystems.shooter.hood;
 
 import static frc.robot.subsystems.shooter.hood.HoodConstants.*;
+import static frc.robot.util.SparkUtil.ifOk;
+import static frc.robot.util.SparkUtil.sparkStickyFault;
 import static frc.robot.util.SparkUtil.tryUntilOk;
 
 import com.revrobotics.PersistMode;
@@ -10,35 +12,39 @@ import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.math.filter.Debouncer;
+import java.util.function.DoubleSupplier;
 
 // Note: CAD'ed Absolute Encoder is pointless
 public class HoodIOSpark implements HoodIO {
   // Declare REV motor hardware here
-  private final SparkBase masterVortex;
+  private final SparkBase masterNEO;
 
   // Declare REV encoders hardware here
   private final RelativeEncoder masterRelativeEncoder;
 
   // Declare motor controllers
-  private final SparkClosedLoopController masterVortexController;
+  private final SparkClosedLoopController masterNEOController;
+
+  // Declare WPILib Debouncer for Motor Disconnection Alerts here
+  private final Debouncer masterNEODebouncer = new Debouncer(0.25, Debouncer.DebounceType.kFalling);
 
   public HoodIOSpark() {
     // Initialize REV motor hardware here
-    masterVortex =
-        new SparkFlex(HoodConstants.sparkMasterHoodCanId, SparkBase.MotorType.kBrushless);
+    masterNEO = new SparkMax(HoodConstants.sparkMasterHoodCanId, SparkBase.MotorType.kBrushless);
 
     // Initialize REV encoders hardware here
-    masterRelativeEncoder = masterVortex.getEncoder();
+    masterRelativeEncoder = masterNEO.getEncoder();
 
     // Initialize motor controllers here
-    masterVortexController = masterVortex.getClosedLoopController();
+    masterNEOController = masterNEO.getClosedLoopController();
 
-    var masterVortexConfig = new SparkFlexConfig();
-    masterVortexConfig.idleMode(IdleMode.kBrake).inverted(false).smartCurrentLimit(35);
-    masterVortexConfig
+    var masterNEOConfig = new SparkMaxConfig();
+    masterNEOConfig.idleMode(IdleMode.kBrake).inverted(false).smartCurrentLimit(35);
+    masterNEOConfig
         .encoder
         .positionConversionFactor(
             masterPositionConversionFactor) // Rot to Rad // (2.0 * Math.PI) / kTotalReduction
@@ -46,17 +52,17 @@ public class HoodIOSpark implements HoodIO {
         .inverted(false)
         .uvwMeasurementPeriod(10)
         .uvwAverageDepth(2);
-    masterVortexConfig
+    masterNEOConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .pid(sparkMasterHoodkP, sparkMasterHoodkI, sparkMasterHoodkD);
-    masterVortexConfig
+    masterNEOConfig
         .softLimit
         .reverseSoftLimitEnabled(true)
         .reverseSoftLimit(minAngleRad)
         .forwardSoftLimitEnabled(true)
         .forwardSoftLimit(maxAngleRad);
-    masterVortexConfig
+    masterNEOConfig
         .signals
         .primaryEncoderPositionAlwaysOn(true)
         .primaryEncoderPositionPeriodMs((int) (20))
@@ -66,26 +72,35 @@ public class HoodIOSpark implements HoodIO {
         .busVoltagePeriodMs(20)
         .outputCurrentPeriodMs(20);
     tryUntilOk(
-        masterVortex,
+        masterNEO,
         5,
         () ->
-            masterVortex.configure(
-                masterVortexConfig,
-                ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters));
+            masterNEO.configure(
+                masterNEOConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
 
-    // Autohome to a known position, if possible. If not, hope for the best
-    masterRelativeEncoder.setPosition(minAngleRad);
+    // Assuming you never call reset position when you aren't supposed to
   }
 
   @Override
   public void updateInputs(HoodIOInputs inputs) {
-    // Find a way to log master connection status
-    inputs.positionRads =
-        masterRelativeEncoder.getPosition(); // Rot to Rad conversion is done in config
-    inputs.positionRadsPerSec = masterRelativeEncoder.getVelocity();
-    inputs.appliedVoltage = masterVortex.getAppliedOutput() * masterVortex.getBusVoltage();
-    inputs.supplyCurrentAmps = masterVortex.getOutputCurrent();
+    // Update all the FlywheelIO inputs for the master motor
+    // Use SparkStickyFaults to track motor connectivity (See SparkUtil for Implementation)
+    sparkStickyFault = false;
+    ifOk(
+        masterNEO,
+        masterRelativeEncoder::getPosition,
+        (value) -> inputs.masterPositionRads = value + HoodConstants.hoodOffsetRad);
+    ifOk(
+        masterNEO,
+        masterRelativeEncoder::getVelocity,
+        (value) -> inputs.masterVelocityRads = value);
+    ifOk(
+        masterNEO,
+        new DoubleSupplier[] {masterNEO::getAppliedOutput, masterNEO::getBusVoltage},
+        (values) -> inputs.masterAppliedVolts = values[0] * values[1]);
+    ifOk(masterNEO, masterNEO::getAppliedOutput, (value) -> inputs.masterSupplyCurrentAmps = value);
+    inputs.masterMotorConnected =
+        masterNEODebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
   }
 
   @Override
@@ -96,14 +111,11 @@ public class HoodIOSpark implements HoodIO {
     double safeSetpoint = Math.max(minAngleRad, Math.min(maxAngleRad, outputs.positionRad));
 
     switch (outputs.mode) {
-      case COAST:
-        masterVortex.stopMotor();
-        break;
       case BRAKE:
-        masterVortex.stopMotor();
+        masterNEO.stopMotor();
         break;
       case CLOSED_LOOP:
-        masterVortexController.setSetpoint(
+        masterNEOController.setSetpoint(
             safeSetpoint, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot0);
         break;
     }
@@ -113,6 +125,6 @@ public class HoodIOSpark implements HoodIO {
   // Use like <0.01 for testing if motor is going to be a V1.1
   @Override
   public void runOpenLoop(double decimalPercentage) {
-    masterVortex.set(decimalPercentage);
+    masterNEO.set(decimalPercentage);
   }
 }

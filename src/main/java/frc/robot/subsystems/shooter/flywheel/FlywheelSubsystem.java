@@ -1,10 +1,5 @@
 package frc.robot.subsystems.shooter.flywheel;
 
-import java.util.function.DoubleSupplier;
-
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -13,7 +8,10 @@ import frc.robot.RobotState;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIO.FlywheelIOOutputMode;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIO.FlywheelIOOutputs;
 import frc.robot.util.FullSubsystem;
+import java.util.function.DoubleSupplier;
 import lombok.RequiredArgsConstructor;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class FlywheelSubsystem extends FullSubsystem {
 
@@ -25,9 +23,9 @@ public class FlywheelSubsystem extends FullSubsystem {
   private Alert followerDisconnected;
 
   @RequiredArgsConstructor
-/*
- * Defines all possible states for the flywheel. Each goal state has a DoubleSupplier arguement that updates from Robot State
- */
+  /*
+   * Defines all possible states for the flywheel. Each goal state has a DoubleSupplier arguement that updates from Robot State
+   */
   public enum Goal {
     // Stop the flywheel and chooses COAST Mode
     IDLE(() -> 0.0),
@@ -94,15 +92,17 @@ public class FlywheelSubsystem extends FullSubsystem {
 
   /**
    * Sets the current goal state for the subsystem.
+   *
    * @param desiredGoal The new goal to "transition" to.
    */
   private void setGoal(Goal desiredGoal) {
-      this.currentGoal = desiredGoal;
+    this.currentGoal = desiredGoal;
   }
 
   @AutoLogOutput(key = "Flywheels/AtGoal")
   /**
-   * Returns true if the flywheel is within the velocity tolerance. Note: IDLE check catches the exception because I'm lazy
+   * Returns true if the flywheel is within the velocity tolerance. Note: IDLE check catches the
+   * exception because I'm lazy
    */
   public boolean atGoal() {
     return currentGoal == Goal.IDLE
@@ -112,6 +112,7 @@ public class FlywheelSubsystem extends FullSubsystem {
 
   /**
    * Update the io for velocity closed loop control and applies the new velocity setpoint
+   *
    * @param velocityRadsPerSec the new velocity setpoint.
    */
   private void runVelocity(double velocityRadsPerSec) {
@@ -126,22 +127,21 @@ public class FlywheelSubsystem extends FullSubsystem {
 
   public Command prepareHubCommand() {
     return startEnd(() -> setGoal(Goal.PREPARE_HUB), () -> setGoal(Goal.IDLE))
-        .withName("Flywheels Shoot");
+        .withName("Flywheels Prepare Hub");
   }
 
   public Command juggleCommand() {
     return startEnd(() -> setGoal(Goal.JUGGLE), () -> setGoal(Goal.IDLE))
-        .withName("Flywheels Shoot");
+        .withName("Flywheels Juggle");
   }
 
   public Command runDebuggingCommand() {
     return startEnd(() -> setGoal(Goal.DEBUGGING), () -> setGoal(Goal.IDLE))
-        .withName("Flywheels Shoot");
+        .withName("Flywheels Debug");
   }
 
-  /** 
-   * Manual override command to run a specific velocity. 
-   * Note: This bypasses the "state machine".
+  /**
+   * Manual override command to run a specific velocity. Note: This bypasses the "state machine".
    */
   public Command runSetVelocityCommand(DoubleSupplier velocity) {
     return runEnd(() -> runVelocity(velocity.getAsDouble()), this::stop);

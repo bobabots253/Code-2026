@@ -7,15 +7,13 @@ public interface HoodIO {
   public static class HoodIOInputs {
     public boolean masterMotorConnected = true;
 
-    public double positionRads = 0.0;
-    public double positionRadsPerSec = 0.0;
-    public double appliedVoltage = 0.0;
-    public double supplyCurrentAmps = 0.0;
-    public double torqueCurrentAmps = 0.0;
+    public double masterPositionRads = 0.0;
+    public double masterVelocityRads = 0.0;
+    public double masterAppliedVolts = 0.0;
+    public double masterSupplyCurrentAmps = 0.0;
   }
 
   public static enum HoodIOOutputMode {
-    COAST,
     BRAKE,
     CLOSED_LOOP
   }
