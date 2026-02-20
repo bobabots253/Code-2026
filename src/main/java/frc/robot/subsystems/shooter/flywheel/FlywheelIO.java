@@ -8,13 +8,11 @@ public interface FlywheelIO {
     public boolean flywheelMasterConnected = false;
     public double flywheelMasterVolts = 0.0;
     public double flywheelMasterCurrentAmps = 0.0;
-    public double flywheelMasterTorqueCurrent = 0.0;
     public double flywheelMasterVelocityRad = 0.0;
 
     public boolean flywheelFollowerConnected = false;
     public double flywheelFollowerVolts = 0.0;
     public double flywheelFollowerCurrentAmps = 0.0;
-    public double flywheelFollowerTorqueCurrent = 0.0;
     public double flywheelFollowerVelocityRad = 0.0;
   }
 

@@ -62,7 +62,7 @@ public class HoodSubsystem extends FullSubsystem {
     goalVelocity = velocity;
   }
 
-public void setGoalParams(double angle) {
+  public void setGoalParams(double angle) {
     goalAngle = angle;
   }
 
