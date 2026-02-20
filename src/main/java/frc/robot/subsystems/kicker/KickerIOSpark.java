@@ -6,7 +6,6 @@ import static frc.robot.subsystems.kicker.KickerConstants.kV;
 import static frc.robot.subsystems.kicker.KickerConstants.masterKickerEncoderPositionFactor;
 import static frc.robot.subsystems.kicker.KickerConstants.masterKickerEncoderVelocityFactor;
 import static frc.robot.subsystems.kicker.KickerConstants.maxAcceleration;
-import static frc.robot.subsystems.kicker.KickerConstants.sparkMasterKicker;
 import static frc.robot.subsystems.kicker.KickerConstants.sparkMasterKickerkD;
 import static frc.robot.subsystems.kicker.KickerConstants.sparkMasterKickerkI;
 import static frc.robot.subsystems.kicker.KickerConstants.sparkMasterKickerkP;
@@ -20,7 +19,6 @@ import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -52,7 +50,7 @@ public class KickerIOSpark implements KickerIO {
 
   public KickerIOSpark() {
     // Initialize REV motor hardware here
-    masterNEO = new SparkMax(sparkMasterKicker, MotorType.kBrushless);
+    masterNEO = new SparkMax(KickerConstants.sparkMasterKickerCanId, MotorType.kBrushless);
 
     // Initialize REV encoders hardware here
     masterRelativeEncoder = masterNEO.getEncoder();

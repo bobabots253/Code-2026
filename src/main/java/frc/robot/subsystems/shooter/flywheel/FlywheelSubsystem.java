@@ -99,7 +99,7 @@ public class FlywheelSubsystem extends FullSubsystem {
     this.currentGoal = desiredGoal;
   }
 
-  @AutoLogOutput(key = "Flywheels/AtGoal")
+  @AutoLogOutput(key = "Flywheel/AtGoal")
   /**
    * Returns true if the flywheel is within the velocity tolerance. Note: IDLE check catches the
    * exception because I'm lazy
@@ -160,6 +160,7 @@ public class FlywheelSubsystem extends FullSubsystem {
         || Math.abs(inputs.followerSupplyCurrentAmps) > 50.0;
   }
 
+  @AutoLogOutput(key = "Flywheel/MeasuredVelocity")
   public double getVelocity() {
     return inputs.masterVelocityRads;
   }

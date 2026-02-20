@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake.roller;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Robot;
 import frc.robot.subsystems.intake.roller.RollerIO.RollerIOOutputMode;
 import frc.robot.subsystems.intake.roller.RollerIO.RollerIOOutputs;
 import frc.robot.util.FullSubsystem;
@@ -27,11 +28,11 @@ public class RollerSubsystem extends FullSubsystem {
     DEBUGGING(() -> RollerConstants.debuggingVolts);
 
     // Required Arguement for each enum state
-    private final DoubleSupplier angleRads;
+    private final DoubleSupplier voltage;
 
-    /** Returns the current target angle for this goal state. */
+    /** Returns the current target voltage for this goal state. */
     private double getGoal() {
-      return angleRads.getAsDouble();
+      return voltage.getAsDouble();
     }
   }
 
@@ -49,6 +50,8 @@ public class RollerSubsystem extends FullSubsystem {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Roller", inputs);
+
+    masterDisconnected.set(Robot.showHardwareAlerts() && (!inputs.masterMotorConnected));
 
     // Force IDLE state if the robot is disabled
     if (DriverStation.isDisabled()) {

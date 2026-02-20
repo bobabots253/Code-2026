@@ -1,7 +1,7 @@
 package frc.robot.subsystems.kicker;
 
 public class KickerConstants {
-  public static final int sparkMasterKicker = 13;
+  public static final int sparkMasterKickerCanId = 13;
 
   // If using the FlywheelSubsystem of Closed-Loop control, make sure kP is really small
   public static final double sparkMasterKickerkP = 0.0001; //
