@@ -16,8 +16,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
@@ -31,7 +29,8 @@ public class HoodIOSpark implements HoodIO {
   private final RelativeEncoder hoodEncoder;
   private final SparkClosedLoopController hoodController;
   private final ProfiledPIDController profiledHoodController;
-  private final SimpleMotorFeedforward hoodFF = new SimpleMotorFeedforward(sparkHoodProfiledkS, sparkHoodProfiledkV);
+  private final SimpleMotorFeedforward hoodFF =
+      new SimpleMotorFeedforward(sparkHoodProfiledkS, sparkHoodProfiledkV);
   private final Debouncer hoodDebounce;
 
   public HoodIOSpark() {
@@ -40,8 +39,13 @@ public class HoodIOSpark implements HoodIO {
     hoodEncoder = hoodSpark.getEncoder();
     hoodController = hoodSpark.getClosedLoopController();
 
-    profiledHoodController = new ProfiledPIDController(sparkHoodProfiledkP, sparkHoodProfiledkI, sparkHoodProfiledkD, 
-      new TrapezoidProfile.Constraints(sparkHoodMaxAccel, sparkHoodMaxVelocity), 0.02);
+    profiledHoodController =
+        new ProfiledPIDController(
+            sparkHoodProfiledkP,
+            sparkHoodProfiledkI,
+            sparkHoodProfiledkD,
+            new TrapezoidProfile.Constraints(sparkHoodMaxAccel, sparkHoodMaxVelocity),
+            0.02);
 
     var hoodConfig = new SparkMaxConfig();
     hoodConfig
@@ -77,7 +81,7 @@ public class HoodIOSpark implements HoodIO {
         (values) -> inputs.hoodVolts = values[0] * values[1]);
     ifOk(hoodSpark, hoodSpark::getOutputCurrent, (value) -> inputs.hoodCurrentAmps = value);
     inputs.hoodSparkConnected = hoodDebounce.calculate(!sparkStickyFault);
-    inputs.hoodPosRad = Units.rotationsToRadians(hoodEncoder.getPosition()); 
+    inputs.hoodPosRad = Units.rotationsToRadians(hoodEncoder.getPosition());
     inputs.hoodVelocityRad = Units.rotationsToRadians(hoodEncoder.getVelocity());
   }
 
@@ -92,9 +96,9 @@ public class HoodIOSpark implements HoodIO {
       case CLOSED_LOOP_CONTROL:
         setClosedLoopControl(outputs);
         break;
-      case PROFILED_CONTROL: 
-          setProfiledControl(outputs);
-          break;
+      case PROFILED_CONTROL:
+        setProfiledControl(outputs);
+        break;
     }
   }
 
@@ -103,15 +107,17 @@ public class HoodIOSpark implements HoodIO {
   }
 
   public void setClosedLoopControl(HoodIOOutputs outputs) {
-        hoodController.setSetpoint(outputs.hoodSetPosRad, ControlType.kPosition);
-      }
+    hoodController.setSetpoint(outputs.hoodSetPosRad, ControlType.kPosition);
+  }
 
-public void setProfiledControl(HoodIOOutputs outputs) {
-       hoodSpark.setVoltage(profiledHoodController.calculate((hoodEncoder.getPosition() - hoodOffset), 
-        outputs.hoodSetPosRad + hoodFF.calculate(outputs.hoodSetVelocityRad)));
-    }
-  
+  public void setProfiledControl(HoodIOOutputs outputs) {
+    hoodSpark.setVoltage(
+        profiledHoodController.calculate(
+            (hoodEncoder.getPosition() - hoodOffset),
+            outputs.hoodSetPosRad + hoodFF.calculate(outputs.hoodSetVelocityRad)));
+  }
+
   public Boolean atAngle(Boolean atAngle, double setpoint) {
     return atAngle;
   }
-  }
+}

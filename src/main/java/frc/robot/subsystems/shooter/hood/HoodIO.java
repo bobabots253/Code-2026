@@ -32,5 +32,4 @@ public interface HoodIO {
   default void setPercentVoltage(double decimalPercent) {}
 
   default void setPosition(double setpoint) {}
-
 }

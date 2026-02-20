@@ -10,14 +10,12 @@ public interface FlywheelIO {
     public double flywheelMasterCurrentAmps = 0.0;
     public double flywheelMasterTorqueCurrent = 0.0;
     public double flywheelMasterVelocityRad = 0.0;
-    public double flywheelMasterPosRad = 0.0;
 
     public boolean flywheelFollowerConnected = false;
     public double flywheelFollowerVolts = 0.0;
     public double flywheelFollowerCurrentAmps = 0.0;
     public double flywheelFollowerTorqueCurrent = 0.0;
     public double flywheelFollowerVelocityRad = 0.0;
-    public double flywheelFollowerPosRad = 0.0;
   }
 
   public static enum FlywheelOutputMode {
@@ -28,6 +26,7 @@ public interface FlywheelIO {
 
   public static class FlywheelIOOutputs {
     double velocityRadsPerSec = 0.0;
+    double volts = 0.0;
     FlywheelOutputMode mode = FlywheelOutputMode.COAST;
   }
 
