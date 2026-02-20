@@ -17,12 +17,12 @@ import edu.wpi.first.math.filter.Debouncer;
 import java.util.function.DoubleSupplier;
 
 public class FlywheelIOSpark implements FlywheelIO {
-  private final SparkBase flywheelMasterVortex;
-  private final SparkBase flywheelFollowerVortex;
+  private final SparkBase masterVortex;
+  private final SparkBase followerVortex;
   private final BangBangController flywheelController = new BangBangController(flywheelTolerance); //creates new Bang Bang Controller with tolerance of 1. 
   private final Debouncer flywheelDebouncer = new Debouncer(0.5, Debouncer.DebounceType.kFalling); // creates debouncer so we aren't constantl checking values
-  private final RelativeEncoder flywheelMasterEncoder;
-  private final RelativeEncoder flywheelFollowerEncoder;
+  private final RelativeEncoder flywheelMasterRelativeEncoder;
+  private final RelativeEncoder flywheelFollowerRelativeEncoder;
   private final SimpleMotorFeedforward ffCalculator = new SimpleMotorFeedforward(kS, kV, kA);// new feedforward, used to calculate ffvolts later on. Constants are placeholders.
 
   public FlywheelIOSpark() {
@@ -133,8 +133,7 @@ public class FlywheelIOSpark implements FlywheelIO {
       case COAST: // if the motor is in coast mode, stop it
         masterVortex.stopMotor();
         break;
-      case VOLTAGE: // if the motor is in voltage mode, give it 6 volts. 6 is a placeholder value,
-        // 50% seemed safe.
+      case VOLTAGE: // if the motor is in voltage mode, give it volts = to setpoint
         runVolts(outputs.volts);
         break;
       case BANG_BANG: // if the motor is in BANG BANG mode, run the velocity bang bang controller
@@ -145,7 +144,7 @@ public class FlywheelIOSpark implements FlywheelIO {
   }
 @Override
 public void runVolts(double volts) { // method to run voltage mode. Can be called indpendently of outputs, but also runs in outputs.
-    flywheelMasterVortex.setVoltage(volts);
+    masterVortex.setVoltage(volts);
   }
 
   public void runVelocityBangBang(
