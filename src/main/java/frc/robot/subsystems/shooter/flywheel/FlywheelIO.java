@@ -12,13 +12,11 @@ public interface FlywheelIO {
     public double masterVelocityRads = 0.0;
     public double masterAppliedVolts = 0.0;
     public double masterSupplyCurrentAmps = 0.0;
-    public double masterTorqueCurrentAmps = 0.0;
 
     public double followerPositionRads = 0.0;
     public double followerVelocityRads = 0.0;
     public double followerAppliedVolts = 0.0;
     public double followerSupplyCurrentAmps = 0.0;
-    public double followerTorqueCurrentAmps = 0.0;
   }
 
   public static enum FlywheelIOOutputMode {

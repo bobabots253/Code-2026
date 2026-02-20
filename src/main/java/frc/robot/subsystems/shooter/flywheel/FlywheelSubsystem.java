@@ -16,10 +16,6 @@ public class FlywheelSubsystem extends FullSubsystem {
   private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
   private final FlywheelIOOutputs outputs = new FlywheelIOOutputs();
 
-  private final Debouncer masterVortexConnectedDebouncer =
-      new Debouncer(0.5, Debouncer.DebounceType.kFalling);
-  private final Debouncer followerVortexConnectedDebouncer =
-      new Debouncer(0.5, Debouncer.DebounceType.kFalling);
   private Alert masterDisconnected;
   private Alert followerDisconnected;
 
@@ -37,10 +33,10 @@ public class FlywheelSubsystem extends FullSubsystem {
 
     masterDisconnected.set(
         Robot.showHardwareAlerts()
-            && !masterVortexConnectedDebouncer.calculate(inputs.masterMotorConnected));
+            && (!inputs.masterMotorConnected));
     followerDisconnected.set(
         Robot.showHardwareAlerts()
-            && !followerVortexConnectedDebouncer.calculate(inputs.followerMotorConnected));
+            && (!inputs.followerMotorConnected));
   }
 
   @Override
