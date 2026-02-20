@@ -17,8 +17,6 @@ import static frc.robot.util.SparkUtil.ifOk;
 import static frc.robot.util.SparkUtil.sparkStickyFault;
 import static frc.robot.util.SparkUtil.tryUntilOk;
 
-import java.util.function.DoubleSupplier;
-
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -31,11 +29,10 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
-
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.util.Units;
+import java.util.function.DoubleSupplier;
 
 /**
  * Flywheel Hardware implementation using SparkFlex Current System is designed to mimics
@@ -147,27 +144,47 @@ public class FlywheelIOSpark implements FlywheelIO {
 
     // Update all the FlywheelIO inputs for the master motor
     // Use SparkStickyFaults to track motor connectivity (See SparkUtil for Implementation)
-    sparkStickyFault = false; 
-    ifOk(masterVortex, masterRelativeEncoder::getPosition, (value) -> inputs.masterPositionRads = value);
-    ifOk(masterVortex, masterRelativeEncoder::getVelocity, (value) -> inputs.masterVelocityRads = value);
+    sparkStickyFault = false;
+    ifOk(
+        masterVortex,
+        masterRelativeEncoder::getPosition,
+        (value) -> inputs.masterPositionRads = value);
+    ifOk(
+        masterVortex,
+        masterRelativeEncoder::getVelocity,
+        (value) -> inputs.masterVelocityRads = value);
     ifOk(
         masterVortex,
         new DoubleSupplier[] {masterVortex::getAppliedOutput, masterVortex::getBusVoltage},
         (values) -> inputs.masterAppliedVolts = values[0] * values[1]);
-    ifOk(masterVortex, masterVortex::getAppliedOutput, (value) -> inputs.masterSupplyCurrentAmps = value);
-    inputs.masterMotorConnected = masterVortexDebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
+    ifOk(
+        masterVortex,
+        masterVortex::getAppliedOutput,
+        (value) -> inputs.masterSupplyCurrentAmps = value);
+    inputs.masterMotorConnected =
+        masterVortexDebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
 
     // Update all the FlywheelIO inputs for the follower motor
     // Use SparkStickyFaults to track motor connectivity (See SparkUtil for Implementation)
-    sparkStickyFault = false; 
-    ifOk(followerVortex, followerRelativeEncoder::getPosition, (value) -> inputs.followerPositionRads = value);
-    ifOk(followerVortex, followerRelativeEncoder::getVelocity, (value) -> inputs.followerVelocityRads = value);
+    sparkStickyFault = false;
+    ifOk(
+        followerVortex,
+        followerRelativeEncoder::getPosition,
+        (value) -> inputs.followerPositionRads = value);
+    ifOk(
+        followerVortex,
+        followerRelativeEncoder::getVelocity,
+        (value) -> inputs.followerVelocityRads = value);
     ifOk(
         followerVortex,
         new DoubleSupplier[] {followerVortex::getAppliedOutput, followerVortex::getBusVoltage},
         (values) -> inputs.followerAppliedVolts = values[0] * values[1]);
-    ifOk(followerVortex, followerVortex::getAppliedOutput, (value) -> inputs.followerSupplyCurrentAmps = value);
-    inputs.followerMotorConnected = followerVortexDebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
+    ifOk(
+        followerVortex,
+        followerVortex::getAppliedOutput,
+        (value) -> inputs.followerSupplyCurrentAmps = value);
+    inputs.followerMotorConnected =
+        followerVortexDebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
   }
 
   @Override

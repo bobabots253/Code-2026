@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.RobotState;
 import frc.robot.fieldSetup;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.util.FullSubsystem;
@@ -78,6 +79,18 @@ public class ShotCalculator extends FullSubsystem {
     targetSpeedRPM = ShootOnTheFlyConstants.FLYWHEEL_RPM_INTERPOLATOR.get(distance2D);
     targetSpeedMPS = ShootOnTheFlyConstants.FLYWHEEL_VELOCITY_INTERPOLATOR.get(distance2D);
     targetAngle = ShootOnTheFlyConstants.HOOD_DEGREES_INTERPOLATOR.get(distance2D);
+
+    // Publish Shot Calculation Data to Robot State
+    RobotState.getInstance()
+        .setShootingParameters(
+            new RobotState.ShootingParameters(
+                getCorrectedTargetPose2d(),
+                getCorrectedTargetSpeedRPM(),
+                getCorrectTargetVelocity(),
+                getCorrectedTargetAngle(),
+                getCorrectTargetRotation(),
+                getShooterToCorrectTargetPoseDistance(),
+                getShooterToCorrectTargetPoseDistance3D()));
   }
 
   public Pose2d getCorrectedTargetPose2d() {

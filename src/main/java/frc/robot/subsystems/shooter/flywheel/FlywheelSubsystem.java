@@ -1,6 +1,5 @@
 package frc.robot.subsystems.shooter.flywheel;
 
-import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
@@ -31,12 +30,8 @@ public class FlywheelSubsystem extends FullSubsystem {
     io.updateInputs(inputs);
     Logger.processInputs("Flywheel", inputs);
 
-    masterDisconnected.set(
-        Robot.showHardwareAlerts()
-            && (!inputs.masterMotorConnected));
-    followerDisconnected.set(
-        Robot.showHardwareAlerts()
-            && (!inputs.followerMotorConnected));
+    masterDisconnected.set(Robot.showHardwareAlerts() && (!inputs.masterMotorConnected));
+    followerDisconnected.set(Robot.showHardwareAlerts() && (!inputs.followerMotorConnected));
   }
 
   @Override
