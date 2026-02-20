@@ -1,17 +1,19 @@
 package frc.robot.subsystems.shooter.flywheel;
 
 public class FlywheelConstants {
+  //CAN Ids
   public static final int flywheelMasterCanID = 15;
   public static final int flywheelFollowerCanID = 16;
-
+//Current limit
   public static final int flywheelCurrentLimit = 50;
 
+  //Encoder constants
   public static final double flywheelReduction = 1.0;
   public static final boolean flywheelEncoderInverted = false;
   public static final double flywheelEncoderPositionFactor = (2.0 * Math.PI) / flywheelReduction;
   public static final double flywheelEncoderVelocityFactor =
       (2.0 * Math.PI) / 60 / flywheelReduction;
-      
+//Bang Bang and FF constants
   public static final double flywheelTolerance = 1.00;
   public static final double kS = 0.015;
   public static final double kV = 0.015;

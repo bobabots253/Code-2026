@@ -15,52 +15,53 @@ import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class FlywheelSubsystem extends FullSubsystem {
-  private final FlywheelIO io;
-  private final Alert flywheelMasterDisconnectedAlert;
+  private final FlywheelIO io; //initilializes the flywheel io.
+  private final Alert flywheelMasterDisconnectedAlert; // initializes alerts for if a motor disconnects
   private final Alert flywheelFollowerDisconnectedAlert;
-  private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
+  private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged(); //creates new inputs and outputs, which are logged.
   private final FlywheelIOOutputs outputs = new FlywheelIOOutputs();
-  private final Debouncer flywheelDebouncer = new Debouncer(0.2, DebounceType.kFalling);
+  private final Debouncer flywheelDebouncer = new Debouncer(0.2, DebounceType.kFalling); // creates new debouncer
 
   public FlywheelSubsystem(FlywheelIO io) {
-    this.io = io;
+    this.io = io; // creates the actual io, which will be FlywheelIO io (above)
     flywheelMasterDisconnectedAlert =
-        new Alert("Disconnected Master motor in flywheel", AlertType.kError);
+        new Alert("Disconnected Master motor in flywheel", AlertType.kError); // gives the alerts text to help identify them
     flywheelFollowerDisconnectedAlert =
         new Alert("Disconnected Follower motor in flywheel", AlertType.kError);
   }
 
   @Override
-  public void periodic() {
-    io.updateInputs(inputs);
-    Logger.processInputs("Flywheel / Inputs", inputs);
-    flywheelMasterDisconnectedAlert.set(
-        Robot.showHardwareAlerts() && flywheelDebouncer.calculate(inputs.flywheelMasterConnected));
+  public void periodic() { //things here are called every 20ms
+    io.updateInputs(inputs); //runs the io's updateInputs function based on our autologged inputs.
+    Logger.processInputs("Flywheel / Inputs", inputs); // puts the inputs on advantage scope.
+    flywheelMasterDisconnectedAlert.set( //sets the parameters needed for our alerts to trigger
+        Robot.showHardwareAlerts() && flywheelDebouncer.calculate(inputs.flywheelMasterConnected)); //the alerts trigger if our flywheelMasterConnected input is false for more than 0.2 sec
     flywheelFollowerDisconnectedAlert.set(
         Robot.showHardwareAlerts()
             && flywheelDebouncer.calculate(inputs.flywheelFollowerConnected));
   }
 
   @Override
-  public void periodicAfterScheduler() {
-    Logger.recordOutput("Flywheel / Outputs", outputs.mode);
-    io.applyOutputs(outputs);
+  public void periodicAfterScheduler() { // this method runs after periodic, and is used to apply outputs
+    Logger.recordOutput("Flywheel / Outputs", outputs.mode); // puts our outputs in advantageScope.
+    io.applyOutputs(outputs); // runs the io's applyOutputs function with our outputs from above.
   }
 
-  private void runVolts(double volts) {
+  private void runVolts(double volts) { //method to change the flywheel's mode to VOLTAGE.
     outputs.mode = FlywheelOutputMode.VOLTAGE;
+    outputs.volts = volts; //sets the target voltage (output.volts) to the double volts passed to the method
   }
 
-  private void runVelocity(double velocityRadsPerSec) {
+  private void runVelocity(double velocityRadsPerSec) { //method to change the flywheel's mode to BANG_BANG
     outputs.mode = FlywheelOutputMode.BANG_BANG;
-    outputs.velocityRadsPerSec = velocityRadsPerSec;
+    outputs.velocityRadsPerSec = velocityRadsPerSec; //sets the target velocity (output.velocityRadPerSec) to the double velocityRadPerSec passed to the method
   }
 
-  public double getSpeed() {
+  public double getSpeed() { //method which returns the speed of the flywheel, useful for the shot calculator
     return inputs.flywheelMasterVelocityRad;
   }
 
-  public Boolean atSpeed() {
+  public Boolean atSpeed() { //method which checks is the flywheel is within 1 rad/sec of the target speed.
     if (Math.abs(inputs.flywheelMasterVelocityRad - outputs.velocityRadsPerSec)
         <= flywheelTolerance) {
       return true;
@@ -69,25 +70,21 @@ public class FlywheelSubsystem extends FullSubsystem {
     }
   }
 
-  private void stop() {
+  private void stop() { //method to set the flywheel's mode to COAST, which will stop it.
     outputs.mode = FlywheelOutputMode.COAST;
-    outputs.velocityRadsPerSec = 0.0;
+    outputs.velocityRadsPerSec = 0.0; //sets velocity and volt setpoints to 0 to ensure the motor stops.
     outputs.volts = 0.0;
   }
 
-  public Command stopCommand() {
+  public Command stopCommand() { //command that runs our stop method to stop the flywheel.
     return runOnce(this::stop);
   }
 
-  public Command runFixedVelocity(DoubleSupplier velocity) {
+  public Command runFixedVelocity(DoubleSupplier velocity) { //command that runs our runVelocity method, and runs the stop method if interrupted.
     return runEnd(() -> runVelocity(velocity.getAsDouble()), this::stop);
   }
 
-  public Command runVoltage(DoubleSupplier volts) {
+  public Command runVoltage(DoubleSupplier volts) { //command that runs our runVolts method, and runs the stop method if interrupted.
     return runEnd(() -> runVolts(volts.getAsDouble()), this::stop);
   }
-
-  // public Command runCalculatedVelocity(){
-  //   return runEnd (() -> runVelocity(), this::stop);
-  // }
 }
