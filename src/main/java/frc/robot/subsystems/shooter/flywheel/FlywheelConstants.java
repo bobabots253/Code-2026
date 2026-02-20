@@ -47,4 +47,6 @@ public class FlywheelConstants {
   // Temporary holding for subsystem variables
   public static final double jugglingVelocity = 0.0; // Check ReCalc for values
   public static final double debuggingVelocity = 0.0; // Change as needed
+
+  public static final double closedLoopVelocityTolerance = 0.0; // Change to heuristic value
 }
