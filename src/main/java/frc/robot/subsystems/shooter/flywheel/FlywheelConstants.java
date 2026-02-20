@@ -43,4 +43,8 @@ public class FlywheelConstants {
   public static final double kA = 0.05; // Torque Control Substitute
 
   public static final double maxAcceleration = 400.0; // rad/s^2, check with ReCalc
+
+  // Temporary holding for subsystem variables
+  public static final double jugglingVelocity = 0.0; // Check ReCalc for values
+  public static final double debuggingVelocity = 0.0; // Change as needed
 }

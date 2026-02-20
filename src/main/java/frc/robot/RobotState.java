@@ -8,7 +8,7 @@ public class RobotState {
   public record ShootingParameters(
       Pose2d correctedTargetPose2d,
       double correctedTargetSpeedRPM,
-      double CorrectTargetVelocity,
+      double correctTargetVelocity,
       double correctedTargetAngle,
       Rotation2d correctTargetRotation,
       double shooterToCorrectTargetPoseDistance,
