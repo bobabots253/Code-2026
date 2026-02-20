@@ -39,8 +39,7 @@ public class KickerIOSpark implements KickerIO {
   private final SparkClosedLoopController masterNEOController;
 
   // Declare WPILib Debouncer for Motor Disconnection Alerts here
-  private final Debouncer masterNEODebouncer =
-      new Debouncer(0.25, Debouncer.DebounceType.kFalling);
+  private final Debouncer masterNEODebouncer = new Debouncer(0.25, Debouncer.DebounceType.kFalling);
 
   private final SimpleMotorFeedforward ffCalculator = new SimpleMotorFeedforward(kS, kV, kA);
   private final SlewRateLimiter slewRateLimiter = new SlewRateLimiter(maxAcceleration);
@@ -87,9 +86,7 @@ public class KickerIOSpark implements KickerIO {
         5,
         () ->
             masterNEO.configure(
-                masterNEOConfig,
-                ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters));
+                masterNEOConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
   }
 
   @Override
@@ -109,10 +106,7 @@ public class KickerIOSpark implements KickerIO {
         masterNEO,
         new DoubleSupplier[] {masterNEO::getAppliedOutput, masterNEO::getBusVoltage},
         (values) -> inputs.masterAppliedVolts = values[0] * values[1]);
-    ifOk(
-        masterNEO,
-        masterNEO::getAppliedOutput,
-        (value) -> inputs.masterSupplyCurrentAmps = value);
+    ifOk(masterNEO, masterNEO::getAppliedOutput, (value) -> inputs.masterSupplyCurrentAmps = value);
     inputs.masterMotorConnected =
         masterNEODebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
   }

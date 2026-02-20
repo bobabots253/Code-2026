@@ -29,5 +29,4 @@ public interface HoodIO {
   public default void applyOutputs(HoodIOOutputs outputs) {}
 
   default void runOpenLoop(double decimalPercentage) {}
-
 }

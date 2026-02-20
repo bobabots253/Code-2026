@@ -80,8 +80,10 @@ public class FlywheelIOSpark implements FlywheelIO {
     masterVortexConfig
         .encoder
         .positionConversionFactor(masterFlywheelEncoderPositionFactor) // Only used for logging
-        .velocityConversionFactor(masterFlywheelEncoderVelocityFactor) // THE USER MUST GET THIS RIGHT
-        .uvwMeasurementPeriod(10) // Measurement = Postion / deltaTime, this edits deltaTime to parameter
+        .velocityConversionFactor(
+            masterFlywheelEncoderVelocityFactor) // THE USER MUST GET THIS RIGHT
+        .uvwMeasurementPeriod(
+            10) // Measurement = Postion / deltaTime, this edits deltaTime to parameter
         .uvwAverageDepth(2); // Does not affect positional control
     masterVortexConfig
         .closedLoop

@@ -3,7 +3,6 @@ package frc.robot.subsystems.shooter.hood;
 import static frc.robot.subsystems.shooter.hood.HoodConstants.*;
 import static frc.robot.util.SparkUtil.*;
 
-
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -48,11 +47,11 @@ public class HoodIOSpark implements HoodIO {
         .smartCurrentLimit(35); // Current Limit reduced for safety
     masterNEOConfig
         .encoder
-        .positionConversionFactor(
-            masterPositionConversionFactor) // THE USER MUST GET THIS RIGHT
+        .positionConversionFactor(masterPositionConversionFactor) // THE USER MUST GET THIS RIGHT
         .velocityConversionFactor(masterVelocityConversionFactor) // Only used for logging
         .inverted(false)
-        .uvwMeasurementPeriod(10) // Measurement = Postion / deltaTime, this edits deltaTime to parameter
+        .uvwMeasurementPeriod(
+            10) // Measurement = Postion / deltaTime, this edits deltaTime to parameter
         .uvwAverageDepth(2); // Does not affect positional control
     masterNEOConfig
         .closedLoop
@@ -126,11 +125,9 @@ public class HoodIOSpark implements HoodIO {
   }
 
   /**
-   * Utility for ensuring correct direction and possibly for characterization.
-   * Use like <0.01 for testing if motor is going to be a V1.1.
-   * Preferably do NOT use.
-   *  Instead use the state based system found in HoodSubsystem
-   * and edit the corresponding constructor arguement
+   * Utility for ensuring correct direction and possibly for characterization. Use like <0.01 for
+   * testing if motor is going to be a V1.1. Preferably do NOT use. Instead use the state based
+   * system found in HoodSubsystem and edit the corresponding constructor arguement
    */
   @Override
   public void runOpenLoop(double decimalPercentage) {
