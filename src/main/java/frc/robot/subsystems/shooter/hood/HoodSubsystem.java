@@ -52,8 +52,6 @@ public class HoodSubsystem extends FullSubsystem {
     outputs.hoodSetVelocityRad = goalVelocity;
   }
 
-
-
   public void setGoalParams(double angle, double velocity) {
     goalAngle = angle;
     goalVelocity = velocity;
@@ -100,7 +98,7 @@ public class HoodSubsystem extends FullSubsystem {
   }
 
   public Command zero() {
-    return runOnce(io.zeroHood(inputs)).ignoringDisable(true);
+    return runOnce(() -> io.zeroHood(inputs)).ignoringDisable(true);
   }
 
   public Command stopCommand() {

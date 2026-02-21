@@ -21,7 +21,6 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
 import java.util.function.DoubleSupplier;
 
 public class HoodIOSpark implements HoodIO {
@@ -124,11 +123,12 @@ public class HoodIOSpark implements HoodIO {
   public void setProfiledControl(HoodIOOutputs outputs) {
     masterNeo.setVoltage(
         profiledHoodController.calculate(
-            (hoodEncoder.getPosition() - hoodOffset),
-            outputs.hoodSetPosRad )+ hoodFF.calculate(outputs.hoodSetVelocityRad));
+                (hoodEncoder.getPosition() - hoodOffset), outputs.hoodSetPosRad)
+            + hoodFF.calculate(outputs.hoodSetVelocityRad));
   }
-@Override
-    public void zeroHood(HoodIOInputs inputs) {
+
+  @Override
+  public void zeroHood(HoodIOInputs inputs) {
     hoodOffset = minAngleRad - inputs.hoodPosRad;
     hoodEncoder.setPosition(0.0);
   }
