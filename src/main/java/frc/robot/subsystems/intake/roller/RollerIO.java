@@ -27,5 +27,3 @@ public interface RollerIO {
 
   public default void setRollerOpenLoop(double voltage) {}
 }
-
-

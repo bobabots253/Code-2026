@@ -6,9 +6,6 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Robot;
-import frc.robot.subsystems.intake.roller.RollerIO.RollerIOOutputMode;
-import frc.robot.subsystems.intake.roller.RollerIO.RollerIOOutputs;
 import frc.robot.util.FullSubsystem;
 import lombok.RequiredArgsConstructor;
 
