@@ -2,19 +2,17 @@ package frc.robot.subsystems.shooter.flywheel;
 
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.flywheelTolerance;
 
-import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.RobotState;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIO.FlywheelIOOutputs;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIO.FlywheelOutputMode;
 import frc.robot.util.FullSubsystem;
-import lombok.RequiredArgsConstructor;
-
 import java.util.function.DoubleSupplier;
+import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.Logger;
 
 public class FlywheelSubsystem extends FullSubsystem {
@@ -26,14 +24,21 @@ public class FlywheelSubsystem extends FullSubsystem {
       new FlywheelIOInputsAutoLogged(); // creates new inputs and outputs, which are logged.
   private final FlywheelIOOutputs outputs = new FlywheelIOOutputs();
 
+  @RequiredArgsConstructor
+  public enum Goal {
+    IDLE(() -> 0.0),
+    PREPARE_HUB(() -> RobotState.getInstance().getCustomShotData().correctTargetVelocity()),
+    SHOOT(() -> RobotState.getInstance().getCustomShotData().correctTargetVelocity()),
+    DEBUGGING(() -> FlywheelConstants.debuggingVelocity);
 
-@RequiredArgsConstructor
-public enum Goal {
-  IDLE(()-> 0.0),
-  SHOOT(() -> RobotState.getInstance.getCustomShotData.correctTargetVelocity),
-  
-  
-}
+    private final DoubleSupplier velocityRadsPerSec;
+
+    private double getGoal() {
+      return velocityRadsPerSec.getAsDouble();
+    }
+  }
+
+  private Goal currentGoal = Goal.IDLE;
 
   public FlywheelSubsystem(FlywheelIO io) {
     this.io = io; // creates the actual io, which will be FlywheelIO io (above)
@@ -47,15 +52,26 @@ public enum Goal {
 
   @Override
   public void periodic() { // things here are called every 20ms
+
+    if (DriverStation.isDisabled()) {
+      setGoal(Goal.IDLE);
+    }
+
+    if (currentGoal == Goal.IDLE) {
+      stop();
+    } else {
+      runVelocity(currentGoal.getGoal());
+    }
     io.updateInputs(inputs); // runs the io's updateInputs function based on our autologged inputs.
+
     Logger.processInputs("Flywheel / Inputs", inputs); // puts the inputs on advantage scope.
     flywheelMasterDisconnectedAlert.set( // sets the parameters needed for our alerts to trigger
         Robot.showHardwareAlerts()
-            && !(inputs.flywheelMasterConnected)); // the alerts trigger if our flywheelMasterConnected
+            && !(inputs
+                .flywheelMasterConnected)); // the alerts trigger if our flywheelMasterConnected
     // input is false for more than 0.2 sec
     flywheelFollowerDisconnectedAlert.set(
-        Robot.showHardwareAlerts()
-            && !(inputs.flywheelFollowerConnected));
+        Robot.showHardwareAlerts() && !(inputs.flywheelFollowerConnected));
   }
 
   @Override
@@ -63,6 +79,25 @@ public enum Goal {
       periodicAfterScheduler() { // this method runs after periodic, and is used to apply outputs
     Logger.recordOutput("Flywheel / Outputs", outputs.mode); // puts our outputs in advantageScope.
     io.applyOutputs(outputs); // runs the io's applyOutputs function with our outputs from above.
+  }
+
+  private void setGoal(Goal desiredGoal) {
+    if (desiredGoal == Goal.IDLE) {
+      outputs.mode = FlywheelOutputMode.COAST;
+      return;
+
+    } else if (desiredGoal == Goal.DEBUGGING) {
+      outputs.mode = FlywheelOutputMode.VOLTAGE;
+
+    } else {
+      this.currentGoal = desiredGoal;
+      runVelocity(currentGoal.getGoal());
+    }
+  }
+
+  public boolean atGoal() {
+    return currentGoal == Goal.IDLE
+        || Math.abs(getSpeed() - currentGoal.getGoal()) <= FlywheelConstants.flywheelTolerance;
   }
 
   private void runVolts(double volts) { // method to change the flywheel's mode to VOLTAGE.
