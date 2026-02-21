@@ -5,7 +5,7 @@ import org.littletonrobotics.junction.AutoLog;
 public interface HoodIO {
   @AutoLog
   public static class HoodIOInputs {
-    public boolean masterNeoHoodConnected = false;
+    public boolean masterNeoConnected = false;
     public double hoodVolts = 0.0;
     public double hoodCurrentAmps = 0.0;
     public double hoodPosRad = 0.0;
@@ -26,7 +26,9 @@ public interface HoodIO {
     public double hoodDecimalPercentOutput = 0.0;
   }
 
-  default void updateInputs(HoodIOInputsAutoLogged inputs) {}
+  default void updateInputs(HoodIOInputs inputs) {}
+
+  default void zeroHood(HoodIOInputs inputs) {}
 
   default void applyOutputs(HoodIOOutputs outputs) {}
 

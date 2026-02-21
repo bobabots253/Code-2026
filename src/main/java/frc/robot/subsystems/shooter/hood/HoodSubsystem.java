@@ -19,7 +19,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class HoodSubsystem extends FullSubsystem {
-  private HoodIO hoodIO;
+  private HoodIO io;
   private final Alert hoodDisconnected;
   private final HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
   private final HoodIOOutputs outputs = new HoodIOOutputs();
@@ -29,33 +29,30 @@ public class HoodSubsystem extends FullSubsystem {
   private double goalVelocity = 0.0;
   private Boolean hoodZeroed = false;
 
-  public HoodSubsystem(HoodIO hoodIO) {
+  public HoodSubsystem(HoodIO io) {
 
-    this.hoodIO = hoodIO;
+    this.io = io;
     hoodDisconnected = new Alert("Hood Motor Disconnected", AlertType.kError);
   }
 
   @Override
   public void periodic() {
-    hoodIO.updateInputs(inputs);
+    io.updateInputs(inputs);
     Logger.processInputs("Hood / Inputs", inputs);
 
     hoodDisconnected.set(
-        Robot.showHardwareAlerts() && !hoodDebouncer.calculate(inputs.masterNeoHoodConnected));
+        Robot.showHardwareAlerts() && !hoodDebouncer.calculate(inputs.masterNeoConnected));
   }
 
   @Override
   public void periodicAfterScheduler() {
     Logger.recordOutput("Hood / Outputs", outputs.mode);
-    hoodIO.applyOutputs(outputs);
+    io.applyOutputs(outputs);
     outputs.hoodSetPosRad = MathUtil.clamp(goalAngle, minAngleRad, maxAngleRad) - hoodOffset;
     outputs.hoodSetVelocityRad = goalVelocity;
   }
 
-  public void zeroHood() {
-    hoodOffset = minAngleRad - inputs.hoodPosRad;
-    hoodZeroed = true;
-  }
+
 
   public void setGoalParams(double angle, double velocity) {
     goalAngle = angle;
@@ -91,7 +88,7 @@ public class HoodSubsystem extends FullSubsystem {
   public boolean hoodAtGoal() {
     return DriverStation.isEnabled()
         && hoodZeroed
-        && Math.abs(getHoodAngle() - goalAngle) <= Units.degreesToRadians(toleranceDeg);
+        && Math.abs(getHoodAngle() - goalAngle) <= Units.degreesToRadians(toleranceRad);
   }
 
   // public Command trackTarget() {
@@ -103,7 +100,7 @@ public class HoodSubsystem extends FullSubsystem {
   }
 
   public Command zero() {
-    return runOnce(this::zeroHood).ignoringDisable(true);
+    return runOnce(io.zeroHood(inputs)).ignoringDisable(true);
   }
 
   public Command stopCommand() {
