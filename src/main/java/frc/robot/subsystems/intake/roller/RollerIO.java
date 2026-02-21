@@ -5,10 +5,9 @@ import org.littletonrobotics.junction.AutoLog;
 public interface RollerIO {
   @AutoLog
   public class RollerIOInputs {
-    // public boolean rollerConnected = false;
     public double rollerAppliedVolts = 0.0;
     public double rollerCurrentAmps = 0.0;
-    public boolean RollerBeamBreak = false;
+    //public boolean RollerBeamBreak = false;
     public boolean RollerConnected = false;
   }
 

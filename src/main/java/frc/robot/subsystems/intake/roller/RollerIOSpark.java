@@ -16,12 +16,12 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import frc.robot.subsystems.intake.roller.RollerIO.RollerIOInputs;
 
 public class RollerIOSpark implements RollerIO {
-  private final DigitalInput rollerBeamBreak;
+  //private final DigitalInput rollerBeamBreak;
   private final SparkBase rollerSpark;
 
   public RollerIOSpark() {
     rollerSpark = new SparkMax(11, MotorType.kBrushless);
-    rollerBeamBreak = new DigitalInput(beamBreakChannel); 
+   // rollerBeamBreak = new DigitalInput(beamBreakChannel); 
 
 
     SparkMaxConfig rollerSparkConfig = new SparkMaxConfig();
@@ -46,7 +46,7 @@ public class RollerIOSpark implements RollerIO {
   public void updateInputs(RollerIOInputs inputs) {
     inputs.rollerCurrentAmps = rollerSpark.getOutputCurrent();
     inputs.rollerAppliedVolts = rollerSpark.getAppliedOutput() * rollerSpark.getBusVoltage();
-    inputs.RollerBeamBreak = rollerBeamBreak.get();
+    //inputs.RollerBeamBreak = rollerBeamBreak.get();
   }
 
   @Override
@@ -64,10 +64,9 @@ public class RollerIOSpark implements RollerIO {
       break;
     }
   }
-
-  public boolean hasFuel() {
-    return rollerBeamBreak.get();
-  }
+  // public boolean hasFuel() {
+  //  // return rollerBeamBreak.get();
+  // }
 }
 
 
