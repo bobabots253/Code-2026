@@ -24,7 +24,5 @@ public class RollerSubsystem extends FullSubsystem {
 
   @Override
   public void periodicAfterScheduler() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'periodicAfterScheduler'");
   }
 }
