@@ -25,7 +25,7 @@ public class IndexerIOSpark implements IndexerIO {
     SparkMaxConfig masterSparkMaxConfig = new SparkMaxConfig();
     masterSparkMaxConfig
         .idleMode(IdleMode.kCoast)
-        .smartCurrentLimit(50)
+        .smartCurrentLimit(IndexerConstants.masterCurrentLimit)
         .signals
         .appliedOutputPeriodMs(20)
         .busVoltagePeriodMs(20)
@@ -37,7 +37,7 @@ public class IndexerIOSpark implements IndexerIO {
             masterNEO.configure(
                 masterSparkMaxConfig,
                 ResetMode.kResetSafeParameters,
-                PersistMode.kNoPersistParameters));
+                PersistMode.kPersistParameters));
   }
 
   @Override
