@@ -136,6 +136,26 @@ public class FlywheelSubsystem extends FullSubsystem {
     outputs.volts = 0.0;
   }
 
+ public Command shootCommand(){
+ return startEnd(() -> setGoal(Goal.SHOOT), () -> setGoal(Goal.IDLE))
+ .withName("Flywheels Shoot");
+
+ }
+
+ public Command prepareHubCommand(){
+ return startEnd(() -> setGoal(Goal.PREPARE_HUB), () -> setGoal(Goal.IDLE))
+  .withName("Flywheels Shoot");
+
+ 
+ }
+
+ public Command debuggingCommand(){
+ return startEnd(() -> setGoal(Goal.DEBUGGING), () -> setGoal(Goal.IDLE))
+  .withName("Flywheels Shoot");
+
+ 
+ }
+
   public Command stopCommand() { // command that runs our stop method to stop the flywheel.
     return runOnce(this::stop);
   }
