@@ -10,7 +10,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.filter.Debouncer;
-import frc.robot.subsystems.intake.roller.RollerConstants;
 import java.util.function.DoubleSupplier;
 
 public class IndexerIOSpark implements IndexerIO {
@@ -22,7 +21,7 @@ public class IndexerIOSpark implements IndexerIO {
 
   public IndexerIOSpark() {
     // Initialize REV motor hardware here
-    masterNEO = new SparkMax(RollerConstants.sparkMasterRollerCanId, MotorType.kBrushless);
+    masterNEO = new SparkMax(IndexerConstants.sparkMasterIndexerCanId, MotorType.kBrushless);
     SparkMaxConfig masterSparkMaxConfig = new SparkMaxConfig();
     masterSparkMaxConfig
         .idleMode(IdleMode.kCoast)
