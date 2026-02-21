@@ -24,19 +24,19 @@ public class HoodConstants {
   private static final double kBottomPulleyToTopPulleyReduction =
       22.0 / 22.0; // 22T/22T, CAD (18:24) is wrong
   // https://cad.onshape.com/documents/4e82030250652400505b5189/w/167427ae385287ae525c40f5/e/b221a965ecb48b8e800aa181
-  private static final double kPinionHarringtonDiametralPitch = 10.0; // Solved via CAD
-  private static final double kHoodHarringtonDiametralPitch = 10.0; // Solved via CAD
-  private static final double kPinionHarringtonPitchDiameter = Units.inchesToMeters(1.4);
-  private static final double kHoodHarringtonPitchDiameter = Units.inchesToMeters(14);
-  private static final double kPinionHarringtonPitchRadius =
-      kPinionHarringtonPitchDiameter / 2; // Unused
+  private static final double kPinionHerringboneDiametralPitch = 10.0; // Solved via CAD
+  private static final double kHoodHerringboneDiametralPitch = 10.0; // Solved via CAD
+  private static final double kPinionHerringbonePitchDiameter = Units.inchesToMeters(1.4);
+  private static final double kHoodHerringbonePitchDiameter = Units.inchesToMeters(14);
+  private static final double kPinionHerringbonePitchRadius =
+      kPinionHerringbonePitchDiameter / 2; // Unused
   private static final double kHoodHarringtonPitchRadius =
-      kHoodHarringtonPitchDiameter / 2; // Unused
+      kHoodHerringbonePitchDiameter / 2; // Unused
   // Because the pinion DP and the Hood DP are 1:1, change in arc lenght remains 1:1.
   private static final double kTotalReduction =
       kMotorToBottomPulleyReduction
           * kBottomPulleyToTopPulleyReduction
-          * (kPinionHarringtonDiametralPitch / kHoodHarringtonDiametralPitch);
+          * (kPinionHerringboneDiametralPitch / kHoodHerringboneDiametralPitch);
 
   public static final double minAngleRad = Math.toRadians(minAngleDeg);
   public static final double maxAngleRad = Math.toRadians(maxAngleDeg);
