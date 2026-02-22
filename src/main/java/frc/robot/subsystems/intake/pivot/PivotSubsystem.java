@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake.pivot;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.intake.pivot.PivotIO.PivotIOOutputMode;
 import frc.robot.subsystems.intake.pivot.PivotIO.PivotIOOutputs;
 import frc.robot.subsystems.shooter.hood.HoodConstants;
 import frc.robot.subsystems.shooter.hood.HoodIO.HoodIOOutputMode;
@@ -95,7 +96,7 @@ public class PivotSubsystem extends FullSubsystem {
    * @param angleRads the new angular setpoint.
    */
   private void runAngular(double angleRads) {
-    outputs.mode = HoodIOOutputMode.CLOSED_LOOP;
+    outputs.mode = PivotIOOutputMode.CLOSED_LOOP;
     outputs.positionRad = angleRads;
   }
 
@@ -134,6 +135,6 @@ public class PivotSubsystem extends FullSubsystem {
   }
 
   private void stop() {
-    outputs.mode = HoodIOOutputMode.BRAKE;
+    outputs.mode = PivotIOOutputMode.BRAKE;
   }
 }

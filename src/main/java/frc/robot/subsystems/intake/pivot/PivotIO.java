@@ -20,7 +20,7 @@ public interface PivotIO {
   }
 
   public static class PivotIOOutputs {
-    public HoodIOOutputMode mode = HoodIOOutputMode.BRAKE;
+    public PivotIOOutputMode mode = PivotIOOutputMode.BRAKE;
     public double positionRad = 0.0;
   }
 
