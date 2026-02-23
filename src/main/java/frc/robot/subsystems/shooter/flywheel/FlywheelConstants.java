@@ -48,9 +48,11 @@ public class FlywheelConstants {
   public static final double vortexStallTorque = 3.6;
   public static final double vortexCount = 2.0;
   public static final double vortexMaxEfficiency = 0.8; // decimalPercentage
-  public static final double flywheelMaxTorque = (vortexStallTorque * vortexCount) * flywheelReductionRatio * vortexMaxEfficiency;
+  public static final double flywheelMaxTorque =
+      (vortexStallTorque * vortexCount) * flywheelReductionRatio * vortexMaxEfficiency;
   public static final double shooterwheelMOI = 0.00187289378195; // kg * m^2
-  public static final double maxAcceleration = flywheelMaxTorque / shooterwheelMOI; // rad/s^2, check with ReCalc
+  public static final double maxAcceleration =
+      flywheelMaxTorque / shooterwheelMOI; // rad/s^2, check with ReCalc
 
   // Temporary holding for subsystem variables
   public static final double jugglingVelocity = 0.0; // Check ReCalc for values
@@ -61,7 +63,8 @@ public class FlywheelConstants {
   public static final double idleTolerance = 10.47; // rad/sec, 100 rpm
 
   public static final double flywheelControlVelocityTolerance = 20.94; // rad/sec, 200 rpm
-  public static final double ballDetectionThreshold = 10.47; // rad/sec^2, CHECK physically check how much the velocity drops from one shot
+  public static final double ballDetectionThreshold =
+      10.47; // rad/sec^2, CHECK physically check how much the velocity drops from one shot
 
   /*
    * Solving for kI_velocity:
@@ -75,7 +78,7 @@ public class FlywheelConstants {
    */
   // Make sure this value is able to hold the motor at the setpoint while in IDLE phase
   // If there is too much drift, this value is too low
-  public static final double kI_velocity = 0.0; // amps/(rad/sec) SOLVE KADEN, DONT FORGET. 
+  public static final double kI_velocity = 0.0; // amps/(rad/sec) SOLVE KADEN, DONT FORGET.
 
   /*
   NOTE: TUNE Idle Phase first, PLEASE
@@ -85,8 +88,10 @@ public class FlywheelConstants {
    * 4. Look at re.calc's expected drop in RPM
    * 5. If it drops too much, increase AntiLag value
    * 6. Test with at least 3 balls, catch if Ball 2 flies shorter than Ball 1
-   * Note: Do NOT over-torque the ball, as it will lose grip 
+   * Note: Do NOT over-torque the ball, as it will lose grip
    */
-  // This value accounts for the amount of torque it takes for the ball to clear shooter wheel compression
-  public static final double kAntilag = 10.0; // amps SOLVE KADEN, DONT FORGET, Set AMP to 10 when starting
+  // This value accounts for the amount of torque it takes for the ball to clear shooter wheel
+  // compression
+  public static final double kAntilag =
+      10.0; // amps SOLVE KADEN, DONT FORGET, Set AMP to 10 when starting
 }

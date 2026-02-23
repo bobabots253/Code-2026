@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.pivot.PivotIO.PivotIOOutputMode;
 import frc.robot.subsystems.intake.pivot.PivotIO.PivotIOOutputs;
 import frc.robot.subsystems.shooter.hood.HoodConstants;
-import frc.robot.subsystems.shooter.hood.HoodIO.HoodIOOutputMode;
 import frc.robot.util.FullSubsystem;
 import java.util.function.DoubleSupplier;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,5 @@
 package frc.robot.subsystems.intake.pivot;
 
-import frc.robot.subsystems.shooter.hood.HoodIO.HoodIOOutputMode;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface PivotIO {

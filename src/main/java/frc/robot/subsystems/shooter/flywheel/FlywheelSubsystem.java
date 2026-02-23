@@ -121,7 +121,6 @@ public class FlywheelSubsystem extends FullSubsystem {
     outputs.measuredVelocityRadPerSec = inputs.masterVelocityRads;
   }
 
-
   // private void runFlywheelControlLoop(double velocityRadsPerSec){
   //   double measuredVelocity = inputs.masterVelocityRads;
   //   double setpoint = velocityRadsPerSec;

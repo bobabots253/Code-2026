@@ -25,7 +25,6 @@ public class PivotConstants {
   // Temporary Values (Confirm Functionality)
   public static final double stowAngle = 0.0;
   public static final double deployedAngle = -2.225;
-  public static final double jugglingAngle =
-      Units.degreesToRadians(0.0); 
+  public static final double jugglingAngle = Units.degreesToRadians(0.0);
   public static final double debuggingAngle = Units.degreesToRadians(0.0); // Change as needed
 }
