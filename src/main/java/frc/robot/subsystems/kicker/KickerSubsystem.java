@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.subsystems.kicker.KickerIO.KickerIOOutputMode;
 import frc.robot.subsystems.kicker.KickerIO.KickerIOOutputs;
-import frc.robot.subsystems.shooter.flywheel.FlywheelConstants;
 import frc.robot.util.FullSubsystem;
 import java.util.function.DoubleSupplier;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +21,12 @@ public class KickerSubsystem extends FullSubsystem {
 
   @RequiredArgsConstructor
   /*
-   * Defines all possible states for the flywheel. Each goal state has a DoubleSupplier arguement that updates from Robot State
+   * Defines all possible states for the kicker. Each goal state has a DoubleSupplier arguement that updates from Robot State
    */
+
+   // ADD MVP STATE
   public enum Goal {
-    // Stop the flywheel and chooses COAST Mode
+    // Stop the kicker and chooses COAST Mode
     IDLE(() -> 0.0),
     // Velocity setpoint calculated by the ShotCalculator for the Hub.
     PREPARE_HUB(() -> KickerConstants.prepareHubVelocity),
@@ -90,13 +91,13 @@ public class KickerSubsystem extends FullSubsystem {
 
   @AutoLogOutput(key = "Kicker/AtGoal")
   /**
-   * Returns true if the flywheel is within the velocity tolerance. Note: IDLE check catches the
+   * Returns true if the kicker is within the velocity tolerance. Note: IDLE check catches the
    * exception because I'm lazy
    */
   public boolean atGoal() {
     return currentGoal == Goal.IDLE
         || Math.abs(getVelocity() - currentGoal.getGoal())
-            <= FlywheelConstants.closedLoopVelocityTolerance;
+            <= KickerConstants.closedLoopVelocityTolerance;
   }
 
   public Command shootCommand() {

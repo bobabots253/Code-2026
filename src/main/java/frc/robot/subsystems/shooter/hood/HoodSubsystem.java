@@ -24,6 +24,7 @@ public class HoodSubsystem extends FullSubsystem {
   /*
    * Defines all possible states for the hood. Each goal state has a DoubleSupplier arguement that updates from Robot State
    */
+  // ADD MVP STATE
   public enum Goal {
     // Stop ClosedLoopControl on the Hood, Remains in Brake Mode
     IDLE(() -> 0.0),

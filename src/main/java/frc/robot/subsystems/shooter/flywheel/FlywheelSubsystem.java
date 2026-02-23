@@ -26,6 +26,7 @@ public class FlywheelSubsystem extends FullSubsystem {
   /*
    * Defines all possible states for the flywheel. Each goal state has a DoubleSupplier arguement that updates from Robot State
    */
+  // ADD MVP STATE
   public enum Goal {
     // Stop the flywheel and chooses COAST Mode
     IDLE(() -> 0.0),
