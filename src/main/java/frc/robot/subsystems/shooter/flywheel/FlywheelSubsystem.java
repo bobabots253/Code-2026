@@ -118,7 +118,16 @@ public class FlywheelSubsystem extends FullSubsystem {
   private void runVelocity(double velocityRadsPerSec) {
     outputs.mode = FlywheelIOOutputMode.VELOCITY_SETPOINT;
     outputs.velocityRadsPerSec = velocityRadsPerSec;
+    outputs.measuredVelocityRadPerSec = inputs.masterVelocityRads;
   }
+
+
+  // private void runFlywheelControlLoop(double velocityRadsPerSec){
+  //   double measuredVelocity = inputs.masterVelocityRads;
+  //   double setpoint = velocityRadsPerSec;
+  //   double error = setpoint - measuredVelocity;
+
+  // }
 
   public Command shootCommand() {
     return startEnd(() -> setGoal(Goal.SHOOT), () -> setGoal(Goal.IDLE))

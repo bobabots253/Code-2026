@@ -2,23 +2,22 @@ package frc.robot.subsystems.shooter.flywheel;
 
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.followerFlywheelEncoderPositionFactor;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.followerFlywheelEncoderVelocityFactor;
-import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.kA;
-import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.kS;
-import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.kV;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.masterFlywheelEncoderPositionFactor;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.masterFlywheelEncoderVelocityFactor;
-import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.maxAcceleration;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkFollowerFlywheelCanId;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkMasterFlyWheelkD;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkMasterFlyWheelkI;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkMasterFlyWheelkP;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkMasterFlywheelCanId;
-import static frc.robot.util.SparkUtil.*;
+import static frc.robot.util.SparkUtil.ifOk;
+import static frc.robot.util.SparkUtil.sparkStickyFault;
+import static frc.robot.util.SparkUtil.tryUntilOk;
+
+import java.util.function.DoubleSupplier;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
-import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -27,10 +26,8 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.SlewRateLimiter;
-import java.util.function.DoubleSupplier;
 
 /**
  * Flywheel Hardware implementation using SparkFlex Current System is designed to mimics
@@ -54,11 +51,11 @@ public class FlywheelIOSpark implements FlywheelIO {
   private final Debouncer followerVortexDebouncer =
       new Debouncer(0.25, Debouncer.DebounceType.kFalling);
 
-  private final SimpleMotorFeedforward ffCalculator = new SimpleMotorFeedforward(kS, kV, kA);
-  private final SlewRateLimiter slewRateLimiter = new SlewRateLimiter(maxAcceleration);
-
-  // Hardware State Tracking
-  private boolean wasCoasting = true;
+  // Internal Flywheel Control State Tracking
+  private enum FlywheelPhase { STARTUP, IDLE, BALL, RECOVERY }
+  private FlywheelPhase currentPhase = FlywheelPhase.STARTUP;
+  private double lastMeasuredVelocity = 0.0;
+  private double lastTime = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
 
   public FlywheelIOSpark() {
     // Initialize REV motor hardware here
@@ -189,43 +186,72 @@ public class FlywheelIOSpark implements FlywheelIO {
 
   @Override
   public void applyOutputs(FlywheelIOOutputs outputs) {
-    // TO-DO: Enforce Max Output RPM: 75% of Vortex Free-Speed RPM
+    // Better Implementation of Bang-Bang and TorqueCurrentFOC cuz REV API ;(
+    double measuredVelocity = outputs.measuredVelocityRadPerSec;
+    double setpoint = outputs.velocityRadsPerSec;
+    double error = setpoint - measuredVelocity;
 
-    if (outputs.mode == FlywheelIOOutputMode.COAST) {
-      masterVortex.stopMotor(); // Internal REV API calls "set(0);"
-      wasCoasting = true;
-      slewRateLimiter.reset(masterRelativeEncoder.getVelocity());
-    } else {
-      if (wasCoasting) {
-        // On transition from coasting to velocity control,
-        // reset the slew rate limiter to current velocity to prevent a large jump in ramping.
-        slewRateLimiter.reset(masterRelativeEncoder.getVelocity());
-        wasCoasting = false;
-      }
+    double currentTime = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
+    double deltaTime = currentTime - lastTime;
+    double acceleration = (measuredVelocity - lastMeasuredVelocity) / deltaTime;
+
+    lastMeasuredVelocity = measuredVelocity;
+    lastTime = currentTime;
+
+    if (setpoint <= 0) {
+        masterVortex.stopMotor();
+        currentPhase = FlywheelPhase.IDLE; // Reset phase
+        return;
     }
 
-    // Generate Simple Profiled Setpoint
-    double profiledSetpoint = slewRateLimiter.calculate(outputs.velocityRadsPerSec);
+    if (Math.abs(error) <= FlywheelConstants.idleTolerance) {
+        // Already at goal velocity
+        currentPhase = FlywheelPhase.IDLE;
+    } else if (acceleration < FlywheelConstants.ballDetectionThreshold) {
+        // A drop in speed indicated a ball is in the shooter. 
+        // Note: Even if we were in the middle of recovering from a previous shot,
+        // a negative spike will show a new ball is in the shooter.
+        // Note: Velocity checks doesn't catch this.
+        currentPhase = FlywheelPhase.BALL;
+    } else if (currentPhase == FlywheelPhase.BALL && acceleration > 0) {
+        // We were in the BALL phase but the velocity has stopped dropping 
+        // and is now positive. Ball has left the shooter.
+        currentPhase = FlywheelPhase.RECOVERY;
+    } else if (currentPhase != FlywheelPhase.BALL && Math.abs(error) > FlywheelConstants.idleTolerance) {
+        // If we are far away from the setpoint, either spin up for the first time, we are or actively recovering.
+        // Note: Recovery and Startup use same logic
+        currentPhase = FlywheelPhase.STARTUP;
+    }
 
-    // If still ramping, calculate feedforward with max acceleration.
-    // If at setpoint, set feedforward to 0 to prevent overshooting.
-    double accel =
-        Math.abs(outputs.velocityRadsPerSec - profiledSetpoint) < 1.0
-            ? 0.0
-            : (outputs.velocityRadsPerSec > profiledSetpoint ? maxAcceleration : -maxAcceleration);
+    switch (currentPhase) {
+        case STARTUP:
+        case RECOVERY:
+            // Bang-Bang Controller to maximize Duty-Cycle Output
+            // If error > 0 (too slow), request +12V. If error < 0 (too fast), request -12V.
+            double outputVolts = (error > 0) ? 12.0 : -12.0;
+            masterVortex.setVoltage(outputVolts);
+            break;
+        case IDLE:
+            if (error > 0) {
+                // The wheel is at goal velocity. Apply current output as needed to overcome friction only.
+                // Keeps the wheel at goal velocity when we are already there.
+                double idleCurrent = (FlywheelConstants.kI_velocity * setpoint);
+                masterVortexController.setSetpoint(idleCurrent, ControlType.kCurrent);
+            } else {
+                // Over-peeked the goal velocity, allow it to passively reduce velocity
+                masterVortex.setVoltage(0);
+            }
+            break;
+        case BALL:
+            // Constant Torque-CurrentFOC Simulated Fever Ah Solution at 2AM
+            // ignore velocity entirely when ball is in the shooter, just shove the max amount of
+            // current/torque to shooter as needed. Because it is a fixed current each time,
+            // ball exit velocity theoretically should be the same even if the voltage sags.
+            double ballCurrent = (FlywheelConstants.kI_velocity * setpoint) + FlywheelConstants.kAntilag;
+            masterVortexController.setSetpoint(ballCurrent, ControlType.kCurrent);
+            break;
+    }  
 
-    // Goober FF Model Used: VoltsApplied = kS * Math.signum(v) + kV * v + kA * a
-    // Will be deprecated next year, bruh. GL Josh.
-    double ffVolts = ffCalculator.calculate(profiledSetpoint, accel);
-
-    // Set the setpoint with the calculated feedforward
-    masterVortexController.setSetpoint(
-        profiledSetpoint,
-        ControlType.kVelocity,
-        ClosedLoopSlot.kSlot0,
-        // kP should only be used to apply enough voltage to factor IRL discrepancies
-        ffVolts,
-        SparkClosedLoopController.ArbFFUnits.kVoltage);
   }
 
   @Override
