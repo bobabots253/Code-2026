@@ -244,10 +244,10 @@ public class RobotContainer {
             () -> -controller.getRightX()));
 
     // Lock to Hub when A button is held
-    controller
-        .a()
-        .whileTrue(rollerSubsystem.setVoltage(-12.0))
-        .whileFalse(rollerSubsystem.setVoltage(0));
+    // controller
+    //     .a()
+    //     .whileTrue(rollerSubsystem.setVoltage(-12.0))
+    //     .whileFalse(rollerSubsystem.setVoltage(0));
     // .whileFalse(rollerSubsystem.setVoltage(0));
 
     controller.x().whileTrue(pivotSubsystem.runTrackTargetCommand(-2.225));

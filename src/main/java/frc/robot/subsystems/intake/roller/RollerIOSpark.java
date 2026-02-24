@@ -12,13 +12,12 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import frc.robot.subsystems.intake.roller.RollerIO.RollerIOInputs;
 
 public class RollerIOSpark implements RollerIO {
-  //private final DigitalInput rollerBeamBreak;
+  // private final DigitalInput rollerBeamBreak;
   private final SparkBase rollerSpark;
 
   public RollerIOSpark() {
     rollerSpark = new SparkMax(11, MotorType.kBrushless);
-   // rollerBeamBreak = new DigitalInput(beamBreakChannel); 
-
+    // rollerBeamBreak = new DigitalInput(beamBreakChannel);
 
     SparkMaxConfig rollerSparkConfig = new SparkMaxConfig();
     rollerSparkConfig
@@ -29,10 +28,10 @@ public class RollerIOSpark implements RollerIO {
         .busVoltagePeriodMs(20)
         .outputCurrentPeriodMs(20);
     tryUntilOk(
-        rollerBase,
+        rollerSpark,
         5,
         () ->
-            rollerBase.configure(
+            rollerSpark.configure(
                 rollerSparkConfig,
                 ResetMode.kResetSafeParameters,
                 PersistMode.kNoPersistParameters));
@@ -42,7 +41,7 @@ public class RollerIOSpark implements RollerIO {
   public void updateInputs(RollerIOInputs inputs) {
     inputs.rollerCurrentAmps = rollerSpark.getOutputCurrent();
     inputs.rollerAppliedVolts = rollerSpark.getAppliedOutput() * rollerSpark.getBusVoltage();
-    //inputs.RollerBeamBreak = rollerBeamBreak.get();
+    // inputs.RollerBeamBreak = rollerBeamBreak.get();
   }
 
   @Override
@@ -53,11 +52,11 @@ public class RollerIOSpark implements RollerIO {
   public void updateOutputs(RollerIOOutputs outputs) {
     switch (outputs.mode) {
       case COAST:
-      rollerSpark.stopMotor();
-      break;
+        rollerSpark.stopMotor();
+        break;
       case VOLTAGE:
-      rollerSpark.set(outputs.rollerSpeed);
-      break;
+        rollerSpark.set(outputs.rollerSpeed);
+        break;
     }
   }
   // public boolean hasFuel() {
