@@ -23,22 +23,19 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
-import frc.robot.subsystems.shooter.ShotCalculator;
-import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
-import frc.robot.subsystems.shooter.flywheel.FlywheelSubsystem;
-import frc.robot.subsystems.shooter.hood.HoodIOSim;
-import frc.robot.subsystems.shooter.hood.HoodSubsystem;
+import frc.robot.subsystems.intake.pivot.PivotIO;
+import frc.robot.subsystems.intake.pivot.PivotIOSim;
+import frc.robot.subsystems.intake.pivot.PivotIOSpark;
+import frc.robot.subsystems.intake.pivot.PivotSubsystem;
+import frc.robot.subsystems.intake.roller.RollerIO;
+import frc.robot.subsystems.intake.roller.RollerIOSpark;
+import frc.robot.subsystems.intake.roller.RollerSubsystem;
 import frc.robot.subsystems.swerve.GyroIO;
 import frc.robot.subsystems.swerve.GyroIOPigeon2;
 import frc.robot.subsystems.swerve.ModuleIO;
 import frc.robot.subsystems.swerve.ModuleIOSim;
 import frc.robot.subsystems.swerve.ModuleIOSpark;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
-import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionConstants;
-import frc.robot.subsystems.vision.VisionIO;
-import frc.robot.subsystems.vision.VisionIOLimelight;
-import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -50,15 +47,17 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final SwerveSubsystem swerveSubsystem;
-  private final Vision vision;
-  private final ShotCalculator shotCalculator;
-  private final HoodSubsystem hoodSubsystem;
-  private final FlywheelSubsystem flywheelSubsystem;
+  private final PivotSubsystem pivotSubsystem;
+  private final RollerSubsystem rollerSubsystem;
+  //   private final Vision vision;
+  //   private final ShotCalculator shotCalculator;
+  //   private final HoodSubsystem hoodSubsystem;
+  //   private final FlywheelSubsystem flywheelSubsystem;
   //   private final ShooterSubsystem shooterSubsystem;
 
   // Dashboard Inputs
-  private final LoggedDashboardChooser<Integer> clampVisionChooser =
-      new LoggedDashboardChooser<>("Clamp Vision Estimates");
+  //   private final LoggedDashboardChooser<Integer> clampVisionChooser =
+  //       new LoggedDashboardChooser<>("Clamp Vision Estimates");
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -69,11 +68,11 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    clampVisionChooser.addDefaultOption("Locked", 10);
-    clampVisionChooser.addOption("Unlocked | Purple", 0);
-    clampVisionChooser.addOption("Unlocked | Orange", 1);
-    clampVisionChooser.addOption("Unlocked | Green", 2);
-    clampVisionChooser.addOption("Unlocked | Blue", 3);
+    // clampVisionChooser.addDefaultOption("Locked", 10);
+    // clampVisionChooser.addOption("Unlocked | Purple", 0);
+    // clampVisionChooser.addOption("Unlocked | Orange", 1);
+    // clampVisionChooser.addOption("Unlocked | Green", 2);
+    // clampVisionChooser.addOption("Unlocked | Blue", 3);
 
     switch (Constants.currentMode) {
       case REAL:
@@ -86,21 +85,23 @@ public class RobotContainer {
                 new ModuleIOSpark(2),
                 new ModuleIOSpark(3));
 
-        vision =
-            new Vision(
-                swerveSubsystem::addVisionMeasurement,
-                swerveSubsystem::getRotation,
-                swerveSubsystem::getChassisSpeeds,
-                new VisionIOLimelight(VisionConstants.cameraPurple, swerveSubsystem::getRotation),
-                new VisionIOLimelight(VisionConstants.cameraOrange, swerveSubsystem::getRotation),
-                new VisionIOLimelight(VisionConstants.cameraGreen, swerveSubsystem::getRotation),
-                new VisionIOLimelight(VisionConstants.cameraBlue, swerveSubsystem::getRotation));
+        // vision =
+        //     new Vision(
+        //         swerveSubsystem::addVisionMeasurement,
+        //         swerveSubsystem::getRotation,
+        //         swerveSubsystem::getChassisSpeeds,
+        //         new VisionIOLimelight(VisionConstants.cameraPurple,
+        // swerveSubsystem::getRotation),
+        //         new VisionIOLimelight(VisionConstants.cameraOrange,
+        // swerveSubsystem::getRotation),
+        //         new VisionIOLimelight(VisionConstants.cameraGreen, swerveSubsystem::getRotation),
+        //         new VisionIOLimelight(VisionConstants.cameraBlue, swerveSubsystem::getRotation));
 
-        shotCalculator = new ShotCalculator(swerveSubsystem);
+        // shotCalculator = new ShotCalculator(swerveSubsystem);
 
-        hoodSubsystem = new HoodSubsystem(new frc.robot.subsystems.shooter.hood.HoodIOSpark());
-        flywheelSubsystem =
-            new FlywheelSubsystem(new frc.robot.subsystems.shooter.flywheel.FlywheelIOSpark());
+        // hoodSubsystem = new HoodSubsystem(new frc.robot.subsystems.shooter.hood.HoodIOSpark());
+        // flywheelSubsystem =
+        //     new FlywheelSubsystem(new frc.robot.subsystems.shooter.flywheel.FlywheelIOSpark());
         // shooterSubsystem =
         //     new ShooterSubsystem(
         //         flywheelSubsystem,
@@ -108,6 +109,8 @@ public class RobotContainer {
         //         shotCalculator,
         //         swerveSubsystem::getPose,
         //         swerveSubsystem::getChassisSpeeds);
+        pivotSubsystem = new PivotSubsystem(new PivotIOSpark());
+        rollerSubsystem = new RollerSubsystem(new RollerIOSpark());
 
         break;
 
@@ -121,31 +124,31 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim());
 
-        vision =
-            new Vision(
-                swerveSubsystem::addVisionMeasurement,
-                swerveSubsystem::getRotation,
-                swerveSubsystem::getChassisSpeeds,
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.cameraPurple,
-                    VisionConstants.cameraTransformToPurple,
-                    swerveSubsystem::getPose),
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.cameraOrange,
-                    VisionConstants.cameraTransformToOrange,
-                    swerveSubsystem::getPose),
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.cameraGreen,
-                    VisionConstants.cameraTransformToGreen,
-                    swerveSubsystem::getPose),
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.cameraBlue,
-                    VisionConstants.cameraTransformToBlue,
-                    swerveSubsystem::getPose));
+        // vision =
+        //     new Vision(
+        //         swerveSubsystem::addVisionMeasurement,
+        //         swerveSubsystem::getRotation,
+        //         swerveSubsystem::getChassisSpeeds,
+        //         new VisionIOPhotonVisionSim(
+        //             VisionConstants.cameraPurple,
+        //             VisionConstants.cameraTransformToPurple,
+        //             swerveSubsystem::getPose),
+        //         new VisionIOPhotonVisionSim(
+        //             VisionConstants.cameraOrange,
+        //             VisionConstants.cameraTransformToOrange,
+        //             swerveSubsystem::getPose),
+        //         new VisionIOPhotonVisionSim(
+        //             VisionConstants.cameraGreen,
+        //             VisionConstants.cameraTransformToGreen,
+        //             swerveSubsystem::getPose),
+        //         new VisionIOPhotonVisionSim(
+        //             VisionConstants.cameraBlue,
+        //             VisionConstants.cameraTransformToBlue,
+        //             swerveSubsystem::getPose));
 
-        shotCalculator = new ShotCalculator(swerveSubsystem);
-        hoodSubsystem = new HoodSubsystem(new HoodIOSim());
-        flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
+        // shotCalculator = new ShotCalculator(swerveSubsystem);
+        // hoodSubsystem = new HoodSubsystem(new HoodIOSim());
+        // flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
         // shooterSubsystem =
         //     new ShooterSubsystem(
         //         flywheelSubsystem,
@@ -153,6 +156,8 @@ public class RobotContainer {
         //         shotCalculator,
         //         swerveSubsystem::getPose,
         //         swerveSubsystem::getChassisSpeeds);
+        pivotSubsystem = new PivotSubsystem(new PivotIOSim());
+        rollerSubsystem = new RollerSubsystem(new RollerIOSpark());
 
         // configureFuelSim();
         break;
@@ -167,17 +172,17 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
 
-        vision =
-            new Vision(
-                swerveSubsystem::addVisionMeasurement,
-                swerveSubsystem::getRotation,
-                swerveSubsystem::getChassisSpeeds,
-                new VisionIO() {},
-                new VisionIO() {});
+        // vision =
+        //     new Vision(
+        //         swerveSubsystem::addVisionMeasurement,
+        //         swerveSubsystem::getRotation,
+        //         swerveSubsystem::getChassisSpeeds,
+        //         new VisionIO() {},
+        //         new VisionIO() {});
 
-        shotCalculator = new ShotCalculator(swerveSubsystem);
-        hoodSubsystem = new HoodSubsystem(new HoodIOSim());
-        flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
+        // shotCalculator = new ShotCalculator(swerveSubsystem);
+        // hoodSubsystem = new HoodSubsystem(new HoodIOSim());
+        // flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
         // shooterSubsystem =
         //     new ShooterSubsystem(
         //         new FlywheelSubsystem(new FlywheelIO() {}),
@@ -185,6 +190,9 @@ public class RobotContainer {
         //         new ShotCalculator(swerveSubsystem),
         //         swerveSubsystem::getPose,
         //         swerveSubsystem::getChassisSpeeds);
+        pivotSubsystem = new PivotSubsystem(new PivotIO() {});
+        rollerSubsystem = new RollerSubsystem(new RollerIO() {});
+
         break;
     }
 
@@ -232,14 +240,23 @@ public class RobotContainer {
             () -> -controller.getRightX()));
 
     // Lock to Hub when A button is held
+    // controller
+    //     .a()
+    //     .whileTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             swerveSubsystem,
+    //             () -> -controller.getLeftY(),
+    //             () -> -controller.getLeftX(),
+    //             () -> shotCalculator.getCorrectTargetRotation()));
+
+    controller.a().onTrue(pivotSubsystem.simpleDeployCommand());
+
+    controller.y().onTrue(pivotSubsystem.simpleStowCommand());
+
     controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                swerveSubsystem,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> shotCalculator.getCorrectTargetRotation()));
+        .leftBumper()
+        .whileTrue(rollerSubsystem.simpleDeployCommand())
+        .whileFalse(rollerSubsystem.simpleStowCommand());
 
     // Shoot on the fly when X button is pressed
     // controller.x().whileTrue(shooterSubsystem.simShootOnTheFlyCommand());
@@ -309,7 +326,7 @@ public class RobotContainer {
    *
    * @return true if vision estimates should be clamped. Enabled by default.
    */
-  public Integer enableVisionClamp() {
-    return clampVisionChooser.get();
-  }
+  //   public Integer enableVisionClamp() {
+  //     return clampVisionChooser.get();
+  //   }
 }

@@ -24,4 +24,6 @@ public interface RollerIO {
   default void updateInputs(RollerIOInputs inputs) {}
 
   default void applyOutputs(RollerIOOutputs outputs) {}
+
+  default void simpleVoltage(double volts) {}
 }

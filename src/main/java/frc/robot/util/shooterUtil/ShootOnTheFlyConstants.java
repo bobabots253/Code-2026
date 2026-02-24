@@ -44,7 +44,8 @@ public class ShootOnTheFlyConstants {
 
     // Key: Distance (meters), Value: Shooter Velocity (rad/sec)
     // USE THIS, BUT FIX FIRST
-    FLYWHEEL_VELOCITY_INTERPOLATOR.put(1.0, Units.rotationsPerMinuteToRadiansPerSecond(0)); // Touching Hub
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(
+        1.0, Units.rotationsPerMinuteToRadiansPerSecond(0)); // Touching Hub
     FLYWHEEL_VELOCITY_INTERPOLATOR.put(1.5, Units.rotationsPerMinuteToRadiansPerSecond(0));
     FLYWHEEL_VELOCITY_INTERPOLATOR.put(2.0, Units.rotationsPerMinuteToRadiansPerSecond(0));
     FLYWHEEL_VELOCITY_INTERPOLATOR.put(2.5, Units.rotationsPerMinuteToRadiansPerSecond(0));

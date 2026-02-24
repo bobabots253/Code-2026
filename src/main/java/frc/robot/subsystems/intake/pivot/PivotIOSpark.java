@@ -118,4 +118,10 @@ public class PivotIOSpark implements PivotIO {
   public void stop() {
     masterVortex.set(0.0);
   }
+
+  @Override
+  public void lazyClosedLoop(double target) {
+    masterVortexController.setSetpoint(
+        target, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot0);
+  }
 }

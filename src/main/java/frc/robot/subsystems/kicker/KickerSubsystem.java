@@ -24,7 +24,7 @@ public class KickerSubsystem extends FullSubsystem {
    * Defines all possible states for the kicker. Each goal state has a DoubleSupplier arguement that updates from Robot State
    */
 
-   // ADD MVP STATE
+  // ADD MVP STATE
   public enum Goal {
     // Stop the kicker and chooses COAST Mode
     IDLE(() -> 0.0),

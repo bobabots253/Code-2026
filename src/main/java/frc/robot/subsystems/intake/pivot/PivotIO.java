@@ -28,4 +28,6 @@ public interface PivotIO {
   public default void applyOutputs(PivotIOOutputs outputs) {}
 
   public default void stop() {}
+
+  public default void lazyClosedLoop(double target) {}
 }

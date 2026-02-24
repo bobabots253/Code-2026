@@ -69,4 +69,9 @@ public class RollerIOSpark implements RollerIO {
         break;
     }
   }
+
+  @Override
+  public void simpleVoltage(double volts) {
+    masterNEO.setVoltage(volts);
+  }
 }
