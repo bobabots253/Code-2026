@@ -1,5 +1,7 @@
 package frc.robot.subsystems.intake.roller;
-
+import frc.robot.Robot;
+import frc.robot.subsystems.intake.roller.RollerIO.RollerIOOutputMode;
+import frc.robot.subsystems.intake.roller.RollerIO.RollerIOOutputs;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.Alert;
@@ -25,10 +27,10 @@ public class RollerSubsystem extends FullSubsystem {
 @RequiredArgsConstructor
   public enum Goal {
     IDLE(() -> 0.0),
-    DEPLOYED(() -> RollerConstants.intakingVolts);
-    // STOW(() -> RollerConstants.stowVolts), // Change if Necessary
-    // JUGGLE(() -> RollerConstants.jugglingVolts),
-    // DEBUGGING(() -> RollerConstants.debuggingVolts);
+    DEPLOYED(() -> RollerConstants.intakingVolts),
+    //STOW(() -> RollerConstants.stowVolts), // Change if Necessary
+    JUGGLE(() -> RollerConstants.jugglingVolts),
+    DEBUGGING(() -> RollerConstants.debuggingVolts);
 
     private final DoubleSupplier voltage;
 
@@ -85,7 +87,7 @@ public class RollerSubsystem extends FullSubsystem {
     private void setGoal(Goal desiredGoal) {
     this.currentGoal = desiredGoal;
   }
-  //lalalalalalalalalala (dont delete this)
+  //lalalalalalalalalala (dont delete this plz o^o)
   private void stop() {
     outputs.mode = RollerIOOutputMode.COAST;
     outputs.rollerSpeed = 0;
@@ -94,6 +96,16 @@ public class RollerSubsystem extends FullSubsystem {
   public Command intakeCommand() {
     return startEnd(() -> setGoal(Goal.DEPLOYED), () -> setGoal(Goal.IDLE))
         .withName("Roller Deploy");
+  }
+
+    public Command juggleCommand() {
+    return startEnd(() -> setGoal(Goal.JUGGLE), () -> setGoal(Goal.IDLE))
+        .withName("Roller Juggle");
+  }
+
+  public Command runDebuggingCommand() {
+    return startEnd(() -> setGoal(Goal.DEBUGGING), () -> setGoal(Goal.IDLE))
+        .withName("Roller Debug");
   }
 
   public Command stopCommand() {
