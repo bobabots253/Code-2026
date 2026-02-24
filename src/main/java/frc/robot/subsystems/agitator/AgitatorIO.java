@@ -10,13 +10,13 @@ public interface AgitatorIO {
     public double masterSupplyCurrentAmps = 0.0;
   }
 
-  public static enum AgitatorIoOutputMode {
+  public static enum AgitatorIOOutputMode {
     BRAKE,
     VOLTAGE
   }
 
   public static class AgitatorIOOutputs {
-    public AgitatorIoOutputMode mode = AgitatorIoOutputMode.BRAKE;
+    public AgitatorIOOutputMode mode = AgitatorIOOutputMode.BRAKE;
     public double voltage = 0.0;
   }
 
