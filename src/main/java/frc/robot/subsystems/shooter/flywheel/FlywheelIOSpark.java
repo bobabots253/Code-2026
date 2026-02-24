@@ -6,8 +6,11 @@ import static frc.robot.util.SparkUtil.*;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
@@ -19,21 +22,29 @@ import java.util.function.DoubleSupplier;
 public class FlywheelIOSpark implements FlywheelIO {
   private final SparkBase masterVortex; // initializing the SparkFlexes for the shooter flywheel
   private final SparkBase followerVortex;
-  private final BangBangController flywheelController =
-      new BangBangController(
-          flywheelTolerance); // creates new Bang Bang Controller with tolerance of 1.
+  private final SparkClosedLoopController flywheelController;// creates new Bang Bang Controller with tolerance of 1.
+
   private final Debouncer flywheelDebouncer =
       new Debouncer(
           0.5,
           Debouncer.DebounceType
               .kFalling); // creates debouncer so we aren't constantl checking values
-  private final RelativeEncoder
-      flywheelMasterRelativeEncoder; // initializing the relative encoders for the shooter flywheel
+  private final RelativeEncoder flywheelMasterRelativeEncoder; // initializing the relative encoders for the shooter flywheel
   private final RelativeEncoder flywheelFollowerRelativeEncoder;
   private final SimpleMotorFeedforward ffCalculator =
-      new SimpleMotorFeedforward(
-          kS, kV,
-          kA); // new feedforward, used to calculate ffvolts later on. Constants are placeholders.
+      new SimpleMotorFeedforward(kS, kV, kA); // new feedforward, used to calculate ffvolts later on. Constants are placeholders.
+
+
+public enum FlywheelState{
+    STARTUP,
+    IDLE,
+    BALL,
+    RECOVERY;
+}
+
+private FlywheelState currentState = FlywheelState.STARTUP;
+private double lastMeasuredVelocity = 0.0;
+private double lastTime = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
 
   public FlywheelIOSpark() {
     masterVortex =
@@ -46,6 +57,7 @@ public class FlywheelIOSpark implements FlywheelIO {
             .getEncoder(); // relative encoders to track velocity. Does not get the velocity, just
     // specifies that the encoder tracks it.
     flywheelFollowerRelativeEncoder = followerVortex.getEncoder();
+    flywheelController = masterVortex.getClosedLoopController();
 
     var flywheelMasterConfig = new SparkFlexConfig(); // master config
     flywheelMasterConfig
@@ -53,14 +65,20 @@ public class FlywheelIOSpark implements FlywheelIO {
         .smartCurrentLimit(
             flywheelCurrentLimit) // sets current limit to vortex current limit, 50 amps
         .voltageCompensation(
-            12.0); // compensates for the drop in voltage when we draw more current to power the
-    // motor.
+            12.0); // compensates for the drop in voltage when we draw more current to power the motor.
+
     flywheelMasterConfig
         .encoder
         .inverted(flywheelEncoderInverted)
         .positionConversionFactor(flywheelEncoderPositionFactor)
         .uvwMeasurementPeriod(10)
         .uvwAverageDepth(2); // converts encoder velocities from rotations to radians
+
+    flywheelMasterConfig
+    .closedLoop
+    .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+    .pid(flywheelVelocitykP,flywheelVelocitykI,flywheelVelocitykD);
+
     flywheelMasterConfig
         .signals // sets signals to collect every 20ms to calculate inputs and encoder values
         .primaryEncoderPositionAlwaysOn(true)
@@ -93,6 +111,7 @@ public class FlywheelIOSpark implements FlywheelIO {
         .velocityConversionFactor(flywheelEncoderVelocityFactor)
         .uvwMeasurementPeriod(10)
         .uvwAverageDepth(2);
+
     flywheelFollowerConfig
         .signals
         .primaryEncoderPositionAlwaysOn(true)
@@ -102,6 +121,7 @@ public class FlywheelIOSpark implements FlywheelIO {
         .appliedOutputPeriodMs(20)
         .busVoltagePeriodMs(20)
         .outputCurrentPeriodMs(20);
+
     tryUntilOk(
         followerVortex,
         5,
@@ -151,35 +171,85 @@ public class FlywheelIOSpark implements FlywheelIO {
       case VOLTAGE: // if the motor is in voltage mode, give it volts = to setpoint
         runVolts(outputs.volts);
         break;
-      case BANG_BANG: // if the motor is in BANG BANG mode, run the velocity bang bang controller
-        // and the feedforward, with a setpoint of velocityRAdPerSec from outputs
-        runVelocityBangBang(outputs.velocityRadsPerSec);
+      case BANG_BANG: // if the motor is in BANG BANG mode, run the velocity setpoint and the feedforward, with a setpoint of velocityRadPerSec from outputs
+        double measuredVelocity = outputs.measuredVelocityRadPerSec;
+        double setpoint = outputs.velocityRadsPerSec;
+        double error = setpoint - measuredVelocity;
+
+        double currentTime = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
+        double deltaTime = currentTime - lastTime;
+        double acceleration = (measuredVelocity-lastMeasuredVelocity)/deltaTime;
+        lastMeasuredVelocity = measuredVelocity;
+        lastTime = currentTime;
+
+        if (setpoint <= 0){
+            masterVortex.stopMotor();
+            currentState = FlywheelState.IDLE;
+            return;
+        }
+
+        if(Math.abs(error) >= flywheelTolerance){
+            currentState = FlywheelState.IDLE;
+
+        } else if (acceleration < ballDetectionThreshold){
+            currentState = FlywheelState.BALL;
+
+        }else if (currentState == FlywheelState.BALL && acceleration > 0){
+            currentState = FlywheelState.RECOVERY;
+
+        } else if (currentState != FlywheelState.BALL && Math.abs(error) > idleTolerance) {
+            currentState = FlywheelState.STARTUP;
+        }
+
+        switch(currentState){
+            case STARTUP:
+            case RECOVERY:
+            if (error>0){
+                double outputVolts = 12.0;
+                masterVortex.set(outputVolts);
+
+            } else if (error<0) {
+                double outputVolts = -12.0;
+                masterVortex.set(outputVolts);
+            }
+            break;
+
+            case IDLE:
+                if (error > 0){
+                    double idleCurrent = (kI_velocity*setpoint);
+                    flywheelController.setSetpoint(idleCurrent, ControlType.kCurrent);
+                } else {
+                    masterVortex.setVoltage(0);
+                }
+                break;
+
+            case BALL:
+            double ballCurrent = (kI_velocity *setpoint) + kAntilag;
+            flywheelController.setSetpoint(ballCurrent, ControlType.kCurrent);
+            break;
+        }
         break;
     }
   }
 
   @Override
-  public void runVolts(
-      double volts) { // method to run voltage mode. Can be called indpendently of outputs, but also
+  public void runVolts(double volts) { // method to run voltage mode. Can be called indpendently of outputs, but also
     // runs in outputs.
     masterVortex.setVoltage(volts);
   }
-
-  public void runVelocityBangBang(
-      double
-          velocityRadsPerSec) { // method to run bang bang control with a feed forward. Can also be
+  
+@Override
+  public void runVelocitySetpoint(double velocityRadsPerSec) { // method to run with a velocity stepoint. Can also be
     // called independently of outputs.
     double ffVolts =
-        ffCalculator.calculate(
-            velocityRadsPerSec); // calculates feedforward based off of a velocity setpoint, omits
-    // acceleration because we have no stepoint here for bang bang
-    masterVortex.set(
-        flywheelController.calculate(
-            flywheelMasterRelativeEncoder.getVelocity(), velocityRadsPerSec + 0.9 * ffVolts));
-    // sets the flywheel speed using the ff and bang bang controller. FF is reduced slightly to
-    // compensate for the high power/ unpredictability of the bang bang controller, as recommended
-    // on WPILib docs.
-    // uses the relative encoder from earlier to measure this velocity
-    // NOTE: This won't work, since it can't slow the motor down
+        ffCalculator.calculate(velocityRadsPerSec); 
+
+    flywheelController.setSetpoint(velocityRadsPerSec + ffVolts, ControlType.kVelocity);
+  }
+
+  @Override
+  public void stop() {
+    masterVortex.stopMotor();
+    followerVortex.stopMotor();
   }
 }

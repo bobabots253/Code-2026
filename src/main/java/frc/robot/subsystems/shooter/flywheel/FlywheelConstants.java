@@ -21,9 +21,18 @@ public class FlywheelConstants {
 
   // State related constants
   public static final double debuggingVelocity = 0.0;
-  // public static final double flywheelVelocitykP = 0.0;
-  // public static final double flywheelVelocitykI = 0.0;
-  // public static final double flywheelVelocitykD = 0.0;
-  // public static final double flywheelPIDMaxOutput = 0.0;
-  // public static final double flywheelPIDMinOutput = 0.0;
+  public static final double jugglingVelocity = 0.0;
+
+  //SparkIO state related constants
+    public static final double ballDetectionThreshold = 10.47;
+    public static final double idleTolerance = 10.47;
+    public static final double kI_velocity = 0.0;
+    public static final double kAntilag = 10.0;
+
+
+  //PID Constants
+  public static final double flywheelVelocitykP = 0.0;
+  public static final double flywheelVelocitykI = 0.0;
+  public static final double flywheelVelocitykD = 0.0;
+
 }

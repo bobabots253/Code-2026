@@ -25,6 +25,7 @@ public interface FlywheelIO {
   public static class FlywheelIOOutputs {
     double velocityRadsPerSec = 0.0;
     double volts = 0.0;
+    double measuredVelocityRadPerSec = 0.0;
     FlywheelOutputMode mode = FlywheelOutputMode.COAST;
   }
 
@@ -34,7 +35,7 @@ public interface FlywheelIO {
 
   default void runVolts(double volts) {}
 
-  default void runVelocity(double velocity) {}
+  default void runVelocitySetpoint(double velocity) {}
 
   default void stop() {}
 }
