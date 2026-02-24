@@ -105,7 +105,7 @@ public class PivotSubsystem extends FullSubsystem {
   }
 
   public Command deployCommand() {
-    return run(() -> setGoal(Goal.DEPLOYED)).withName("Pivot Deploy");
+    return startEnd(() -> setGoal(Goal.DEPLOYED), () -> setGoal(Goal.IDLE)).withName("Pivot Stow");
   }
 
   public Command simpleDeployCommand() {

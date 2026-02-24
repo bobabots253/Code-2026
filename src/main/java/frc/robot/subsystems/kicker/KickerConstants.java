@@ -28,5 +28,7 @@ public class KickerConstants {
   public static final double jugglingVelocity = 0.0; // Check ReCalc for values
   public static final double debuggingVelocity = 0.0; // Change as needed
 
+  public static final double indexingVoltage = 9.0;
+
   public static final double closedLoopVelocityTolerance = 0.0; // Change to heuristic value
 }

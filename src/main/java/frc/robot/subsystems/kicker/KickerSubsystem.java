@@ -35,9 +35,11 @@ public class KickerSubsystem extends FullSubsystem {
     // Low-speed state for juggling them balls into our own hopper LOL
     JUGGLE(() -> KickerConstants.jugglingVelocity),
     // Static speed state for subsystem testing
-    DEBUGGING(() -> KickerConstants.debuggingVelocity);
+    DEBUGGING(() -> KickerConstants.debuggingVelocity),
+
+    INDEXING(() -> KickerConstants.indexingVoltage);
     // Required Arguement for each enum state
-    private final DoubleSupplier velocityRadsPerSec;
+    private final DoubleSupplier velocityRadsPerSec; // might be volts, who knows
     /** Returns the current target velocity for this goal state. */
     private double getGoal() {
       return velocityRadsPerSec.getAsDouble();
@@ -70,7 +72,7 @@ public class KickerSubsystem extends FullSubsystem {
     if (currentGoal == Goal.IDLE) {
       stop();
     } else {
-      runVelocity(currentGoal.getGoal());
+      runVoltage(currentGoal.getGoal());
     }
   }
 
@@ -109,6 +111,11 @@ public class KickerSubsystem extends FullSubsystem {
         .withName("Kicker Prepare Hub");
   }
 
+  public Command indexCommand() {
+    return startEnd(() -> setGoal(Goal.INDEXING), () -> setGoal(Goal.IDLE))
+        .withName("Kicker Index");
+  }
+
   public Command juggleCommand() {
     return startEnd(() -> setGoal(Goal.JUGGLE), () -> setGoal(Goal.IDLE)).withName("Kicker Juggle");
   }
@@ -126,6 +133,11 @@ public class KickerSubsystem extends FullSubsystem {
   private void runVelocity(double velocityRadsPerSec) {
     outputs.mode = KickerIOOutputMode.VELOCITY_SETPOINT;
     outputs.velocityRadsPerSec = velocityRadsPerSec;
+  }
+
+  private void runVoltage(double volts) {
+    outputs.mode = KickerIOOutputMode.VOLTAGE;
+    outputs.voltage = volts;
   }
 
   public Command runSetVelocityCommand(DoubleSupplier velocity) {

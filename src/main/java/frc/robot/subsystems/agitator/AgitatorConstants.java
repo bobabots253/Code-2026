@@ -6,8 +6,8 @@ public class AgitatorConstants {
 
   // Temporary Values (Confirm Functionality)
   public static final double indexingVolts = 12.0;
-  public static final double passiveVolts = 4.0;
-  public static final double intakingVolts = 8.0;
+  public static final double passiveVolts = -3.0;
+  public static final double intakingVolts = -6.0;
   public static final double jugglingVolts = 0.0;
-  public static final double debuggingVolts = 0.0;
+  public static final double debuggingVolts = 4.0;
 }

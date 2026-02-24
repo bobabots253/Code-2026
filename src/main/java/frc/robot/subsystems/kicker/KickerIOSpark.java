@@ -14,7 +14,6 @@ import static frc.robot.util.SparkUtil.*;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
-import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -115,33 +114,14 @@ public class KickerIOSpark implements KickerIO {
   public void applyOutputs(KickerIOOutputs outputs) {
     // Utilize the same code logic from the flywheel
     // See src\main\java\frc\robot\subsystems\shooter\flywheel\FlywheelIOSpark.java
-    if (outputs.mode == KickerIOOutputMode.COAST) {
-      masterNEO.stopMotor();
-      wasCoasting = true;
-      slewRateLimiter.reset(masterRelativeEncoder.getVelocity());
-    } else {
-      if (wasCoasting) {
-        slewRateLimiter.reset(masterRelativeEncoder.getVelocity());
-        wasCoasting = false;
-      }
+    switch (outputs.mode) {
+      case COAST:
+      case VELOCITY_SETPOINT:
+        masterNEO.stopMotor();
+        break;
+      case VOLTAGE:
+        masterNEO.setVoltage(outputs.voltage);
     }
-
-    double profiledSetpoint = slewRateLimiter.calculate(outputs.velocityRadsPerSec);
-
-    double accel =
-        Math.abs(outputs.velocityRadsPerSec - profiledSetpoint) < 1.0
-            ? 0.0
-            : (outputs.velocityRadsPerSec > profiledSetpoint ? maxAcceleration : -maxAcceleration);
-
-    double ffVolts = ffCalculator.calculate(profiledSetpoint, accel);
-
-    masterNEOController.setSetpoint(
-        profiledSetpoint,
-        ControlType.kVelocity,
-        ClosedLoopSlot.kSlot0,
-        // kP should only be used to apply enough voltage to factor IRL discrepancies
-        ffVolts,
-        SparkClosedLoopController.ArbFFUnits.kVoltage);
   }
 
   @Override

@@ -41,7 +41,7 @@ public class FlywheelSubsystem extends FullSubsystem {
     // Low-speed state for juggling them balls into our own hopper LOL
     JUGGLE(() -> FlywheelConstants.jugglingVelocity),
     // Static speed state for subsystem testing
-    DEBUGGING(() -> FlywheelConstants.debuggingVelocity);
+    DEBUGGING(() -> FlywheelConstants.kDebuggingVoltage); // VOLTAGE
 
     // Required Arguement for each enum state
     private final DoubleSupplier velocityRadsPerSec;
@@ -80,6 +80,8 @@ public class FlywheelSubsystem extends FullSubsystem {
     // Re-poll the supplier every loop to handle new shot calculations
     if (currentGoal == Goal.IDLE) {
       stop();
+    } else if (currentGoal == Goal.DEBUGGING) {
+      runVoltage(currentGoal.getGoal());
     } else {
       runVelocity(currentGoal.getGoal());
     }
@@ -120,6 +122,11 @@ public class FlywheelSubsystem extends FullSubsystem {
     outputs.mode = FlywheelIOOutputMode.VELOCITY_SETPOINT;
     outputs.velocityRadsPerSec = velocityRadsPerSec;
     outputs.measuredVelocityRadPerSec = inputs.masterVelocityRads;
+  }
+
+  private void runVoltage(double volts) {
+    outputs.mode = FlywheelIOOutputMode.VOLTAGE;
+    outputs.voltage = volts;
   }
 
   // private void runFlywheelControlLoop(double velocityRadsPerSec){

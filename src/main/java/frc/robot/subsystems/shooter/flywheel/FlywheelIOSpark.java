@@ -266,6 +266,9 @@ public class FlywheelIOSpark implements FlywheelIO {
             break;
         }
         break;
+      case VOLTAGE:
+        masterVortex.setVoltage(outputs.voltage);
+        break;
     }
   }
 

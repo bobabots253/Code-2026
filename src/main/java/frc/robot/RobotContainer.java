@@ -23,13 +23,30 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.subsystems.agitator.AgitatorIO;
+import frc.robot.subsystems.agitator.AgitatorIOSim;
+import frc.robot.subsystems.agitator.AgitatorIOSpark;
+import frc.robot.subsystems.agitator.AgitatorSubsystem;
+import frc.robot.subsystems.indexer.IndexerIO;
+import frc.robot.subsystems.indexer.IndexerIOSim;
+import frc.robot.subsystems.indexer.IndexerIOSpark;
+import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.intake.pivot.PivotIO;
 import frc.robot.subsystems.intake.pivot.PivotIOSim;
 import frc.robot.subsystems.intake.pivot.PivotIOSpark;
 import frc.robot.subsystems.intake.pivot.PivotSubsystem;
 import frc.robot.subsystems.intake.roller.RollerIO;
+import frc.robot.subsystems.intake.roller.RollerIOSim;
 import frc.robot.subsystems.intake.roller.RollerIOSpark;
 import frc.robot.subsystems.intake.roller.RollerSubsystem;
+import frc.robot.subsystems.kicker.KickerIO;
+import frc.robot.subsystems.kicker.KickerIOSim;
+import frc.robot.subsystems.kicker.KickerIOSpark;
+import frc.robot.subsystems.kicker.KickerSubsystem;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIO;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIOSpark;
+import frc.robot.subsystems.shooter.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.swerve.GyroIO;
 import frc.robot.subsystems.swerve.GyroIOPigeon2;
 import frc.robot.subsystems.swerve.ModuleIO;
@@ -49,6 +66,10 @@ public class RobotContainer {
   private final SwerveSubsystem swerveSubsystem;
   private final PivotSubsystem pivotSubsystem;
   private final RollerSubsystem rollerSubsystem;
+  private final AgitatorSubsystem agitatorSubsystem;
+  private final IndexerSubsystem indexerSubsystem;
+  private final KickerSubsystem kickerSubsystem;
+  private final FlywheelSubsystem flywheelSubsystem;
   //   private final Vision vision;
   //   private final ShotCalculator shotCalculator;
   //   private final HoodSubsystem hoodSubsystem;
@@ -111,6 +132,10 @@ public class RobotContainer {
         //         swerveSubsystem::getChassisSpeeds);
         pivotSubsystem = new PivotSubsystem(new PivotIOSpark());
         rollerSubsystem = new RollerSubsystem(new RollerIOSpark());
+        agitatorSubsystem = new AgitatorSubsystem(new AgitatorIOSpark());
+        indexerSubsystem = new IndexerSubsystem(new IndexerIOSpark());
+        kickerSubsystem = new KickerSubsystem(new KickerIOSpark());
+        flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSpark());
 
         break;
 
@@ -157,7 +182,11 @@ public class RobotContainer {
         //         swerveSubsystem::getPose,
         //         swerveSubsystem::getChassisSpeeds);
         pivotSubsystem = new PivotSubsystem(new PivotIOSim());
-        rollerSubsystem = new RollerSubsystem(new RollerIOSpark());
+        rollerSubsystem = new RollerSubsystem(new RollerIOSim());
+        agitatorSubsystem = new AgitatorSubsystem(new AgitatorIOSim());
+        indexerSubsystem = new IndexerSubsystem(new IndexerIOSim());
+        kickerSubsystem = new KickerSubsystem(new KickerIOSim());
+        flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
 
         // configureFuelSim();
         break;
@@ -192,6 +221,10 @@ public class RobotContainer {
         //         swerveSubsystem::getChassisSpeeds);
         pivotSubsystem = new PivotSubsystem(new PivotIO() {});
         rollerSubsystem = new RollerSubsystem(new RollerIO() {});
+        agitatorSubsystem = new AgitatorSubsystem(new AgitatorIO() {});
+        indexerSubsystem = new IndexerSubsystem(new IndexerIO() {});
+        kickerSubsystem = new KickerSubsystem(new KickerIO() {});
+        flywheelSubsystem = new FlywheelSubsystem(new FlywheelIO() {});
 
         break;
     }
@@ -249,14 +282,21 @@ public class RobotContainer {
     //             () -> -controller.getLeftX(),
     //             () -> shotCalculator.getCorrectTargetRotation()));
 
-    controller.a().onTrue(pivotSubsystem.simpleDeployCommand());
+    controller.a().onTrue(pivotSubsystem.deployCommand());
 
-    controller.y().onTrue(pivotSubsystem.simpleStowCommand());
+    controller.y().onTrue(pivotSubsystem.stowCommand());
+
+    controller.x().whileTrue(flywheelSubsystem.runDebuggingCommand());
 
     controller
         .leftBumper()
-        .whileTrue(rollerSubsystem.simpleDeployCommand())
-        .whileFalse(rollerSubsystem.simpleStowCommand());
+        .whileTrue(rollerSubsystem.intakeCommand())
+        .whileTrue(agitatorSubsystem.intakeCommand());
+
+    controller
+        .rightBumper()
+        .whileTrue(indexerSubsystem.indexCommand())
+        .whileTrue(kickerSubsystem.indexCommand());
 
     // Shoot on the fly when X button is pressed
     // controller.x().whileTrue(shooterSubsystem.simShootOnTheFlyCommand());

@@ -101,14 +101,6 @@ public class RollerSubsystem extends FullSubsystem {
         .withName("Roller Deploy");
   }
 
-  public Command simpleDeployCommand() {
-    return run(() -> io.simpleVoltage(RollerConstants.intakingVolts));
-  }
-
-  public Command simpleStowCommand() {
-    return run(() -> io.simpleVoltage(RollerConstants.stowVolts));
-  }
-
   public Command stowCommand() {
     return startEnd(() -> setGoal(Goal.STOW), () -> setGoal(Goal.IDLE)).withName("Roller Stow");
   }

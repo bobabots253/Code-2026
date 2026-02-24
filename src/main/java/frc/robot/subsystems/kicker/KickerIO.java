@@ -23,6 +23,7 @@ public interface KickerIO {
   public static class KickerIOOutputs {
     public KickerIOOutputMode mode = KickerIOOutputMode.COAST;
     public double velocityRadsPerSec = 0.0;
+    public double voltage = 0.0;
   }
 
   default void updateInputs(KickerIOInputs inputs) {}

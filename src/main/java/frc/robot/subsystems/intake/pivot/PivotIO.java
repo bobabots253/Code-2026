@@ -18,6 +18,7 @@ public interface PivotIO {
     CLOSED_LOOP
   }
 
+  @AutoLog
   public static class PivotIOOutputs {
     public PivotIOOutputMode mode = PivotIOOutputMode.BRAKE;
     public double positionRad = 0.0;
