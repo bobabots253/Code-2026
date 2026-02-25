@@ -1,6 +1,7 @@
 package frc.robot.subsystems.shooter.flywheel;
 
 import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public interface FlywheelIO {
   @AutoLog
@@ -27,10 +28,19 @@ public interface FlywheelIO {
   }
 
   public static class FlywheelIOOutputs {
+    @AutoLogOutput(key = "FlywheelOutputs/Mode")
     public FlywheelIOOutputMode mode = FlywheelIOOutputMode.COAST;
+
+    @AutoLogOutput(key = "FlywheelOutputs/VelocityRadPerSec")
     public double velocityRadsPerSec = 0.0;
+
+    @AutoLogOutput(key = "FlywheelOutputs/MeasuredVelocityRadPerSec")
     public double measuredVelocityRadPerSec = 0.0;
+
+    @AutoLogOutput(key = "FlywheelOutputs/Voltage")
     public double voltage = 0.0;
+
+    @AutoLogOutput(key = "FlywheelOutputs/Current")
     public double current = 0.0;
   }
 

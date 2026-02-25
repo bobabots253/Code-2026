@@ -24,7 +24,7 @@ public class FlywheelConstants {
   public static final int sparkMasterFlywheelCanId = 15;
   public static final int sparkFollowerFlywheelCanId = 16;
 
-  public static final double sparkMasterFlyWheelkP = 0.002; // Should be super small
+  public static final double sparkMasterFlyWheelkP = 0.005; // Should be super small
   public static final double sparkMasterFlyWheelkI = 0.0; // default: 0.0
   public static final double sparkMasterFlyWheelkD = 0.0; // default: 0.0
 
@@ -50,7 +50,7 @@ public class FlywheelConstants {
   public static final double kDebuggingVoltage = 4.0;
 
   // Testing Current Values
-  public static final double kDebuggingCurrent = -14.5;
+  public static final double kDebuggingCurrent = 14.5;
 
   // Calculating Max Acceleration of a Two-Motor Flywheel System
   // Use the flywheelReductionRatio constant from above

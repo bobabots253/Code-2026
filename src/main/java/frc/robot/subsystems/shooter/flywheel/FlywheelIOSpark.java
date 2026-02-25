@@ -5,8 +5,6 @@ import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.followerFl
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.masterFlywheelEncoderPositionFactor;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.masterFlywheelEncoderVelocityFactor;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkFollowerFlywheelCanId;
-import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkMasterFlyWheelkD;
-import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkMasterFlyWheelkI;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkMasterFlyWheelkP;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkMasterFlywheelCanId;
 import static frc.robot.util.SparkUtil.ifOk;
@@ -16,6 +14,7 @@ import static frc.robot.util.SparkUtil.tryUntilOk;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -89,17 +88,25 @@ public class FlywheelIOSpark implements FlywheelIO {
         .uvwAverageDepth(2); // Does not affect positional control
     masterVortexConfig
         .closedLoop
-        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .pid(sparkMasterFlyWheelkP, sparkMasterFlyWheelkI, sparkMasterFlyWheelkD);
+        .feedbackSensor(
+            FeedbackSensor
+                .kPrimaryEncoder) // Since Current Control (CC) uses internal motor measurements,
+        // does this even affect
+        .p(sparkMasterFlyWheelkP, ClosedLoopSlot.kSlot0) // Need kD?
+        .allowedClosedLoopError(2, ClosedLoopSlot.kSlot0) // Respect CC?
+        .maxOutput(0.1, ClosedLoopSlot.kSlot0)
+        .minOutput((-0.1), ClosedLoopSlot.kSlot0);
     masterVortexConfig
         .signals
         .primaryEncoderPositionAlwaysOn(true)
         .primaryEncoderPositionPeriodMs(5)
         .primaryEncoderVelocityAlwaysOn(true)
-        .primaryEncoderVelocityPeriodMs(20)
-        .appliedOutputPeriodMs(20)
-        .busVoltagePeriodMs(20)
-        .outputCurrentPeriodMs(20);
+        .primaryEncoderVelocityPeriodMs(10)
+        .isAtSetpointAlwaysOn(true)
+        .isAtSetpointPeriodMs(10)
+        .appliedOutputPeriodMs(10)
+        .busVoltagePeriodMs(10)
+        .outputCurrentPeriodMs(10);
     tryUntilOk(
         masterVortex,
         5,
@@ -130,7 +137,7 @@ public class FlywheelIOSpark implements FlywheelIO {
         .primaryEncoderVelocityPeriodMs(20)
         .appliedOutputPeriodMs(20)
         .busVoltagePeriodMs(20)
-        .outputCurrentPeriodMs(20);
+        .outputCurrentPeriodMs(10);
     tryUntilOk(
         followerVortex,
         5,
@@ -199,6 +206,10 @@ public class FlywheelIOSpark implements FlywheelIO {
     switch (outputs.mode) {
       case COAST:
         masterVortex.stopMotor();
+        break;
+      case CURRENT:
+        masterVortexController.setSetpoint(
+            FlywheelConstants.kDebuggingCurrent, ControlType.kCurrent, ClosedLoopSlot.kSlot0);
         break;
       case VELOCITY_SETPOINT:
         double measuredVelocity = outputs.measuredVelocityRadPerSec;
@@ -275,8 +286,6 @@ public class FlywheelIOSpark implements FlywheelIO {
       case VOLTAGE:
         masterVortex.setVoltage(outputs.voltage);
         break;
-      case CURRENT:
-        masterVortexController.setSetpoint(outputs.current, ControlType.kCurrent);
     }
   }
 
