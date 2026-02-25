@@ -47,6 +47,10 @@ import frc.robot.subsystems.shooter.flywheel.FlywheelIO;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSpark;
 import frc.robot.subsystems.shooter.flywheel.FlywheelSubsystem;
+import frc.robot.subsystems.shooter.hood.HoodIO;
+import frc.robot.subsystems.shooter.hood.HoodIOSim;
+import frc.robot.subsystems.shooter.hood.HoodIOSpark;
+import frc.robot.subsystems.shooter.hood.HoodSubsystem;
 import frc.robot.subsystems.swerve.GyroIO;
 import frc.robot.subsystems.swerve.GyroIOPigeon2;
 import frc.robot.subsystems.swerve.ModuleIO;
@@ -70,6 +74,7 @@ public class RobotContainer {
   private final IndexerSubsystem indexerSubsystem;
   private final KickerSubsystem kickerSubsystem;
   private final FlywheelSubsystem flywheelSubsystem;
+  private final HoodSubsystem hoodSubsystem;
   //   private final Vision vision;
   //   private final ShotCalculator shotCalculator;
   //   private final HoodSubsystem hoodSubsystem;
@@ -136,6 +141,7 @@ public class RobotContainer {
         indexerSubsystem = new IndexerSubsystem(new IndexerIOSpark());
         kickerSubsystem = new KickerSubsystem(new KickerIOSpark());
         flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSpark());
+        hoodSubsystem = new HoodSubsystem(new HoodIOSpark());
 
         break;
 
@@ -187,6 +193,7 @@ public class RobotContainer {
         indexerSubsystem = new IndexerSubsystem(new IndexerIOSim());
         kickerSubsystem = new KickerSubsystem(new KickerIOSim());
         flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
+        hoodSubsystem = new HoodSubsystem(new HoodIOSim());
 
         // configureFuelSim();
         break;
@@ -225,6 +232,7 @@ public class RobotContainer {
         indexerSubsystem = new IndexerSubsystem(new IndexerIO() {});
         kickerSubsystem = new KickerSubsystem(new KickerIO() {});
         flywheelSubsystem = new FlywheelSubsystem(new FlywheelIO() {});
+        hoodSubsystem = new HoodSubsystem(new HoodIO() {});
 
         break;
     }
@@ -295,8 +303,9 @@ public class RobotContainer {
 
     controller
         .rightBumper()
-        .whileTrue(indexerSubsystem.indexCommand())
-        .whileTrue(kickerSubsystem.indexCommand());
+        .whileTrue(indexerSubsystem.runCurrentCommand())
+        .whileTrue(kickerSubsystem.indexCommand())
+        .whileTrue(agitatorSubsystem.indexCommand());
 
     // Shoot on the fly when X button is pressed
     // controller.x().whileTrue(shooterSubsystem.simShootOnTheFlyCommand());

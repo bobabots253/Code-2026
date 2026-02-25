@@ -6,7 +6,6 @@ import static frc.robot.util.SparkUtil.*;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
-import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -49,7 +48,6 @@ public class HoodIOSpark implements HoodIO {
         .encoder
         .positionConversionFactor(masterPositionConversionFactor) // THE USER MUST GET THIS RIGHT
         .velocityConversionFactor(masterVelocityConversionFactor) // Only used for logging
-        .inverted(false)
         .uvwMeasurementPeriod(
             10) // Measurement = Postion / deltaTime, this edits deltaTime to parameter
         .uvwAverageDepth(2); // Does not affect positional control
@@ -117,9 +115,10 @@ public class HoodIOSpark implements HoodIO {
         masterNEO.stopMotor(); // Internal REV API calls "set(0);"
         break;
       case CLOSED_LOOP:
-        masterNEOController.setSetpoint(
-            // kSlot0 is the default setting slot called in the config for pid
-            safeSetpoint, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        masterNEO.stopMotor();
+        // masterNEOController.setSetpoint(
+        //     // kSlot0 is the default setting slot called in the config for pid
+        //     safeSetpoint, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot0);
         break;
     }
   }

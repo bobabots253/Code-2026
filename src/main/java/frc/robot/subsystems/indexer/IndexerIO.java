@@ -13,12 +13,14 @@ public interface IndexerIO {
 
   public static enum IndexerIOOutputMode {
     BRAKE,
-    VOLTAGE
+    VOLTAGE,
+    CURRENT
   }
 
   public static class IndexerIOOutputs {
     public IndexerIOOutputMode mode = IndexerIOOutputMode.BRAKE;
     public double voltage = 0.0;
+    public double current = 0.0;
   }
 
   default void updateInputs(IndexerIOInputs inputs) {}

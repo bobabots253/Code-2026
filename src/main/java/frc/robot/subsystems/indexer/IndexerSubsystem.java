@@ -25,7 +25,8 @@ public class IndexerSubsystem extends FullSubsystem {
     INDEXING(() -> IndexerConstants.indexingVolts),
     STOW(() -> IndexerConstants.stowVolts), // Change if Necessary
     JUGGLE(() -> IndexerConstants.jugglingVolts),
-    DEBUGGING(() -> IndexerConstants.debuggingVolts);
+    DEBUGGING(() -> IndexerConstants.debuggingVolts),
+    CURRENT(() -> IndexerConstants.debuggingCurrent);
 
     // Required Arguement for each enum state
     private final DoubleSupplier voltage;
@@ -61,6 +62,8 @@ public class IndexerSubsystem extends FullSubsystem {
     // Re-poll the supplier every loop to handle new updates
     if (currentGoal == Goal.IDLE) {
       stop();
+    } else if (currentGoal == Goal.CURRENT) {
+      runCurrent(currentGoal.getGoal());
     } else {
       runVoltage(currentGoal.getGoal());
     }
@@ -91,6 +94,11 @@ public class IndexerSubsystem extends FullSubsystem {
     outputs.voltage = voltage;
   }
 
+  private void runCurrent(double current) {
+    outputs.mode = IndexerIOOutputMode.CURRENT;
+    outputs.current = current;
+  }
+
   @AutoLogOutput(key = "Indexer/MeasuredVoltage")
   public double getVoltage() {
     return inputs.masterAppliedVolts;
@@ -113,6 +121,11 @@ public class IndexerSubsystem extends FullSubsystem {
   public Command runDebuggingCommand() {
     return startEnd(() -> setGoal(Goal.DEBUGGING), () -> setGoal(Goal.IDLE))
         .withName("Indexer Debug");
+  }
+
+  public Command runCurrentCommand() {
+    return startEnd(() -> setGoal(Goal.CURRENT), () -> setGoal(Goal.IDLE))
+        .withName("Indexer Current");
   }
 
   public Command stopCommand() {

@@ -51,7 +51,7 @@ public class AgitatorIOSpark implements AgitatorIO {
         masterNEO,
         new DoubleSupplier[] {masterNEO::getAppliedOutput, masterNEO::getBusVoltage},
         (values) -> inputs.masterAppliedVolts = values[0] * values[1]);
-    ifOk(masterNEO, masterNEO::getAppliedOutput, (value) -> inputs.masterSupplyCurrentAmps = value);
+    ifOk(masterNEO, masterNEO::getOutputCurrent, (value) -> inputs.masterSupplyCurrentAmps = value);
     inputs.masterMotorConnected =
         masterNEODebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
   }

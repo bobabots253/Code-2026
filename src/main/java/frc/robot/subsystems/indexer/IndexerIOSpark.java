@@ -3,8 +3,12 @@ package frc.robot.subsystems.indexer;
 import static frc.robot.util.SparkUtil.*;
 
 import com.revrobotics.PersistMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -16,12 +20,18 @@ public class IndexerIOSpark implements IndexerIO {
   // Declare REV motor hardware here
   private final SparkBase masterNEO;
 
+  private final SparkClosedLoopController masterNEOController;
+
+  private final RelativeEncoder masterRelativeEncoder;
+
   // Declare WPILib Debouncer for Motor Disconnection Alerts here
   private final Debouncer masterNEODebouncer = new Debouncer(0.25, Debouncer.DebounceType.kFalling);
 
   public IndexerIOSpark() {
     // Initialize REV motor hardware here
     masterNEO = new SparkMax(IndexerConstants.sparkMasterIndexerCanId, MotorType.kBrushless);
+    masterNEOController = masterNEO.getClosedLoopController();
+    masterRelativeEncoder = masterNEO.getEncoder();
     SparkMaxConfig masterSparkMaxConfig = new SparkMaxConfig();
     masterSparkMaxConfig
         .idleMode(IdleMode.kCoast)
@@ -30,6 +40,7 @@ public class IndexerIOSpark implements IndexerIO {
         .appliedOutputPeriodMs(20)
         .busVoltagePeriodMs(20)
         .outputCurrentPeriodMs(20);
+    masterSparkMaxConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pid(1.0, 0, 0);
     tryUntilOk(
         masterNEO,
         5,
@@ -66,6 +77,8 @@ public class IndexerIOSpark implements IndexerIO {
       case VOLTAGE:
         masterNEO.setVoltage(setpoint);
         break;
+      case CURRENT:
+        masterNEOController.setSetpoint(outputs.current, ControlType.kCurrent);
     }
   }
 }

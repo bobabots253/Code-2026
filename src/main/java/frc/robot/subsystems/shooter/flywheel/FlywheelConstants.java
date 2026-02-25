@@ -44,7 +44,7 @@ public class FlywheelConstants {
   public static final double kA = 0.41; // Torque Control Substitute, V * s^2 / m
 
   // Testing Voltage Values
-  public static final double kDebuggingVoltage = 1.0;
+  public static final double kDebuggingVoltage = 4.5;
 
   // Calculating Max Acceleration of a Two-Motor Flywheel System
   // Use the flywheelReductionRatio constant from above
