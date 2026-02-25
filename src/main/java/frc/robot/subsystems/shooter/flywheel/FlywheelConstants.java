@@ -1,6 +1,7 @@
 package frc.robot.subsystems.shooter.flywheel;
 
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.math.util.Units;
 
 public class FlywheelConstants {
   // public static final FlywheelConfig flywheelConfig =
@@ -23,7 +24,7 @@ public class FlywheelConstants {
   public static final int sparkMasterFlywheelCanId = 15;
   public static final int sparkFollowerFlywheelCanId = 16;
 
-  public static final double sparkMasterFlyWheelkP = 1.0; // Should be super small
+  public static final double sparkMasterFlyWheelkP = 0.002; // Should be super small
   public static final double sparkMasterFlyWheelkI = 0.0; // default: 0.0
   public static final double sparkMasterFlyWheelkD = 0.0; // default: 0.0
 
@@ -46,7 +47,10 @@ public class FlywheelConstants {
   public static final double kA = 0.41; // Torque Control Substitute, V * s^2 / m
 
   // Testing Voltage Values
-  public static final double kDebuggingVoltage = 4.5;
+  public static final double kDebuggingVoltage = 4.0;
+
+  // Testing Current Values
+  public static final double kDebuggingCurrent = -14.5;
 
   // Calculating Max Acceleration of a Two-Motor Flywheel System
   // Use the flywheelReductionRatio constant from above
@@ -90,8 +94,11 @@ public class FlywheelConstants {
   public static final InterpolatingDoubleTreeMap IDLE_RPM_INTERPOLATOR =
       new InterpolatingDoubleTreeMap();
 
+  // Key: setpoint (rad/sec), Value: amps/(rad/sec) (RPM)
   static {
-    IDLE_RPM_INTERPOLATOR.put(0.0, 0.0);
+    IDLE_RPM_INTERPOLATOR.put(
+        Units.rotationsPerMinuteToRadiansPerSecond(1020),
+        14.5 / Units.rotationsPerMinuteToRadiansPerSecond(1020)); // 14.5
     IDLE_RPM_INTERPOLATOR.put(0.0, 0.0);
     IDLE_RPM_INTERPOLATOR.put(0.0, 0.0);
   }

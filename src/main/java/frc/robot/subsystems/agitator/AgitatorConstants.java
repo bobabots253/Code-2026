@@ -5,7 +5,7 @@ public class AgitatorConstants {
   public static final int masterCurrentLimit = 50; // amps
 
   // Temporary Values (Confirm Functionality)
-  public static final double indexingVolts = -9.0;
+  public static final double indexingVolts = -6.0;
   public static final double passiveVolts = -3.0;
   public static final double intakingVolts = -6.0;
   public static final double jugglingVolts = 0.0;

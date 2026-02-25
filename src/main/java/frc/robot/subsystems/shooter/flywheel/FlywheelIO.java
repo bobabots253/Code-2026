@@ -22,7 +22,8 @@ public interface FlywheelIO {
   public static enum FlywheelIOOutputMode {
     COAST,
     VELOCITY_SETPOINT,
-    VOLTAGE
+    VOLTAGE,
+    CURRENT
   }
 
   public static class FlywheelIOOutputs {
@@ -30,6 +31,7 @@ public interface FlywheelIO {
     public double velocityRadsPerSec = 0.0;
     public double measuredVelocityRadPerSec = 0.0;
     public double voltage = 0.0;
+    public double current = 0.0;
   }
 
   default void updateInputs(FlywheelIOInputs inputs) {}

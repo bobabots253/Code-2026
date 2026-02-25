@@ -195,6 +195,7 @@ public class FlywheelIOSpark implements FlywheelIO {
     // Strucutre:
     // https://www.chiefdelphi.com/t/frc-6328-mechanical-advantage-2026-build-thread/509595/272
     // TO-DO: Clean-Up this Code Section and add Acceleration Logging
+    // TO-DO: Possibly Initiate Ball Sub-State using the Kicker Subsystem
     switch (outputs.mode) {
       case COAST:
         masterVortex.stopMotor();
@@ -274,6 +275,8 @@ public class FlywheelIOSpark implements FlywheelIO {
       case VOLTAGE:
         masterVortex.setVoltage(outputs.voltage);
         break;
+      case CURRENT:
+        masterVortexController.setSetpoint(outputs.current, ControlType.kCurrent);
     }
   }
 

@@ -14,12 +14,9 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
@@ -292,6 +289,8 @@ public class RobotContainer {
 
     controller.a().onTrue(pivotSubsystem.deployCommand());
 
+    controller.b().whileTrue(flywheelSubsystem.runCurentCommand());
+
     controller.y().onTrue(pivotSubsystem.stowCommand());
 
     controller.x().whileTrue(flywheelSubsystem.runDebuggingCommand());
@@ -323,16 +322,16 @@ public class RobotContainer {
     //             shooterSubsystem.simShootOnTheFlyCommand()));
 
     // Reset gyro to 0° when B button is pressed
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        swerveSubsystem.setPose(
-                            new Pose2d(
-                                swerveSubsystem.getPose().getTranslation(), new Rotation2d())),
-                    swerveSubsystem)
-                .ignoringDisable(true));
+    // controller
+    //     .b()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //                 () ->
+    //                     swerveSubsystem.setPose(
+    //                         new Pose2d(
+    //                             swerveSubsystem.getPose().getTranslation(), new Rotation2d())),
+    //                 swerveSubsystem)
+    //             .ignoringDisable(true));
   }
 
   //   public void configureFuelSim() {
