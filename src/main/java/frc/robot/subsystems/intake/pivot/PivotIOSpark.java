@@ -93,7 +93,7 @@ public class PivotIOSpark implements PivotIO {
         (values) -> inputs.masterAppliedVolts = values[0] * values[1]);
     ifOk(
         masterVortex,
-        masterVortex::getAppliedOutput,
+        masterVortex::getOutputCurrent,
         (value) -> inputs.masterSupplyCurrentAmps = value);
     inputs.masterMotorConnected =
         masterNEODebouncer.calculate(!sparkStickyFault); // Force Connectivity Check

@@ -25,6 +25,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.wpilibj.Timer;
 import java.util.function.DoubleSupplier;
 
 /**
@@ -59,7 +60,7 @@ public class FlywheelIOSpark implements FlywheelIO {
 
   private FlywheelPhase currentPhase = FlywheelPhase.STARTUP;
   private double lastMeasuredVelocity = 0.0;
-  private double lastTime = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
+  private double lastTime = Timer.getFPGATimestamp();
 
   public FlywheelIOSpark() {
     // Initialize REV motor hardware here
@@ -160,7 +161,7 @@ public class FlywheelIOSpark implements FlywheelIO {
         (values) -> inputs.masterAppliedVolts = values[0] * values[1]);
     ifOk(
         masterVortex,
-        masterVortex::getAppliedOutput,
+        masterVortex::getOutputCurrent,
         (value) -> inputs.masterSupplyCurrentAmps = value);
     inputs.masterMotorConnected =
         masterVortexDebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
@@ -182,7 +183,7 @@ public class FlywheelIOSpark implements FlywheelIO {
         (values) -> inputs.followerAppliedVolts = values[0] * values[1]);
     ifOk(
         followerVortex,
-        followerVortex::getAppliedOutput,
+        followerVortex::getOutputCurrent,
         (value) -> inputs.followerSupplyCurrentAmps = value);
     inputs.followerMotorConnected =
         followerVortexDebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
@@ -191,6 +192,9 @@ public class FlywheelIOSpark implements FlywheelIO {
   @Override
   public void applyOutputs(FlywheelIOOutputs outputs) {
     // Better Implementation of Bang-Bang and TorqueCurrentFOC cuz REV API ;(
+    // Strucutre:
+    // https://www.chiefdelphi.com/t/frc-6328-mechanical-advantage-2026-build-thread/509595/272
+    // TO-DO: Clean-Up this Code Section and add Acceleration Logging
     switch (outputs.mode) {
       case COAST:
         masterVortex.stopMotor();
@@ -200,7 +204,7 @@ public class FlywheelIOSpark implements FlywheelIO {
         double setpoint = outputs.velocityRadsPerSec;
         double error = setpoint - measuredVelocity;
 
-        double currentTime = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
+        double currentTime = Timer.getFPGATimestamp();
         double deltaTime = currentTime - lastTime;
         double acceleration = (measuredVelocity - lastMeasuredVelocity) / deltaTime;
 
@@ -248,7 +252,7 @@ public class FlywheelIOSpark implements FlywheelIO {
               // The wheel is at goal velocity. Apply current output as needed to overcome friction
               // only.
               // Keeps the wheel at goal velocity when we are already there.
-              double idleCurrent = (FlywheelConstants.kI_velocity * setpoint);
+              double idleCurrent = (FlywheelConstants.kIdleVelocityLinearCoefficient * setpoint);
               masterVortexController.setSetpoint(idleCurrent, ControlType.kCurrent);
             } else {
               // Over-peeked the goal velocity, allow it to passively reduce velocity
@@ -261,7 +265,8 @@ public class FlywheelIOSpark implements FlywheelIO {
             // current/torque to shooter as needed. Because it is a fixed current each time,
             // ball exit velocity theoretically should be the same even if the voltage sags.
             double ballCurrent =
-                (FlywheelConstants.kI_velocity * setpoint) + FlywheelConstants.kAntilag;
+                (FlywheelConstants.kIdleVelocityLinearCoefficient * setpoint)
+                    + FlywheelConstants.kAntilag;
             masterVortexController.setSetpoint(ballCurrent, ControlType.kCurrent);
             break;
         }

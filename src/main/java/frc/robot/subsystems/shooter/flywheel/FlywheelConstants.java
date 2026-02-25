@@ -1,5 +1,7 @@
 package frc.robot.subsystems.shooter.flywheel;
 
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+
 public class FlywheelConstants {
   // public static final FlywheelConfig flywheelConfig =
   //     switch (Constants.getRobot()) {
@@ -71,17 +73,28 @@ public class FlywheelConstants {
 
   /*
    * Solving for kI_velocity:
-   * 1. Run the flywheel at 2V, 4V, 6V, 8V, and 10V (Cap at 75% Torque)
+   * 1. Run the flywheel at 2V, 4V, 6V, 8V, and 10V (Cap at 75% MAX_FREE_SPEED)
    * 2. Wait for the speed to reach steady state
    * 3. Record the stabilized velocity (Rad/sec) and Output Current (Amps)
    * 4. Plot X (velocity) and Y (current) on graph
    * 5. Get LOBF or COBF to solve.
    * I think this might work. Ideally, If it takes 5A to maintain 100 rad/s, 5/100 = 0.05 amps/(rad/sec)
    * I don't care about static current, that's dtm.
+   * Optimized method would use an Interpolating Tree Map
    */
   // Make sure this value is able to hold the motor at the setpoint while in IDLE phase
   // If there is too much drift, this value is too low
-  public static final double kI_velocity = 0.0; // amps/(rad/sec) SOLVE KADEN, DONT FORGET.
+  public static final double kIdleVelocityLinearCoefficient =
+      0.0; // amps/(rad/sec) SOLVE KADEN, DONT FORGET.
+
+  public static final InterpolatingDoubleTreeMap IDLE_RPM_INTERPOLATOR =
+      new InterpolatingDoubleTreeMap();
+
+  static {
+    IDLE_RPM_INTERPOLATOR.put(0.0, 0.0);
+    IDLE_RPM_INTERPOLATOR.put(0.0, 0.0);
+    IDLE_RPM_INTERPOLATOR.put(0.0, 0.0);
+  }
 
   /*
   NOTE: TUNE Idle Phase first, PLEASE
