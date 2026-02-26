@@ -1,6 +1,8 @@
 package frc.robot.subsystems.shooter.hood;
 
-import static frc.robot.subsystems.shooter.hood.HoodConstants.*;
+import static frc.robot.subsystems.shooter.hood.HoodConstants.maxAngleRad;
+import static frc.robot.subsystems.shooter.hood.HoodConstants.minAngleRad;
+import static frc.robot.subsystems.shooter.hood.HoodConstants.toleranceRad;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
@@ -133,7 +135,7 @@ public class HoodSubsystem extends FullSubsystem {
   }
 
   // public Command trackTarget() {
-  //   return run (() -> )
+  //    return run (() -> )
   // }
 
   public Command shootCommand() {

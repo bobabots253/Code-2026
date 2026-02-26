@@ -39,8 +39,4 @@ public class HoodConstants {
       (2.0 * Math.PI) / (60.0 * kTotalReduction); // Motor RPM -> Hood Rad/Sec, Solve
 
   public static double hoodOffset = Units.degreesToRadians(1.0); // Radians
-
-  public static final double jugglingAngle =
-      Units.degreesToRadians(0.0); // Check interpolator for values
-  public static final double debuggingAngle = Units.degreesToRadians(0.0);
 }

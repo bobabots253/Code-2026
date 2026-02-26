@@ -4,6 +4,7 @@ import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.flywheelTo
 
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.RobotState;
@@ -12,6 +13,8 @@ import frc.robot.subsystems.shooter.flywheel.FlywheelIO.FlywheelOutputMode;
 import frc.robot.util.FullSubsystem;
 import java.util.function.DoubleSupplier;
 import lombok.RequiredArgsConstructor;
+
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class FlywheelSubsystem extends FullSubsystem {
@@ -26,8 +29,20 @@ public class FlywheelSubsystem extends FullSubsystem {
   @RequiredArgsConstructor
   public enum Goal {
     IDLE(() -> 0.0),
-    SHOOT(() -> RobotState.getInstance.getCustomShotData.correctTargetVelocity),
+    PREPARE_HUB(() -> RobotState.getInstance().getCustomShotData().correctTargetVelocity()),
+    SHOOT(() -> RobotState.getInstance().getCustomShotData().correctTargetVelocity()),
+    JUGGLING(() -> FlywheelConstants.jugglingVelocity),
+    DEBUGGING(() -> FlywheelConstants.debuggingVelocity);
+
+    private final DoubleSupplier velocityRadsPerSec;
+
+    private double getGoal() {
+      return velocityRadsPerSec.getAsDouble();
+    }
   }
+
+ @AutoLogOutput(key = "Flywheels/Goal")
+  private Goal currentGoal = Goal.IDLE;
 
   public FlywheelSubsystem(FlywheelIO io) {
     this.io = io; // creates the actual io, which will be FlywheelIO io (above)
@@ -37,11 +52,25 @@ public class FlywheelSubsystem extends FullSubsystem {
             AlertType.kError); // gives the alerts text to help identify them
     flywheelFollowerDisconnectedAlert =
         new Alert("Disconnected Follower motor in flywheel", AlertType.kError);
+
+    setDefaultCommand(runOnce(() -> setGoal(Goal.IDLE)).withName("Flywheel's Idle"));
+
   }
 
   @Override
   public void periodic() { // things here are called every 20ms
+
+    if (DriverStation.isDisabled()) {
+      setGoal(Goal.IDLE);
+    }
+
+    if (currentGoal == Goal.IDLE) {
+      stop();
+    } else {
+      runVelocity(currentGoal.getGoal());
+    }
     io.updateInputs(inputs); // runs the io's updateInputs function based on our autologged inputs.
+
     Logger.processInputs("Flywheel / Inputs", inputs); // puts the inputs on advantage scope.
     flywheelMasterDisconnectedAlert.set( // sets the parameters needed for our alerts to trigger
         Robot.showHardwareAlerts()
@@ -59,6 +88,27 @@ public class FlywheelSubsystem extends FullSubsystem {
     io.applyOutputs(outputs); // runs the io's applyOutputs function with our outputs from above.
   }
 
+  private void setGoal(Goal desiredGoal) {
+    if (desiredGoal == Goal.IDLE) {
+      outputs.mode = FlywheelOutputMode.COAST;
+      return;
+
+    } else if (desiredGoal == Goal.DEBUGGING) {
+      outputs.mode = FlywheelOutputMode.VOLTAGE;
+
+    } else {
+      this.currentGoal = desiredGoal;
+      runVelocity(currentGoal.getGoal());
+    }
+  }
+
+  @AutoLogOutput(key = "Flywheel/AtGoal")
+
+  public boolean atGoal() {
+    return currentGoal == Goal.IDLE
+        || Math.abs(getSpeed() - currentGoal.getGoal()) <= FlywheelConstants.flywheelTolerance;
+  }
+
   private void runVolts(double volts) { // method to change the flywheel's mode to VOLTAGE.
     outputs.mode = FlywheelOutputMode.VOLTAGE;
     outputs.volts =
@@ -68,9 +118,8 @@ public class FlywheelSubsystem extends FullSubsystem {
   private void runVelocity(
       double velocityRadsPerSec) { // method to change the flywheel's mode to BANG_BANG
     outputs.mode = FlywheelOutputMode.BANG_BANG;
-    outputs.velocityRadsPerSec =
-        velocityRadsPerSec; // sets the target velocity (output.velocityRadPerSec) to the double
-    // velocityRadPerSec passed to the method
+    outputs.velocityRadsPerSec = velocityRadsPerSec; // sets the target velocity (output.velocityRadPerSec) to the double velocityRadPerSec passed to the method
+    outputs.measuredVelocityRadPerSec = inputs.flywheelMasterVelocityRad;
   }
 
   public double
@@ -93,6 +142,26 @@ public class FlywheelSubsystem extends FullSubsystem {
     outputs.velocityRadsPerSec =
         0.0; // sets velocity and volt setpoints to 0 to ensure the motor stops.
     outputs.volts = 0.0;
+  }
+
+  public Command shootCommand() {
+    return startEnd(() -> setGoal(Goal.SHOOT), () -> setGoal(Goal.IDLE))
+        .withName("Flywheels Shoot");
+  }
+
+  public Command prepareHubCommand() {
+    return startEnd(() -> setGoal(Goal.PREPARE_HUB), () -> setGoal(Goal.IDLE))
+        .withName("Flywheels Shoot");
+  }
+
+   public Command jugglingCommand() {
+    return startEnd(() -> setGoal(Goal.JUGGLING), () -> setGoal(Goal.IDLE))
+        .withName("Flywheels Shoot");
+  }
+
+  public Command debuggingCommand() {
+    return startEnd(() -> setGoal(Goal.DEBUGGING), () -> setGoal(Goal.IDLE))
+        .withName("Flywheels Shoot");
   }
 
   public Command stopCommand() { // command that runs our stop method to stop the flywheel.
