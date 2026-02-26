@@ -47,7 +47,7 @@ public class FlywheelConstants {
   public static final double kA = 0.41; // Torque Control Substitute, V * s^2 / m
 
   // Testing Voltage Values
-  public static final double kDebuggingVoltage = 6.0;
+  public static final double kDebuggingVoltage = 10;
 
   // Testing Current Values
   public static final double kDebuggingCurrent = -15;
@@ -101,7 +101,11 @@ public class FlywheelConstants {
   static {
     IDLE_VOLTAGE_INTERPOLATOR.put(Units.rotationsPerMinuteToRadiansPerSecond(1000), 1.95);
     IDLE_VOLTAGE_INTERPOLATOR.put(Units.rotationsPerMinuteToRadiansPerSecond(2100), 3.90);
-    IDLE_VOLTAGE_INTERPOLATOR.put(Units.rotationsPerMinuteToRadiansPerSecond(3300), 6.0); // 14.5
+    IDLE_VOLTAGE_INTERPOLATOR.put(Units.rotationsPerMinuteToRadiansPerSecond(3300), 6.0);
+    IDLE_VOLTAGE_INTERPOLATOR.put(Units.rotationsPerMinuteToRadiansPerSecond(3800), 7.0);
+    IDLE_VOLTAGE_INTERPOLATOR.put(Units.rotationsPerMinuteToRadiansPerSecond(4370), 8.0);
+    IDLE_VOLTAGE_INTERPOLATOR.put(Units.rotationsPerMinuteToRadiansPerSecond(4900), 9.0);
+    IDLE_VOLTAGE_INTERPOLATOR.put(Units.rotationsPerMinuteToRadiansPerSecond(5490), 10.0); // 14.5
     // IDLE_VOLTAGE_INTERPOLATOR.put(0.0, 0.0);
     // IDLE_VOLTAGE_INTERPOLATOR.put(0.0, 0.0);
   }

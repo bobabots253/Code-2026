@@ -293,7 +293,7 @@ public class RobotContainer {
 
     controller.y().onTrue(pivotSubsystem.stowCommand());
 
-    controller.x().onTrue(hoodSubsystem.runDebuggingCommand());
+    controller.x().whileTrue(flywheelSubsystem.runDebuggingCommand());
 
     controller
         .leftBumper()
