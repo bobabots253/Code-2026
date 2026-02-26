@@ -8,13 +8,12 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
 import java.util.function.DoubleSupplier;
@@ -22,29 +21,32 @@ import java.util.function.DoubleSupplier;
 public class FlywheelIOSpark implements FlywheelIO {
   private final SparkBase masterVortex; // initializing the SparkFlexes for the shooter flywheel
   private final SparkBase followerVortex;
-  private final SparkClosedLoopController flywheelController;// creates new Bang Bang Controller with tolerance of 1.
+  private final SparkClosedLoopController
+      flywheelController; // creates new Bang Bang Controller with tolerance of 1.
 
   private final Debouncer flywheelDebouncer =
       new Debouncer(
           0.5,
           Debouncer.DebounceType
               .kFalling); // creates debouncer so we aren't constantl checking values
-  private final RelativeEncoder flywheelMasterRelativeEncoder; // initializing the relative encoders for the shooter flywheel
+  private final RelativeEncoder
+      flywheelMasterRelativeEncoder; // initializing the relative encoders for the shooter flywheel
   private final RelativeEncoder flywheelFollowerRelativeEncoder;
   private final SimpleMotorFeedforward ffCalculator =
-      new SimpleMotorFeedforward(kS, kV, kA); // new feedforward, used to calculate ffvolts later on. Constants are placeholders.
+      new SimpleMotorFeedforward(
+          kS, kV,
+          kA); // new feedforward, used to calculate ffvolts later on. Constants are placeholders.
 
-
-public enum FlywheelState{
+  public enum FlywheelState {
     STARTUP,
     IDLE,
     BALL,
     RECOVERY;
-}
+  }
 
-private FlywheelState currentState = FlywheelState.STARTUP;
-private double lastMeasuredVelocity = 0.0;
-private double lastTime = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
+  private FlywheelState currentState = FlywheelState.STARTUP;
+  private double lastMeasuredVelocity = 0.0;
+  private double lastTime = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
 
   public FlywheelIOSpark() {
     masterVortex =
@@ -65,7 +67,8 @@ private double lastTime = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
         .smartCurrentLimit(
             flywheelCurrentLimit) // sets current limit to vortex current limit, 50 amps
         .voltageCompensation(
-            12.0); // compensates for the drop in voltage when we draw more current to power the motor.
+            12.0); // compensates for the drop in voltage when we draw more current to power the
+    // motor.
 
     flywheelMasterConfig
         .encoder
@@ -75,9 +78,9 @@ private double lastTime = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
         .uvwAverageDepth(2); // converts encoder velocities from rotations to radians
 
     flywheelMasterConfig
-    .closedLoop
-    .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-    .pid(flywheelVelocitykP,flywheelVelocitykI,flywheelVelocitykD);
+        .closedLoop
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        .pid(flywheelVelocitykP, flywheelVelocitykI, flywheelVelocitykD);
 
     flywheelMasterConfig
         .signals // sets signals to collect every 20ms to calculate inputs and encoder values
@@ -171,60 +174,61 @@ private double lastTime = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
       case VOLTAGE: // if the motor is in voltage mode, give it volts = to setpoint
         runVolts(outputs.volts);
         break;
-      case BANG_BANG: // if the motor is in BANG BANG mode, run the velocity setpoint and the feedforward, with a setpoint of velocityRadPerSec from outputs
+      case BANG_BANG: // if the motor is in BANG BANG mode, run the velocity setpoint and the
+        // feedforward, with a setpoint of velocityRadPerSec from outputs
         double measuredVelocity = outputs.measuredVelocityRadPerSec;
         double setpoint = outputs.velocityRadsPerSec;
         double error = setpoint - measuredVelocity;
 
         double currentTime = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
         double deltaTime = currentTime - lastTime;
-        double acceleration = (measuredVelocity-lastMeasuredVelocity)/deltaTime;
+        double acceleration = (measuredVelocity - lastMeasuredVelocity) / deltaTime;
         lastMeasuredVelocity = measuredVelocity;
         lastTime = currentTime;
 
-        if (setpoint <= 0){
-            masterVortex.stopMotor();
-            currentState = FlywheelState.IDLE;
-            return;
+        if (setpoint <= 0) {
+          masterVortex.stopMotor();
+          currentState = FlywheelState.IDLE;
+          return;
         }
 
-        if(Math.abs(error) >= flywheelTolerance){
-            currentState = FlywheelState.IDLE;
+        if (Math.abs(error) >= flywheelTolerance) {
+          currentState = FlywheelState.IDLE;
 
-        } else if (acceleration < ballDetectionThreshold){
-            currentState = FlywheelState.BALL;
+        } else if (acceleration < ballDetectionThreshold) {
+          currentState = FlywheelState.BALL;
 
-        }else if (currentState == FlywheelState.BALL && acceleration > 0){
-            currentState = FlywheelState.RECOVERY;
+        } else if (currentState == FlywheelState.BALL && acceleration > 0) {
+          currentState = FlywheelState.RECOVERY;
 
         } else if (currentState != FlywheelState.BALL && Math.abs(error) > idleTolerance) {
-            currentState = FlywheelState.STARTUP;
+          currentState = FlywheelState.STARTUP;
         }
 
-        switch(currentState){
-            case STARTUP:
-            case RECOVERY:
-            if (error>0){
-                double outputVolts = 12.0;
-                masterVortex.set(outputVolts);
+        switch (currentState) {
+          case STARTUP:
+          case RECOVERY:
+            if (error > 0) {
+              double outputVolts = 12.0;
+              masterVortex.set(outputVolts);
 
-            } else if (error<0) {
-                double outputVolts = -12.0;
-                masterVortex.set(outputVolts);
+            } else if (error < 0) {
+              double outputVolts = -12.0;
+              masterVortex.set(outputVolts);
             }
             break;
 
-            case IDLE:
-                if (error > 0){
-                    double idleCurrent = (kI_velocity*setpoint);
-                    flywheelController.setSetpoint(idleCurrent, ControlType.kCurrent);
-                } else {
-                    masterVortex.setVoltage(0);
-                }
-                break;
+          case IDLE:
+            if (error > 0) {
+              double idleCurrent = (kI_velocity * setpoint);
+              flywheelController.setSetpoint(idleCurrent, ControlType.kCurrent);
+            } else {
+              masterVortex.setVoltage(0);
+            }
+            break;
 
-            case BALL:
-            double ballCurrent = (kI_velocity *setpoint) + kAntilag;
+          case BALL:
+            double ballCurrent = (kI_velocity * setpoint) + kAntilag;
             flywheelController.setSetpoint(ballCurrent, ControlType.kCurrent);
             break;
         }
@@ -233,16 +237,17 @@ private double lastTime = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
   }
 
   @Override
-  public void runVolts(double volts) { // method to run voltage mode. Can be called indpendently of outputs, but also
+  public void runVolts(
+      double volts) { // method to run voltage mode. Can be called indpendently of outputs, but also
     // runs in outputs.
     masterVortex.setVoltage(volts);
   }
-  
-@Override
-  public void runVelocitySetpoint(double velocityRadsPerSec) { // method to run with a velocity stepoint. Can also be
+
+  @Override
+  public void runVelocitySetpoint(
+      double velocityRadsPerSec) { // method to run with a velocity stepoint. Can also be
     // called independently of outputs.
-    double ffVolts =
-        ffCalculator.calculate(velocityRadsPerSec); 
+    double ffVolts = ffCalculator.calculate(velocityRadsPerSec);
 
     flywheelController.setSetpoint(velocityRadsPerSec + ffVolts, ControlType.kVelocity);
   }

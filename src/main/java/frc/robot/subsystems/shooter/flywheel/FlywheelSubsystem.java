@@ -13,7 +13,6 @@ import frc.robot.subsystems.shooter.flywheel.FlywheelIO.FlywheelOutputMode;
 import frc.robot.util.FullSubsystem;
 import java.util.function.DoubleSupplier;
 import lombok.RequiredArgsConstructor;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -41,7 +40,7 @@ public class FlywheelSubsystem extends FullSubsystem {
     }
   }
 
- @AutoLogOutput(key = "Flywheels/Goal")
+  @AutoLogOutput(key = "Flywheels/Goal")
   private Goal currentGoal = Goal.IDLE;
 
   public FlywheelSubsystem(FlywheelIO io) {
@@ -54,7 +53,6 @@ public class FlywheelSubsystem extends FullSubsystem {
         new Alert("Disconnected Follower motor in flywheel", AlertType.kError);
 
     setDefaultCommand(runOnce(() -> setGoal(Goal.IDLE)).withName("Flywheel's Idle"));
-
   }
 
   @Override
@@ -103,7 +101,6 @@ public class FlywheelSubsystem extends FullSubsystem {
   }
 
   @AutoLogOutput(key = "Flywheel/AtGoal")
-
   public boolean atGoal() {
     return currentGoal == Goal.IDLE
         || Math.abs(getSpeed() - currentGoal.getGoal()) <= FlywheelConstants.flywheelTolerance;
@@ -118,7 +115,9 @@ public class FlywheelSubsystem extends FullSubsystem {
   private void runVelocity(
       double velocityRadsPerSec) { // method to change the flywheel's mode to BANG_BANG
     outputs.mode = FlywheelOutputMode.BANG_BANG;
-    outputs.velocityRadsPerSec = velocityRadsPerSec; // sets the target velocity (output.velocityRadPerSec) to the double velocityRadPerSec passed to the method
+    outputs.velocityRadsPerSec =
+        velocityRadsPerSec; // sets the target velocity (output.velocityRadPerSec) to the double
+    // velocityRadPerSec passed to the method
     outputs.measuredVelocityRadPerSec = inputs.flywheelMasterVelocityRad;
   }
 
@@ -154,7 +153,7 @@ public class FlywheelSubsystem extends FullSubsystem {
         .withName("Flywheels Shoot");
   }
 
-   public Command jugglingCommand() {
+  public Command jugglingCommand() {
     return startEnd(() -> setGoal(Goal.JUGGLING), () -> setGoal(Goal.IDLE))
         .withName("Flywheels Shoot");
   }
