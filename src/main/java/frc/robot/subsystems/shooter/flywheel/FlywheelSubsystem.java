@@ -2,8 +2,6 @@ package frc.robot.subsystems.shooter.flywheel;
 
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.flywheelTolerance;
 
-import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -12,9 +10,8 @@ import frc.robot.RobotState;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIO.FlywheelIOOutputs;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIO.FlywheelOutputMode;
 import frc.robot.util.FullSubsystem;
-import lombok.RequiredArgsConstructor;
-
 import java.util.function.DoubleSupplier;
+import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.Logger;
 
 public class FlywheelSubsystem extends FullSubsystem {
@@ -26,14 +23,11 @@ public class FlywheelSubsystem extends FullSubsystem {
       new FlywheelIOInputsAutoLogged(); // creates new inputs and outputs, which are logged.
   private final FlywheelIOOutputs outputs = new FlywheelIOOutputs();
 
-
-@RequiredArgsConstructor
-public enum Goal {
-  IDLE(()-> 0.0),
-  SHOOT(() -> RobotState.getInstance.getCustomShotData.correctTargetVelocity),
-  
-  
-}
+  @RequiredArgsConstructor
+  public enum Goal {
+    IDLE(() -> 0.0),
+    SHOOT(() -> RobotState.getInstance.getCustomShotData.correctTargetVelocity),
+  }
 
   public FlywheelSubsystem(FlywheelIO io) {
     this.io = io; // creates the actual io, which will be FlywheelIO io (above)
@@ -51,11 +45,11 @@ public enum Goal {
     Logger.processInputs("Flywheel / Inputs", inputs); // puts the inputs on advantage scope.
     flywheelMasterDisconnectedAlert.set( // sets the parameters needed for our alerts to trigger
         Robot.showHardwareAlerts()
-            && !(inputs.flywheelMasterConnected)); // the alerts trigger if our flywheelMasterConnected
+            && !(inputs
+                .flywheelMasterConnected)); // the alerts trigger if our flywheelMasterConnected
     // input is false for more than 0.2 sec
     flywheelFollowerDisconnectedAlert.set(
-        Robot.showHardwareAlerts()
-            && !(inputs.flywheelFollowerConnected));
+        Robot.showHardwareAlerts() && !(inputs.flywheelFollowerConnected));
   }
 
   @Override

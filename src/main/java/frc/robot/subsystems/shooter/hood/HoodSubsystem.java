@@ -11,10 +11,12 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
+import frc.robot.RobotState;
 import frc.robot.subsystems.shooter.hood.HoodIO.HoodIOMode;
 import frc.robot.subsystems.shooter.hood.HoodIO.HoodIOOutputs;
 import frc.robot.util.FullSubsystem;
 import java.util.function.DoubleSupplier;
+import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -29,10 +31,32 @@ public class HoodSubsystem extends FullSubsystem {
   private double goalVelocity = 0.0;
   private Boolean hoodZeroed = false;
 
+  @RequiredArgsConstructor
+  public enum Goal {
+    IDLE(() -> 0.0),
+
+    PREPARE_HUB(() -> RobotState.getInstance().getCustomShotData().correctedTargetAngle()),
+
+    SHOOT(() -> RobotState.getInstance().getCustomShotData().correctedTargetAngle()),
+
+    JUGGLE(() -> HoodConstants.jugglingAngle),
+
+    DEBUGGING(() -> HoodConstants.debuggingAngle);
+
+    private final DoubleSupplier angleRads;
+
+    private double getGoal() {
+      return angleRads.getAsDouble();
+    }
+  }
+
+  @AutoLogOutput private Goal currentGoal = Goal.IDLE;
+
   public HoodSubsystem(HoodIO io) {
 
     this.io = io;
     hoodDisconnected = new Alert("Hood Motor Disconnected", AlertType.kError);
+    setDefaultCommand(runOnce(() -> setGoal(Goal.IDLE)).withName("Hood Idle"));
   }
 
   @Override
@@ -42,6 +66,16 @@ public class HoodSubsystem extends FullSubsystem {
 
     hoodDisconnected.set(
         Robot.showHardwareAlerts() && !hoodDebouncer.calculate(inputs.masterNeoConnected));
+
+    if (DriverStation.isDisabled()) {
+      setGoal(Goal.IDLE);
+    }
+
+    if (currentGoal == Goal.IDLE) {
+      stop();
+    } else {
+      runAngular(currentGoal.getGoal());
+    }
   }
 
   @Override
@@ -50,6 +84,15 @@ public class HoodSubsystem extends FullSubsystem {
     io.applyOutputs(outputs);
     outputs.hoodSetPosRad = MathUtil.clamp(goalAngle, minAngleRad, maxAngleRad) - hoodOffset;
     outputs.hoodSetVelocityRad = goalVelocity;
+  }
+
+  private void setGoal(Goal desiredGoal) {
+    this.currentGoal = desiredGoal;
+  }
+
+  private void runAngular(double angleRads) {
+    outputs.mode = HoodIOMode.CLOSED_LOOP_CONTROL;
+    outputs.hoodSetPosRad = angleRads;
   }
 
   public void setGoalParams(double angle, double velocity) {
@@ -82,7 +125,7 @@ public class HoodSubsystem extends FullSubsystem {
     return Units.radiansToDegrees(inputs.hoodPosRad + hoodOffset);
   }
 
-  @AutoLogOutput
+  @AutoLogOutput(key = "Hood/AtGoal")
   public boolean hoodAtGoal() {
     return DriverStation.isEnabled()
         && hoodZeroed
@@ -92,6 +135,27 @@ public class HoodSubsystem extends FullSubsystem {
   // public Command trackTarget() {
   //   return run (() -> )
   // }
+
+  public Command shootCommand() {
+    return startEnd(() -> setGoal(Goal.SHOOT), () -> setGoal(Goal.IDLE)).withName("Hood Shoot");
+  }
+
+  public Command prepareHubCommand() {
+    return startEnd(() -> setGoal(Goal.PREPARE_HUB), () -> setGoal(Goal.IDLE))
+        .withName("Hood Prepare Hub");
+  }
+
+  public Command juggleCommand() {
+    return startEnd(() -> setGoal(Goal.JUGGLE), () -> setGoal(Goal.IDLE)).withName("Hood Juggle");
+  }
+
+  public Command debugCommand() {
+    return startEnd(() -> setGoal(Goal.DEBUGGING), () -> setGoal(Goal.IDLE)).withName("Hood Debug");
+  }
+
+  public Command runSetAngularCommand(DoubleSupplier angle) {
+    return runEnd(() -> runAngular(angle.getAsDouble()), this::stop);
+  }
 
   public Command staticTarget(DoubleSupplier angle) {
     return runEnd(() -> setGoalParams(angle.getAsDouble()), this::stop);
