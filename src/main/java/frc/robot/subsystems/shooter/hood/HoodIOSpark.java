@@ -41,7 +41,7 @@ public class HoodIOSpark implements HoodIO {
 
     var masterNEOConfig = new SparkMaxConfig();
     masterNEOConfig
-        .idleMode(IdleMode.kBrake)
+        .idleMode(IdleMode.kCoast)
         .inverted(false)
         .smartCurrentLimit(35); // Current Limit reduced for safety
     masterNEOConfig
@@ -55,12 +55,12 @@ public class HoodIOSpark implements HoodIO {
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .pid(sparkMasterHoodkP, sparkMasterHoodkI, sparkMasterHoodkD);
-    masterNEOConfig
-        .softLimit
-        .reverseSoftLimitEnabled(true)
-        .reverseSoftLimit(minAngleRad)
-        .forwardSoftLimitEnabled(true)
-        .forwardSoftLimit(maxAngleRad);
+    // masterNEOConfig
+    // .softLimit
+    // .reverseSoftLimitEnabled(true)
+    // .reverseSoftLimit(minAngleRad)
+    // .forwardSoftLimitEnabled(true)
+    // .forwardSoftLimit(maxAngleRad);
     masterNEOConfig
         .signals
         .primaryEncoderPositionAlwaysOn(true)
@@ -89,7 +89,7 @@ public class HoodIOSpark implements HoodIO {
     ifOk(
         masterNEO,
         masterRelativeEncoder::getPosition,
-        (value) -> inputs.masterPositionRads = value + HoodConstants.hoodOffsetRad);
+        (value) -> inputs.masterPositionRads = value);
     ifOk(
         masterNEO,
         masterRelativeEncoder::getVelocity,
@@ -115,10 +115,9 @@ public class HoodIOSpark implements HoodIO {
         masterNEO.stopMotor(); // Internal REV API calls "set(0);"
         break;
       case CLOSED_LOOP:
-        masterNEO.stopMotor();
-        // masterNEOController.setSetpoint(
-        //     // kSlot0 is the default setting slot called in the config for pid
-        //     safeSetpoint, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        masterNEOController.setSetpoint(
+            // kSlot0 is the default setting slot called in the config for pid
+            safeSetpoint, SparkBase.ControlType.kPosition);
         break;
     }
   }
