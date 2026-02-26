@@ -289,7 +289,7 @@ public class RobotContainer {
 
     controller.a().onTrue(pivotSubsystem.deployCommand());
 
-    controller.b().whileTrue(flywheelSubsystem.runCurentCommand());
+    controller.b().whileTrue(flywheelSubsystem.runDebuggingVelocityCommand());
 
     controller.y().onTrue(pivotSubsystem.stowCommand());
 

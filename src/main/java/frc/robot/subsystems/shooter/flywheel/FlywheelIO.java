@@ -13,11 +13,13 @@ public interface FlywheelIO {
     public double masterVelocityRads = 0.0;
     public double masterAppliedVolts = 0.0;
     public double masterSupplyCurrentAmps = 0.0;
+    public double masterAccelerationRadPerSecSquared = 0.0;
 
     public double followerPositionRads = 0.0;
     public double followerVelocityRads = 0.0;
     public double followerAppliedVolts = 0.0;
     public double followerSupplyCurrentAmps = 0.0;
+    public double followerAccelerationRadPerSecSquared = 0.0;
   }
 
   public static enum FlywheelIOOutputMode {
@@ -36,6 +38,8 @@ public interface FlywheelIO {
 
     @AutoLogOutput(key = "FlywheelOutputs/MeasuredVelocityRadPerSec")
     public double measuredVelocityRadPerSec = 0.0;
+
+    @AutoLogOutput public double calculatedAcceleration = 0.0;
 
     @AutoLogOutput(key = "FlywheelOutputs/Voltage")
     public double voltage = 0.0;

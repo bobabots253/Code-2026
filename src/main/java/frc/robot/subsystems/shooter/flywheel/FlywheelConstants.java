@@ -47,10 +47,13 @@ public class FlywheelConstants {
   public static final double kA = 0.41; // Torque Control Substitute, V * s^2 / m
 
   // Testing Voltage Values
-  public static final double kDebuggingVoltage = 4.0;
+  public static final double kDebuggingVoltage = 6.0;
 
   // Testing Current Values
-  public static final double kDebuggingCurrent = 15;
+  public static final double kDebuggingCurrent = -15;
+
+  // Testing Velocity Values
+  public static final double kDebuggingVelocity = Units.rotationsPerMinuteToRadiansPerSecond(3000);
 
   // Calculating Max Acceleration of a Two-Motor Flywheel System
   // Use the flywheelReductionRatio constant from above
@@ -69,11 +72,11 @@ public class FlywheelConstants {
 
   public static final double closedLoopVelocityTolerance = 0.0; // Change to heuristic value, HALT
 
-  public static final double idleTolerance = 10.47; // rad/sec, 100 rpm
+  public static final double idleTolerance = 20.94 / 2; // rad/sec, 100 rpm
 
   public static final double flywheelControlVelocityTolerance = 20.94; // rad/sec, 200 rpm
   public static final double ballDetectionThreshold =
-      -20.94; // rad/sec^2, CHECK physically check how much the velocity drops from one shot
+      -300.94; // rad/sec^2, CHECK physically check how much the velocity drops from one shot
 
   /*
    * Solving for kI_velocity:
@@ -91,16 +94,16 @@ public class FlywheelConstants {
   public static final double kIdleVelocityLinearCoefficient =
       0.0; // amps/(rad/sec) SOLVE KADEN, DONT FORGET.
 
-  public static final InterpolatingDoubleTreeMap IDLE_RPM_INTERPOLATOR =
+  public static final InterpolatingDoubleTreeMap IDLE_VOLTAGE_INTERPOLATOR =
       new InterpolatingDoubleTreeMap();
 
-  // Key: setpoint (rad/sec), Value: amps/(rad/sec) (RPM)
+  // Key:
   static {
-    IDLE_RPM_INTERPOLATOR.put(
-        Units.rotationsPerMinuteToRadiansPerSecond(1020),
-        14.5 / Units.rotationsPerMinuteToRadiansPerSecond(1020)); // 14.5
-    IDLE_RPM_INTERPOLATOR.put(0.0, 0.0);
-    IDLE_RPM_INTERPOLATOR.put(0.0, 0.0);
+    IDLE_VOLTAGE_INTERPOLATOR.put(Units.rotationsPerMinuteToRadiansPerSecond(1000), 1.95);
+    IDLE_VOLTAGE_INTERPOLATOR.put(Units.rotationsPerMinuteToRadiansPerSecond(2100), 3.90);
+    IDLE_VOLTAGE_INTERPOLATOR.put(Units.rotationsPerMinuteToRadiansPerSecond(3300), 6.0); // 14.5
+    // IDLE_VOLTAGE_INTERPOLATOR.put(0.0, 0.0);
+    // IDLE_VOLTAGE_INTERPOLATOR.put(0.0, 0.0);
   }
 
   /*
@@ -116,5 +119,5 @@ public class FlywheelConstants {
   // This value accounts for the amount of torque it takes for the ball to clear shooter wheel
   // compression
   public static final double kAntilag =
-      10.0; // amps SOLVE KADEN, DONT FORGET, Set AMP to 10 when starting
+      0.0; // volts now | SOLVE KADEN, DONT FORGET, Set AMP to 10 when starting
 }

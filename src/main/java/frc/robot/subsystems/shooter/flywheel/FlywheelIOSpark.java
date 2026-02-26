@@ -23,8 +23,9 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.wpilibj.Timer;
 import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * Flywheel Hardware implementation using SparkFlex Current System is designed to mimics
@@ -57,8 +58,6 @@ public class FlywheelIOSpark implements FlywheelIO {
   }
 
   private FlywheelPhase currentPhase = FlywheelPhase.STARTUP;
-  private double lastMeasuredVelocity = 0.0;
-  private double lastTime = Timer.getFPGATimestamp();
 
   public FlywheelIOSpark() {
     // Initialize REV motor hardware here
@@ -93,20 +92,17 @@ public class FlywheelIOSpark implements FlywheelIO {
     // .minOutput((-1), ClosedLoopSlot.kSlot0);
     masterVortexConfig
         .signals
-        .appliedOutputPeriodMs(20)
-        .busVoltagePeriodMs(20)
-        .outputCurrentPeriodMs(20);
-    // .primaryEncoderPositionAlwaysOn(true)
-    // .primaryEncoderPositionPeriodMs(10)
-    // .primaryEncoderVelocityAlwaysOn(true)
-    // .primaryEncoderVelocityPeriodMs(10)
-    // .isAtSetpointAlwaysOn(true)
-    // .isAtSetpointPeriodMs(10)
-    // .setSetpointAlwaysOn(true)
-    // .setpointPeriodMs(10)
-    // .appliedOutputPeriodMs(10)
-    // .busVoltagePeriodMs(10)
-    // .outputCurrentPeriodMs(10);
+        .primaryEncoderPositionAlwaysOn(true)
+        .primaryEncoderPositionPeriodMs(10)
+        .primaryEncoderVelocityAlwaysOn(true)
+        .primaryEncoderVelocityPeriodMs(10)
+        .isAtSetpointAlwaysOn(true)
+        .isAtSetpointPeriodMs(10)
+        .setSetpointAlwaysOn(true)
+        .setpointPeriodMs(10)
+        .appliedOutputPeriodMs(10)
+        .busVoltagePeriodMs(10)
+        .outputCurrentPeriodMs(10);
     tryUntilOk(
         masterVortex,
         5,
@@ -131,20 +127,17 @@ public class FlywheelIOSpark implements FlywheelIO {
         .uvwAverageDepth(2);
     followerVortexConfig
         .signals
-        .appliedOutputPeriodMs(20)
-        .busVoltagePeriodMs(20)
-        .outputCurrentPeriodMs(20);
-    // .primaryEncoderPositionAlwaysOn(true)
-    // .primaryEncoderPositionPeriodMs(10)
-    // .primaryEncoderVelocityAlwaysOn(true)
-    // .primaryEncoderVelocityPeriodMs(10)
-    // .isAtSetpointAlwaysOn(true)
-    // .isAtSetpointPeriodMs(10)
-    // .setSetpointAlwaysOn(true)
-    // .setpointPeriodMs(10)
-    // .appliedOutputPeriodMs(10)
-    // .busVoltagePeriodMs(10)
-    // .outputCurrentPeriodMs(10);
+        .primaryEncoderPositionAlwaysOn(true)
+        .primaryEncoderPositionPeriodMs(10)
+        .primaryEncoderVelocityAlwaysOn(true)
+        .primaryEncoderVelocityPeriodMs(10)
+        .isAtSetpointAlwaysOn(true)
+        .isAtSetpointPeriodMs(10)
+        .setSetpointAlwaysOn(true)
+        .setpointPeriodMs(10)
+        .appliedOutputPeriodMs(10)
+        .busVoltagePeriodMs(10)
+        .outputCurrentPeriodMs(10);
     tryUntilOk(
         followerVortex,
         5,
@@ -214,23 +207,18 @@ public class FlywheelIOSpark implements FlywheelIO {
       case COAST:
         masterVortex.stopMotor();
         break;
-      case CURRENT:
+      case CURRENT: // DO NOT USE, BROKEN
         masterVortexController.setSetpoint(
             FlywheelConstants.kDebuggingCurrent, ControlType.kCurrent, ClosedLoopSlot.kSlot0);
         break;
       case VELOCITY_SETPOINT:
         double measuredVelocity = outputs.measuredVelocityRadPerSec;
         double setpoint = outputs.velocityRadsPerSec;
+
         double error = setpoint - measuredVelocity;
+        Logger.recordOutput("Flywheel/Error", error);
 
-        double currentTime = Timer.getFPGATimestamp();
-        double deltaTime = currentTime - lastTime;
-
-        // @AutoLogOutput(key = "Flywheel/Acceleration")
-        double acceleration = (measuredVelocity - lastMeasuredVelocity) / deltaTime;
-
-        lastMeasuredVelocity = measuredVelocity;
-        lastTime = currentTime;
+        double acceleration = outputs.calculatedAcceleration;
 
         if (setpoint <= 0) {
           masterVortex.stopMotor();
@@ -265,7 +253,7 @@ public class FlywheelIOSpark implements FlywheelIO {
           case RECOVERY:
             // Bang-Bang Controller to maximize Duty-Cycle Output
             // If error > 0 (too slow), request +12V. If error < 0 (too fast), request -12V.
-            double outputVolts = (error > 0) ? 12.0 : -12.0;
+            double outputVolts = (error > 0) ? 12.0 : 0;
             masterVortex.setVoltage(outputVolts);
             break;
           case IDLE:
@@ -273,8 +261,12 @@ public class FlywheelIOSpark implements FlywheelIO {
               // The wheel is at goal velocity. Apply current output as needed to overcome friction
               // only.
               // Keeps the wheel at goal velocity when we are already there.
-              double idleCurrent = (FlywheelConstants.kIdleVelocityLinearCoefficient * setpoint);
-              masterVortexController.setSetpoint(idleCurrent, ControlType.kCurrent);
+              // double idleCurrent = (FlywheelConstants.kIdleVelocityLinearCoefficient * setpoint);
+              // masterVortexController.setSetpoint(idleCurrent, ControlType.kCurrent);
+
+              // Interpolator Key in Radians/Sec
+              double idleVoltage = FlywheelConstants.IDLE_VOLTAGE_INTERPOLATOR.get(setpoint);
+              masterVortex.setVoltage(idleVoltage);
             } else {
               // Over-peeked the goal velocity, allow it to passively reduce velocity
               masterVortex.setVoltage(0);
@@ -285,10 +277,12 @@ public class FlywheelIOSpark implements FlywheelIO {
             // ignore velocity entirely when ball is in the shooter, just shove the max amount of
             // current/torque to shooter as needed. Because it is a fixed current each time,
             // ball exit velocity theoretically should be the same even if the voltage sags.
-            double ballCurrent =
-                (FlywheelConstants.kIdleVelocityLinearCoefficient * setpoint)
-                    + FlywheelConstants.kAntilag;
-            masterVortexController.setSetpoint(ballCurrent, ControlType.kCurrent);
+            // double ballCurrent =
+            //     (FlywheelConstants.kIdleVelocityLinearCoefficient * setpoint)
+            //         + FlywheelConstants.kAntilag;
+            // masterVortexController.setSetpoint(ballCurrent, ControlType.kVoltage);
+            double idleVoltage = FlywheelConstants.IDLE_VOLTAGE_INTERPOLATOR.get(setpoint);
+            masterVortex.setVoltage(idleVoltage);
             break;
         }
         break;
@@ -313,5 +307,10 @@ public class FlywheelIOSpark implements FlywheelIO {
   public void stop() {
     masterVortex.stopMotor();
     followerVortex.stopMotor();
+  }
+
+  @AutoLogOutput(key = "Flywheel/CurrentPhase")
+  public FlywheelPhase getCurrentPhase() {
+    return currentPhase;
   }
 }

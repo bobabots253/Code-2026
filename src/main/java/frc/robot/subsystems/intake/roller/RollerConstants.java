@@ -6,7 +6,7 @@ public class RollerConstants {
 
   // Temporary Values (Confirm Functionality)
   public static final double stowVolts = 0.0;
-  public static final double intakingVolts = -12.0;
+  public static final double intakingVolts = -9.0;
   public static final double jugglingVolts = 0.0;
   public static final double debuggingVolts = 0.0;
 }

@@ -2,6 +2,7 @@ package frc.robot.subsystems.shooter.flywheel;
 
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.RobotState;
@@ -21,6 +22,16 @@ public class FlywheelSubsystem extends FullSubsystem {
 
   private Alert masterDisconnected;
   private Alert followerDisconnected;
+
+  private double lastMeasuredVelocity;
+  private double lastTime;
+  private double measuredVelocity;
+  private double setpoint;
+
+  private double currentTime;
+  private double deltaTime;
+
+  double acceleration;
 
   @RequiredArgsConstructor
   /*
@@ -42,7 +53,8 @@ public class FlywheelSubsystem extends FullSubsystem {
     JUGGLE(() -> FlywheelConstants.jugglingVelocity),
     // Static speed state for subsystem testing
     DEBUGGING(() -> FlywheelConstants.kDebuggingVoltage), // VOLTAGE
-    CURRENT(() -> FlywheelConstants.kDebuggingCurrent);
+    CURRENT(() -> FlywheelConstants.kDebuggingCurrent),
+    DEBUGGING_VELOCITY(() -> FlywheelConstants.kDebuggingVelocity);
 
     // Required Arguement for each enum state
     private final DoubleSupplier velocityRadsPerSec;
@@ -63,6 +75,9 @@ public class FlywheelSubsystem extends FullSubsystem {
     followerDisconnected = new Alert("Follower flywheel disconnected!", Alert.AlertType.kWarning);
 
     setDefaultCommand(runOnce(() -> setGoal(Goal.IDLE)).withName("Flywheels Idle"));
+
+    lastMeasuredVelocity = 0.0;
+    lastTime = Timer.getFPGATimestamp();
   }
 
   @Override
@@ -88,6 +103,18 @@ public class FlywheelSubsystem extends FullSubsystem {
     } else {
       runVelocity(currentGoal.getGoal());
     }
+
+    // Update Acceleration
+    measuredVelocity = inputs.masterVelocityRads;
+    setpoint = outputs.velocityRadsPerSec;
+
+    currentTime = Timer.getFPGATimestamp();
+    deltaTime = currentTime - lastTime;
+
+    acceleration = (measuredVelocity - lastMeasuredVelocity) / deltaTime;
+
+    lastMeasuredVelocity = measuredVelocity;
+    lastTime = currentTime;
   }
 
   @Override
@@ -125,6 +152,7 @@ public class FlywheelSubsystem extends FullSubsystem {
     outputs.mode = FlywheelIOOutputMode.VELOCITY_SETPOINT;
     outputs.velocityRadsPerSec = velocityRadsPerSec;
     outputs.measuredVelocityRadPerSec = inputs.masterVelocityRads;
+    outputs.calculatedAcceleration = acceleration;
   }
 
   private void runVoltage(double volts) {
@@ -164,6 +192,11 @@ public class FlywheelSubsystem extends FullSubsystem {
         .withName("Flywheels Debug");
   }
 
+  public Command runDebuggingVelocityCommand() {
+    return startEnd(() -> setGoal(Goal.DEBUGGING_VELOCITY), () -> setGoal(Goal.IDLE))
+        .withName("Flywheels Debug");
+  }
+
   public Command runCurentCommand() {
     return run(() -> setGoal(Goal.CURRENT)).withName("Flywheels Current");
   }
@@ -191,6 +224,11 @@ public class FlywheelSubsystem extends FullSubsystem {
   @AutoLogOutput(key = "Flywheel/MeasuredVelocity")
   public double getVelocity() {
     return inputs.masterVelocityRads;
+  }
+
+  @AutoLogOutput(key = "Flywheel/CalculatedAcceleration")
+  public double getAcceleration() {
+    return acceleration;
   }
 
   private void stop() {
