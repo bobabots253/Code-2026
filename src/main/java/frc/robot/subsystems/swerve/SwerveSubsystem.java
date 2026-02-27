@@ -83,10 +83,6 @@ public class SwerveSubsystem extends FullSubsystem {
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
 
-  boolean isFlipped =
-      DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red;
-  double yawCorrection = isFlipped ? 180.0 : 0.0;
-
   public SwerveSubsystem(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
@@ -218,8 +214,7 @@ public class SwerveSubsystem extends FullSubsystem {
       // Update gyro angle
       if (gyroInputs.connected) {
         // Use the real gyro angle
-        rawGyroRotation =
-            gyroInputs.odometryYawPositions[i].plus(Rotation2d.fromDegrees(yawCorrection));
+        rawGyroRotation = gyroInputs.odometryYawPositions[i];
       } else {
         // Use the angle delta from the kinematics and module deltas
         Twist2d twist = kinematics.toTwist2d(moduleDeltas);
