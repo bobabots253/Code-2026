@@ -41,7 +41,7 @@ public class HoodIOSpark implements HoodIO {
 
     var masterNEOConfig = new SparkMaxConfig();
     masterNEOConfig
-        .idleMode(IdleMode.kCoast)
+        .idleMode(IdleMode.kBrake)
         .inverted(false)
         .smartCurrentLimit(35); // Current Limit reduced for safety
     masterNEOConfig
@@ -119,6 +119,8 @@ public class HoodIOSpark implements HoodIO {
             // kSlot0 is the default setting slot called in the config for pid
             safeSetpoint, SparkBase.ControlType.kPosition);
         break;
+      case VOLTAGE:
+        masterNEO.setVoltage(outputs.voltage);
     }
   }
 

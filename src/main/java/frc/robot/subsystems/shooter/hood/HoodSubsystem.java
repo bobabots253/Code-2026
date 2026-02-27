@@ -39,7 +39,9 @@ public class HoodSubsystem extends FullSubsystem {
     // Static angle for juggling them balls into our own hopper LOL
     JUGGLE(() -> HoodConstants.jugglingAngle),
     // Static angular state for subsystem testing
-    DEBUGGING(() -> HoodConstants.debuggingAngle);
+    DEBUGGING(() -> HoodConstants.debuggingAngle),
+    DEBUGGING_VOLT_UP(() -> HoodConstants.kDebuggingVoltageUP),
+    DEBUGGING_VOLT_DOWN(() -> HoodConstants.kDebuggingVoltageDOWN);
 
     // Required Arguement for each enum state
     private final DoubleSupplier angleRads;
@@ -75,6 +77,8 @@ public class HoodSubsystem extends FullSubsystem {
     // Re-poll the supplier every loop to handle new shot calculations
     if (currentGoal == Goal.IDLE) {
       stop();
+    } else if (currentGoal == Goal.DEBUGGING_VOLT_UP || currentGoal == Goal.DEBUGGING_VOLT_DOWN) {
+      runVoltage(currentGoal.getGoal());
     } else {
       runAngular(currentGoal.getGoal());
     }
@@ -115,6 +119,16 @@ public class HoodSubsystem extends FullSubsystem {
     outputs.positionRad = angleRads;
   }
 
+  /**
+   * Update the io for voltage control and applies the new voltage setpoint
+   *
+   * @param voltage the new voltage setpoint.
+   */
+  private void runVoltage(double voltage) {
+    outputs.mode = HoodIOOutputMode.VOLTAGE;
+    outputs.voltage = voltage;
+  }
+
   @AutoLogOutput(key = "Hood/MeasuredAngleRads")
   public double getAngle() {
     return inputs.masterPositionRads;
@@ -135,6 +149,16 @@ public class HoodSubsystem extends FullSubsystem {
 
   public Command runDebuggingCommand() {
     return startEnd(() -> setGoal(Goal.DEBUGGING), () -> setGoal(Goal.IDLE)).withName("Hood Debug");
+  }
+
+  public Command runDebuggingVoltageUpCommand() {
+    return startEnd(() -> setGoal(Goal.DEBUGGING_VOLT_UP), () -> setGoal(Goal.IDLE))
+        .withName("Hood Debug Voltage Up");
+  }
+
+  public Command runDebuggingVoltageDownCommand() {
+    return startEnd(() -> setGoal(Goal.DEBUGGING_VOLT_DOWN), () -> setGoal(Goal.IDLE))
+        .withName("Hood Debug Voltage Down");
   }
 
   public Command stopCommand() {

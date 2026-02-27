@@ -53,7 +53,8 @@ public class FlywheelConstants {
   public static final double kDebuggingCurrent = -15;
 
   // Testing Velocity Values
-  public static final double kDebuggingVelocity = Units.rotationsPerMinuteToRadiansPerSecond(3000);
+  public static final double kDebuggingVelocity =
+      Units.rotationsPerMinuteToRadiansPerSecond(3000); // 3000
 
   // Calculating Max Acceleration of a Two-Motor Flywheel System
   // Use the flywheelReductionRatio constant from above

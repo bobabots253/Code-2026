@@ -44,25 +44,17 @@ public class ShootOnTheFlyConstants {
 
     // Key: Distance (meters), Value: Shooter Velocity (rad/sec)
     // USE THIS, BUT FIX FIRST
-    FLYWHEEL_VELOCITY_INTERPOLATOR.put(
-        1.0, Units.rotationsPerMinuteToRadiansPerSecond(0)); // Touching Hub
-    FLYWHEEL_VELOCITY_INTERPOLATOR.put(1.5, Units.rotationsPerMinuteToRadiansPerSecond(0));
-    FLYWHEEL_VELOCITY_INTERPOLATOR.put(2.0, Units.rotationsPerMinuteToRadiansPerSecond(0));
-    FLYWHEEL_VELOCITY_INTERPOLATOR.put(2.5, Units.rotationsPerMinuteToRadiansPerSecond(0));
-    FLYWHEEL_VELOCITY_INTERPOLATOR.put(3.0, Units.rotationsPerMinuteToRadiansPerSecond(0));
-    FLYWHEEL_VELOCITY_INTERPOLATOR.put(3.5, Units.rotationsPerMinuteToRadiansPerSecond(0));
-    FLYWHEEL_VELOCITY_INTERPOLATOR.put(4.0, Units.rotationsPerMinuteToRadiansPerSecond(0));
-    FLYWHEEL_VELOCITY_INTERPOLATOR.put(4.5, Units.rotationsPerMinuteToRadiansPerSecond(0));
+    // Touching Hub
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(1.5, Units.rotationsPerMinuteToRadiansPerSecond(3200));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(2.0, Units.rotationsPerMinuteToRadiansPerSecond(3200));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(2.5, Units.rotationsPerMinuteToRadiansPerSecond(3000));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(3.0, Units.rotationsPerMinuteToRadiansPerSecond(3000));
 
     // Key: Distance (meters), Value: Hood Angle (DEGREES)
-    // TO-DO: Fix for Rads, May not be consistent conversion
-    HOOD_DEGREES_INTERPOLATOR.put(1.0, 82.0); // Touching Hub
-    HOOD_DEGREES_INTERPOLATOR.put(1.5, 77.0);
-    HOOD_DEGREES_INTERPOLATOR.put(2.0, 70.0);
-    HOOD_DEGREES_INTERPOLATOR.put(2.5, 69.0);
-    HOOD_DEGREES_INTERPOLATOR.put(3.0, 68.0);
-    HOOD_DEGREES_INTERPOLATOR.put(3.5, 64.0);
-    HOOD_DEGREES_INTERPOLATOR.put(4.0, 61.0);
-    HOOD_DEGREES_INTERPOLATOR.put(4.5, 60.0);
+    // Touching Hub, Using Distance 2d
+    HOOD_DEGREES_INTERPOLATOR.put(1.5, 37.0);
+    HOOD_DEGREES_INTERPOLATOR.put(2.0, 32.0);
+    HOOD_DEGREES_INTERPOLATOR.put(2.5, 27.4);
+    HOOD_DEGREES_INTERPOLATOR.put(3.0, 23.7);
   }
 }

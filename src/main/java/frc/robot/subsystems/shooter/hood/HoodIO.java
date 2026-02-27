@@ -15,13 +15,15 @@ public interface HoodIO {
 
   public static enum HoodIOOutputMode {
     BRAKE,
-    CLOSED_LOOP
+    CLOSED_LOOP,
+    VOLTAGE
   }
 
   public static class HoodIOOutputs {
     public HoodIOOutputMode mode = HoodIOOutputMode.BRAKE;
     public double positionRad = 0.0;
     public double velocityRadsPerSec = 0.0;
+    public double voltage = 0.0;
   }
 
   public default void updateInputs(HoodIOInputs inputs) {}

@@ -325,6 +325,9 @@ public class RobotContainer {
         .whileTrue(kickerSubsystem.indexCommand())
         .whileTrue(agitatorSubsystem.indexCommand());
 
+    controller.povDown().whileTrue(hoodSubsystem.runDebuggingVoltageDownCommand());
+    controller.povUp().whileTrue(hoodSubsystem.runDebuggingVoltageUpCommand());
+
     // Shoot on the fly when X button is pressed
     // controller.x().whileTrue(shooterSubsystem.simShootOnTheFlyCommand());
 
