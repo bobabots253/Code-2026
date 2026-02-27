@@ -14,6 +14,10 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -378,6 +382,24 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  /*
+   * Applies the alliance-relative pose offset to the swerve pose estimator.
+   * Should be called once alliance is known by the DS (mainly from disabledPeriodic via Robot.java).
+   *  Adds 180* on Red, 0* on Blue (relative to the gyro inital heading).
+   */
+  public void applyAlliancePoseOffset() {
+    if (!DriverStation.getAlliance().isPresent()) return;
+
+    boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
+
+    Rotation2d currentHeading = swerveSubsystem.getRotation();
+    Rotation2d allianceOffset = isRed ? Rotation2d.fromDegrees(180.0) : Rotation2d.fromDegrees(0.0);
+
+    swerveSubsystem.setPose(
+        new Pose2d(
+            swerveSubsystem.getPose().getTranslation(), currentHeading.plus(allianceOffset)));
   }
 
   /**

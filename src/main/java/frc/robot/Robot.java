@@ -13,6 +13,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -38,6 +39,9 @@ import org.littletonrobotics.urcl.URCL;
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
+
+  // Flag to ensure we only apply the alliance offset once per DS connection
+  private boolean hasInitializedAlliancePose = false;
 
   public Robot() {
     // Record metadata
@@ -122,11 +126,20 @@ public class Robot extends LoggedRobot {
     LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 0);
     LimelightHelpers.SetIMUMode(VisionConstants.cameraYellow, 0);
     LimelightHelpers.SetIMUMode(VisionConstants.cameraPink, 0);
+
+    // Reset flag so it redoes its thingy if DS reconnects or alliance changes
+    hasInitializedAlliancePose = false;
   }
 
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
+
+    // Only apply nce per time DS connects to robot
+    if (!hasInitializedAlliancePose && DriverStation.getAlliance().isPresent()) {
+      robotContainer.applyAlliancePoseOffset();
+      hasInitializedAlliancePose = true;
+    }
     // LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 0); // Disable IMU mode
     // LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 0); // Disable IMU mode
   }
@@ -134,14 +147,16 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    // PathPlanner resets pose from path start
+    // Note: Reset flag so if teleop follows without a disable, we don't re-apply
+    hasInitializedAlliancePose = true;
+
     autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(autonomousCommand);
     }
-    LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 1);
-    LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 1);
   }
 
   /** This function is called periodically during autonomous. */
@@ -157,6 +172,11 @@ public class Robot extends LoggedRobot {
     // this line or comment it out.
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
+    }
+
+    // Handle edge case where alliance data isn't recieved before enabled
+    if (!hasInitializedAlliancePose) {
+      robotContainer.applyAlliancePoseOffset();
     }
   }
 

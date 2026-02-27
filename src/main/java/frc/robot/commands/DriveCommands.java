@@ -68,6 +68,22 @@ public class DriveCommands {
   }
 
   /**
+   * Returns true if we should negate linear velocity for driver orientation.
+   *
+   * <p>On Red alliance, the driver stands at the red wall facing toward X=0 (blue wall). "Forward"
+   * on the joystick must map to field -X, which can be completed by apllying a negative sign to the
+   * field-relative linear velocity.
+   *
+   * <p>NOTE: Do NOT add +π to the heading in fromFieldRelativeSpeeds because getRotation() already
+   * returns a blue-origin corrected heading on both alliances via applyAlliancePoseOffset.. Adding
+   * +π WILL double-flip Red.
+   */
+  private static boolean shouldFlipDriverPerspective() {
+    return DriverStation.getAlliance().isPresent()
+        && DriverStation.getAlliance().get() == Alliance.Red;
+  }
+
+  /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */
   public static Command joystickDrive(
@@ -81,6 +97,11 @@ public class DriveCommands {
           Translation2d linearVelocity =
               getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
+          // Flip linear velocity if on Red alliance, NOT the heading
+          if (shouldFlipDriverPerspective()) {
+            linearVelocity = linearVelocity.times(-1.0);
+          }
+
           // Apply rotation deadband
           double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
 
@@ -93,15 +114,9 @@ public class DriveCommands {
                   linearVelocity.getX() * swerveSubsystem.getMaxLinearSpeedMetersPerSec(),
                   linearVelocity.getY() * swerveSubsystem.getMaxLinearSpeedMetersPerSec(),
                   omega * swerveSubsystem.getMaxAngularSpeedRadPerSec());
-          boolean isFlipped =
-              DriverStation.getAlliance().isPresent()
-                  && DriverStation.getAlliance().get() == Alliance.Red;
+
           swerveSubsystem.runVelocity(
-              ChassisSpeeds.fromFieldRelativeSpeeds(
-                  speeds,
-                  isFlipped
-                      ? swerveSubsystem.getRotation().plus(new Rotation2d(Math.PI))
-                      : swerveSubsystem.getRotation()));
+              ChassisSpeeds.fromFieldRelativeSpeeds(speeds, swerveSubsystem.getRotation()));
         },
         swerveSubsystem);
   }
@@ -128,10 +143,16 @@ public class DriveCommands {
               Translation2d linearVelocity =
                   getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
+              // Flip linear velocity if on Red alliance, NOT the heading
+              if (shouldFlipDriverPerspective()) {
+                linearVelocity = linearVelocity.times(-1.0);
+              }
+
               // Calculate angular speed
               double omega =
                   angleController.calculate(
-                      drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
+                      drive.getRotation().getRadians(),
+                      rotationSupplier.get().getRadians()); // atan2 blue-origin setpoint
 
               // Convert to field relative speeds & send command
               ChassisSpeeds speeds =
@@ -143,12 +164,7 @@ public class DriveCommands {
               boolean isFlipped =
                   DriverStation.getAlliance().isPresent()
                       && DriverStation.getAlliance().get() == Alliance.Red;
-              drive.runVelocity(
-                  ChassisSpeeds.fromFieldRelativeSpeeds(
-                      speeds,
-                      isFlipped
-                          ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                          : drive.getRotation()));
+              drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
             },
             drive)
 

@@ -67,13 +67,18 @@ public class ShotCalculator extends FullSubsystem {
 
     deltaX = correctedTargetPose.getX() - robotPose.getX();
     deltaY = correctedTargetPose.getY() - robotPose.getY();
-    double atanParam = deltaY / deltaX;
 
-    if (isRedAlliance()) {
-      angleToTargetRad = Math.atan(atanParam) + Math.PI; // Testing: + (Math.PI / 2)
-    } else {
-      angleToTargetRad = Math.atan(atanParam); // Testing: + (Math.PI / 2)
-    }
+    // https://stackoverflow.com/questions/21483999/using-atan2-to-find-angle-between-two-vectors
+    // I swear atan2 is supposed to be right
+    angleToTargetRad = Math.atan2(deltaY, deltaX);
+
+    // double atanParam = deltaY / deltaX;
+
+    // if (isRedAlliance()) {
+    //   angleToTargetRad = Math.atan(atanParam) + Math.PI; // Testing: + (Math.PI / 2)
+    // } else {
+    //   angleToTargetRad = Math.atan(atanParam); // Testing: + (Math.PI / 2)
+    // }
 
     distance2D =
         correctedTargetPose
@@ -100,6 +105,9 @@ public class ShotCalculator extends FullSubsystem {
                 getShooterToCorrectTargetPoseDistance3D()));
   }
 
+  /*
+   * Note: the rotation of this Pose2d is meaningless
+   */
   public Pose2d getCorrectedTargetPose2d() {
     return correctedTargetPose.toPose2d();
   }
@@ -120,6 +128,10 @@ public class ShotCalculator extends FullSubsystem {
   }
 
   @AutoLogOutput(key = "ShotCalculator/CorrectTargetRotation")
+  /**
+   * The heading the robot needs to face to aim at the target location. Calculated as atan2(targetY
+   * - robotY, targetX - robotX). DO NOT DO THE FLIPPING HERE
+   */
   public Rotation2d getCorrectTargetRotation() {
     return new Rotation2d(angleToTargetRad);
   }
