@@ -25,7 +25,8 @@ public class RollerSubsystem extends FullSubsystem {
     DEPLOYED(() -> RollerConstants.intakingVolts),
     STOW(() -> RollerConstants.stowVolts), // Change if Necessary
     JUGGLE(() -> RollerConstants.jugglingVolts),
-    DEBUGGING(() -> RollerConstants.debuggingVolts);
+    DEBUGGING(() -> RollerConstants.debuggingVolts),
+    UNJAM(() -> RollerConstants.unjamVolts);
 
     // Required Arguement for each enum state
     private final DoubleSupplier voltage;
@@ -112,6 +113,10 @@ public class RollerSubsystem extends FullSubsystem {
   public Command runDebuggingCommand() {
     return startEnd(() -> setGoal(Goal.DEBUGGING), () -> setGoal(Goal.IDLE))
         .withName("Roller Debug");
+  }
+
+  public Command runUnjamCommand() {
+    return startEnd(() -> setGoal(Goal.UNJAM), () -> setGoal(Goal.IDLE)).withName("Roller Unjam");
   }
 
   public Command stopCommand() {

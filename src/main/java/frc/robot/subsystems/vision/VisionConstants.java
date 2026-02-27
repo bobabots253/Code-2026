@@ -21,10 +21,13 @@ public class VisionConstants {
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
   // Camera names, must match names configured on coprocessor
-  public static String cameraPurple = "limelight-purple";
-  public static String cameraOrange = "limelight-orange";
-  public static String cameraGreen = "limelight-green";
-  public static String cameraBlue = "limelight-blue";
+  public static String cameraPurple = "limelight-purple"; // BL
+  public static String cameraOrange = "limelight-orange"; // BR
+  public static String cameraYellow = "limelight-yellow"; // FL
+  public static String cameraPink = "limelight-pink"; // FR
+
+  // Unused
+  public static String cameraPlaceholder = "limelight-placeholder";
 
   // Robot to camera transforms
   // (Not used by Limelight, configure in LL Finder UI instead)

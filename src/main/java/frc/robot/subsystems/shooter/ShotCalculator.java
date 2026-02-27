@@ -11,9 +11,9 @@ import frc.robot.RobotState;
 import frc.robot.fieldSetup;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.util.FullSubsystem;
-import frc.robot.util.shooterUtil.ShootOnTheFlyCalculator;
 import frc.robot.util.shooterUtil.ShootOnTheFlyConstants;
 import frc.robot.util.swerveUtil.ChassisAccelerations;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class ShotCalculator extends FullSubsystem {
@@ -24,8 +24,17 @@ public class ShotCalculator extends FullSubsystem {
   private Translation3d redHubTarget = fieldSetup.redHubCenter;
 
   private Pose3d shooterPose = Pose3d.kZero;
+
+  @AutoLogOutput(key = "ShotCalculator/CorrectedTargetPose")
   private Pose3d correctedTargetPose = Pose3d.kZero;
+
   private Pose2d robotPose = Pose2d.kZero;
+
+  @AutoLogOutput(key = "ShotCalculator/DrivetrainSpeeds")
+  ChassisSpeeds drivetrainSpeeds;
+
+  ChassisAccelerations drivetrainAccelerations =
+      new ChassisAccelerations(0.0, 0.0, 0.0); // Initialize with zero accelerations
 
   private double angleToTargetRad;
 
@@ -45,27 +54,25 @@ public class ShotCalculator extends FullSubsystem {
 
   @Override
   public void periodic() {
-    robotPose = swerveSubsystem.getPose();
-    updateTargetByAlliance();
+    robotPose = swerveSubsystem.getPose(); // Good
+    updateTargetByAlliance(); // Good
 
     shooterPose = new Pose3d(robotPose).plus(ShootOnTheFlyConstants.SHOOTER_TRANSFORM_CENTER);
+    drivetrainSpeeds = swerveSubsystem.getChassisSpeeds();
+    drivetrainAccelerations = swerveSubsystem.getFieldRelativeChassisAccelerations();
 
-    ChassisSpeeds drivetrainSpeeds = swerveSubsystem.getChassisSpeeds();
-    ChassisAccelerations drivetrainAccelerations =
-        swerveSubsystem.getFieldRelativeChassisAccelerations();
-
-    Pose3d correctedTargetPose =
-        ShootOnTheFlyCalculator.calculateEffectiveTargetLocation(
-            shooterPose, targetLocation, drivetrainSpeeds, drivetrainAccelerations, 5, 0.001);
+    correctedTargetPose = targetLocation; // Default to uncorrected target pose
+    // ShootOnTheFlyCalculator.calculateEffectiveTargetLocation(
+    //     shooterPose, targetLocation, drivetrainSpeeds, drivetrainAccelerations, 5, 0.001);
 
     deltaX = correctedTargetPose.getX() - robotPose.getX();
     deltaY = correctedTargetPose.getY() - robotPose.getY();
     double atanParam = deltaY / deltaX;
 
     if (isRedAlliance()) {
-      angleToTargetRad = Math.atan(atanParam) - Math.PI + (Math.PI / 2); // Testing: + (Math.PI / 2)
+      angleToTargetRad = Math.atan(atanParam) + Math.PI; // Testing: + (Math.PI / 2)
     } else {
-      angleToTargetRad = Math.atan(atanParam) - (Math.PI / 2); // Testing: + (Math.PI / 2)
+      angleToTargetRad = Math.atan(atanParam); // Testing: + (Math.PI / 2)
     }
 
     distance2D =
@@ -97,26 +104,32 @@ public class ShotCalculator extends FullSubsystem {
     return correctedTargetPose.toPose2d();
   }
 
+  @AutoLogOutput(key = "ShotCalculator/CorrectedTargetSpeedRPM")
   public double getCorrectedTargetSpeedRPM() {
     return targetSpeedRPM;
   }
 
+  @AutoLogOutput(key = "ShotCalculator/CorrectTargetVelocity")
   public double getCorrectTargetVelocity() {
     return targetSpeedMPS;
   }
 
+  @AutoLogOutput(key = "ShotCalculator/CorrectedTargetAngle")
   public double getCorrectedTargetAngle() {
     return targetAngle;
   }
 
+  @AutoLogOutput(key = "ShotCalculator/CorrectTargetRotation")
   public Rotation2d getCorrectTargetRotation() {
     return new Rotation2d(angleToTargetRad);
   }
 
+  @AutoLogOutput(key = "ShotCalculator/Distance2D")
   public double getShooterToCorrectTargetPoseDistance() {
     return distance2D;
   }
 
+  @AutoLogOutput(key = "ShotCalculator/Distance3D")
   public double getShooterToCorrectTargetPoseDistance3D() {
     return distance3D;
   }
@@ -129,7 +142,8 @@ public class ShotCalculator extends FullSubsystem {
 
   // Return This Util in Constants.java
   // Periodic Command Scheduler Overflow Handling
-  public void updateTargetByAlliance() {
+  @AutoLogOutput(key = "ShotCalculator/TargetLocation")
+  public Pose3d updateTargetByAlliance() {
     var alliance = DriverStation.getAlliance();
 
     if (alliance.isPresent()) {
@@ -141,18 +155,11 @@ public class ShotCalculator extends FullSubsystem {
     } else {
       targetLocation = new Pose3d(blueHubTarget, new Rotation3d());
     }
+    return targetLocation;
   }
 
   @Override
   public void periodicAfterScheduler() {
-    Logger.recordOutput("ShotCalculator/DeltaX", deltaX);
-    Logger.recordOutput("ShotCalculator/DeltaY", deltaY);
-    Logger.recordOutput("ShotCalculator/AngleToTargetRad", angleToTargetRad);
-    Logger.recordOutput("ShotCalculator/CorrectedTargetPose", correctedTargetPose);
-    Logger.recordOutput("ShotCalculator/Distance2D", distance2D);
-    Logger.recordOutput("ShotCalculator/Distance3D", distance3D);
-    Logger.recordOutput("ShotCalculator/CorrectedTargetSpeedRPM", getCorrectedTargetSpeedRPM());
-    Logger.recordOutput("ShotCalculator/CorrectTargetVelocity", getCorrectTargetVelocity());
-    Logger.recordOutput("ShotCalculator/getCorrectedTargetAngle", getCorrectedTargetAngle());
+    Logger.recordOutput("ShotCalculator/TargetLocation", targetLocation);
   }
 }

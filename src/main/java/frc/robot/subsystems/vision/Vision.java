@@ -245,7 +245,5 @@ public class Vision extends FullSubsystem {
   }
 
   @Override
-  public void periodicAfterScheduler() {
-    System.gc();
-  }
+  public void periodicAfterScheduler() {}
 }

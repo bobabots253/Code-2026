@@ -218,14 +218,13 @@ public class SwerveSubsystem extends FullSubsystem {
       // Update gyro angle
       if (gyroInputs.connected) {
         // Use the real gyro angle
-        rawGyroRotation = gyroInputs.odometryYawPositions[i];
+        rawGyroRotation =
+            gyroInputs.odometryYawPositions[i].plus(Rotation2d.fromDegrees(yawCorrection));
       } else {
         // Use the angle delta from the kinematics and module deltas
         Twist2d twist = kinematics.toTwist2d(moduleDeltas);
         rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
       }
-
-      rawGyroRotation = rawGyroRotation.plus(Rotation2d.fromDegrees(yawCorrection));
 
       // Apply update
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);

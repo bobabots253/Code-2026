@@ -106,6 +106,8 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
     FullSubsystem.runAllPeriodicAfterScheduler();
 
+    System.gc();
+
     // Return to non-RT thread priority (do not modify the first argument)
     // Threads.setCurrentThreadPriority(false, 10);
   }
@@ -118,6 +120,8 @@ public class Robot extends LoggedRobot {
     // LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 0);
     LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 0);
     LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 0);
+    LimelightHelpers.SetIMUMode(VisionConstants.cameraYellow, 0);
+    LimelightHelpers.SetIMUMode(VisionConstants.cameraPink, 0);
   }
 
   /** This function is called periodically when disabled. */
@@ -154,8 +158,6 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-    LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 1);
-    LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 1);
   }
 
   /** This function is called periodically during operator control. */

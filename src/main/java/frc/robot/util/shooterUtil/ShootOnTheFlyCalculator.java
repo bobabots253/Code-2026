@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.util.swerveUtil.ChassisAccelerations;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 /**
  * Provides static methods to calculate the effective target position to aim for when shooting on
@@ -20,6 +21,7 @@ public class ShootOnTheFlyCalculator {
    * Uses actual physics to more accurately estimate the time it will take for a projectile to reach a target.
    *  This helps seed the iterative calculation of the effective target location. Discounting air resistance.
    */
+  @AutoLogOutput(key = "ShotCalculator/TimeToShootUsingPhysics")
   public static double getTimeToShootUsingPhysics(Pose3d robotPose, Pose3d targetPose) { // GRAVITY
 
     Transform3d diff = (robotPose).minus(targetPose);
@@ -47,6 +49,7 @@ public class ShootOnTheFlyCalculator {
     return totalTime;
   }
 
+  @AutoLogOutput(key = "ShotCalculator/EffectiveTargetPose")
   public static Pose3d calculateEffectiveTargetLocation(
       Pose3d robotPose,
       Pose3d targetPose,
