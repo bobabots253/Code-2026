@@ -125,10 +125,12 @@ public class RobotContainer {
                 swerveSubsystem::addVisionMeasurement,
                 swerveSubsystem::getRotation,
                 swerveSubsystem::getChassisSpeeds,
-                new VisionIOLimelight(VisionConstants.cameraPurple, swerveSubsystem::getRotation),
-                new VisionIOLimelight(VisionConstants.cameraOrange, swerveSubsystem::getRotation),
-                new VisionIOLimelight(VisionConstants.cameraYellow, swerveSubsystem::getRotation),
-                new VisionIOLimelight(VisionConstants.cameraPink, swerveSubsystem::getRotation));
+                // new VisionIOLimelight(VisionConstants.cameraPurple,
+                // swerveSubsystem::getRotation),
+                // new VisionIOLimelight(VisionConstants.cameraOrange,
+                // swerveSubsystem::getRotation),
+                new VisionIOLimelight(VisionConstants.cameraYellow, swerveSubsystem::getRotation));
+        // new VisionIOLimelight(VisionConstants.cameraPink, swerveSubsystem::getRotation));
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
 
@@ -403,7 +405,6 @@ public class RobotContainer {
     swerveSubsystem.setPose(
         new Pose2d(
             swerveSubsystem.getPose().getTranslation(), currentHeading.plus(allianceOffset)));
-    lastAppliedAlliance = alliance;
     lastAppliedAlliance = alliance;
   }
 

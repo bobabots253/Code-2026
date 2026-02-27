@@ -45,7 +45,7 @@ public class VisionConstants {
   public static double maxZError = 0.75;
 
   // Standard deviation baselines at 1 meter
-  public static double linearStdDevBaseline = 0.02; // Meters
+  public static double linearStdDevBaseline = 0.04; // Meters
   public static double angularStdDevBaseline = Double.POSITIVE_INFINITY; // Radians
 
   // Standard deviation multipliers for each camera

@@ -78,7 +78,7 @@ public class ShotCalculator extends FullSubsystem {
     Translation2d fieldToHubAngleTranslation = targetLocation.toPose2d().getTranslation();
     fieldToHubAngle =
         (fieldToHubAngleTranslation)
-            .minus(robotPose.getTranslation())
+            .minus(shooterPose.toPose2d().getTranslation())
             .getAngle(); // Literally Just Atan2
 
     // double atanParam = deltaY / deltaX;
@@ -121,7 +121,6 @@ public class ShotCalculator extends FullSubsystem {
     return correctedTargetPose.toPose2d();
   }
 
-  @AutoLogOutput(key = "ShotCalculator/CorrectedTargetSpeedRPM")
   public double getCorrectedTargetSpeedRPM() {
     return targetSpeedRPM;
   }
@@ -155,7 +154,6 @@ public class ShotCalculator extends FullSubsystem {
     return distance2D;
   }
 
-  @AutoLogOutput(key = "ShotCalculator/Distance3D")
   public double getShooterToCorrectTargetPoseDistance3D() {
     return distance3D;
   }

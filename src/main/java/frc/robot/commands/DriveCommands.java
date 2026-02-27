@@ -133,7 +133,7 @@ public class DriveCommands {
       Supplier<Rotation2d> rotationSupplier) {
 
     // Create PID controller
-    PIDController angleController = new PIDController(0.1, 0.0, 0.0); // Broken atm
+    PIDController angleController = new PIDController(2, 0.0, 0.0); // Broken atm
     angleController.enableContinuousInput(-Math.PI, Math.PI);
 
     // Construct command
