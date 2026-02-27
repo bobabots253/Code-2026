@@ -404,6 +404,7 @@ public class RobotContainer {
         new Pose2d(
             swerveSubsystem.getPose().getTranslation(), currentHeading.plus(allianceOffset)));
     lastAppliedAlliance = alliance;
+    lastAppliedAlliance = alliance;
   }
 
   // public boolean isAllianceHandledAlready() {
@@ -425,6 +426,19 @@ public class RobotContainer {
     if (lastAppliedAlliance == null) return false;
     return lastAppliedAlliance == DriverStation.getAlliance().get();
   }
+  //   boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
+
+  //   Rotation2d currentHeading = swerveSubsystem.getRotation();
+
+  //   if (isRed
+  //       && ((currentHeading.getDegrees() > 170 && currentHeading.getDegrees() < 190)
+  //           || (currentHeading.getDegrees() > -190 && currentHeading.getDegrees() < -170))) {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // }
+
   /**
    * Returns whether vision estimates should be clamped.
    *
