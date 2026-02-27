@@ -84,6 +84,8 @@ public class RobotContainer {
   private final HoodSubsystem hoodSubsystem;
   private final Vision vision;
   private final ShotCalculator shotCalculator;
+
+  private Alliance lastAppliedAlliance = null;
   //   private final HoodSubsystem hoodSubsystem;
   //   private final FlywheelSubsystem flywheelSubsystem;
   //   private final ShooterSubsystem shooterSubsystem;
@@ -285,7 +287,7 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    // Lock to Hub when A button is held
+    // // Lock to Hub when A button is held
     // controller
     //     .a()
     //     .whileTrue(
@@ -308,7 +310,7 @@ public class RobotContainer {
                 swerveSubsystem,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
-                () -> shotCalculator.getCorrectTargetRotation()));
+                () -> shotCalculator.getFieldToHubAngle()));
 
     controller
         .leftBumper()
@@ -392,7 +394,8 @@ public class RobotContainer {
   public void applyAlliancePoseOffset() {
     if (!DriverStation.getAlliance().isPresent()) return;
 
-    boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
+    Alliance alliance = DriverStation.getAlliance().get();
+    boolean isRed = alliance == Alliance.Red;
 
     Rotation2d currentHeading = swerveSubsystem.getRotation();
     Rotation2d allianceOffset = isRed ? Rotation2d.fromDegrees(180.0) : Rotation2d.fromDegrees(0.0);
@@ -400,22 +403,28 @@ public class RobotContainer {
     swerveSubsystem.setPose(
         new Pose2d(
             swerveSubsystem.getPose().getTranslation(), currentHeading.plus(allianceOffset)));
+    lastAppliedAlliance = alliance;
   }
+
+  // public boolean isAllianceHandledAlready() {
+  //   boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
+
+  //   Rotation2d currentHeading = swerveSubsystem.getRotation();
+
+  //   if (isRed
+  //       && ((currentHeading.getDegrees() > 170 && currentHeading.getDegrees() < 190)
+  //           || (currentHeading.getDegrees() > -190 && currentHeading.getDegrees() < -170))) {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // }
 
   public boolean isAllianceHandledAlready() {
-    boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
-
-    Rotation2d currentHeading = swerveSubsystem.getRotation();
-
-    if (isRed
-        && ((currentHeading.getDegrees() > 170 && currentHeading.getDegrees() < 190)
-            || (currentHeading.getDegrees() > -190 && currentHeading.getDegrees() < -170))) {
-      return true;
-    } else {
-      return false;
-    }
+    if (!DriverStation.getAlliance().isPresent()) return false;
+    if (lastAppliedAlliance == null) return false;
+    return lastAppliedAlliance == DriverStation.getAlliance().get();
   }
-
   /**
    * Returns whether vision estimates should be clamped.
    *

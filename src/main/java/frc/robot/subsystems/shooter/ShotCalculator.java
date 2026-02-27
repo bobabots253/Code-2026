@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -41,6 +42,8 @@ public class ShotCalculator extends FullSubsystem {
   private double distance2D;
   private double distance3D;
 
+  Rotation2d fieldToHubAngle;
+
   double deltaX;
   double deltaY;
 
@@ -70,7 +73,13 @@ public class ShotCalculator extends FullSubsystem {
 
     // https://stackoverflow.com/questions/21483999/using-atan2-to-find-angle-between-two-vectors
     // I swear atan2 is supposed to be right
-    angleToTargetRad = Math.atan2(deltaY, deltaX);
+    // angleToTargetRad = Math.atan2(deltaY, deltaX);
+
+    Translation2d fieldToHubAngleTranslation = targetLocation.toPose2d().getTranslation();
+    fieldToHubAngle =
+        (fieldToHubAngleTranslation)
+            .minus(robotPose.getTranslation())
+            .getAngle(); // Literally Just Atan2
 
     // double atanParam = deltaY / deltaX;
 
@@ -134,6 +143,11 @@ public class ShotCalculator extends FullSubsystem {
    */
   public Rotation2d getCorrectTargetRotation() {
     return new Rotation2d(angleToTargetRad);
+  }
+
+  @AutoLogOutput(key = "ShotCalculator/FieldToHubAngle")
+  public Rotation2d getFieldToHubAngle() {
+    return fieldToHubAngle;
   }
 
   @AutoLogOutput(key = "ShotCalculator/Distance2D")

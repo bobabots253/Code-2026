@@ -133,7 +133,7 @@ public class DriveCommands {
       Supplier<Rotation2d> rotationSupplier) {
 
     // Create PID controller
-    PIDController angleController = new PIDController(1, 0.0, 0.1); // Broken atm
+    PIDController angleController = new PIDController(0.1, 0.0, 0.0); // Broken atm
     angleController.enableContinuousInput(-Math.PI, Math.PI);
 
     // Construct command
@@ -154,6 +154,9 @@ public class DriveCommands {
                       drive.getRotation().getRadians(),
                       rotationSupplier.get().getRadians()); // atan2 blue-origin setpoint
 
+              //   // Square rotation value for more precise control
+              //   omega = Math.copySign(omega * omega, omega);
+
               // Convert to field relative speeds & send command
               ChassisSpeeds speeds =
                   new ChassisSpeeds(
@@ -161,9 +164,6 @@ public class DriveCommands {
                       linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                       omega);
 
-              boolean isFlipped =
-                  DriverStation.getAlliance().isPresent()
-                      && DriverStation.getAlliance().get() == Alliance.Red;
               drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
             },
             drive)
