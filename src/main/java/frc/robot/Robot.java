@@ -22,6 +22,7 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.FullSubsystem;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.fuelSimUtil.FuelSim;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -41,6 +42,7 @@ public class Robot extends LoggedRobot {
   private RobotContainer robotContainer;
 
   // Flag to ensure we only apply the alliance offset once per DS connection
+  @AutoLogOutput(key = "Robot/HasInitializedAlliancePose")
   private boolean hasInitializedAlliancePose = false;
 
   public Robot() {
@@ -128,7 +130,11 @@ public class Robot extends LoggedRobot {
     LimelightHelpers.SetIMUMode(VisionConstants.cameraPink, 0);
 
     // Reset flag so it redoes its thingy if DS reconnects or alliance changes
-    hasInitializedAlliancePose = false;
+    if (robotContainer.isAllianceHandledAlready()) {
+      hasInitializedAlliancePose = true;
+    } else {
+      hasInitializedAlliancePose = false;
+    }
   }
 
   /** This function is called periodically when disabled. */
