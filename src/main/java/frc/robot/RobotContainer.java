@@ -333,6 +333,14 @@ public class RobotContainer {
 
     controller.rightTrigger().whileTrue(rollerSubsystem.runUnjamCommand());
 
+    controller.povRight().whileTrue(flywheelSubsystem.runDebuggingVelocityCommand());
+
+    // Bug, Only Updated Hood Angle Once
+    controller
+        .povLeft()
+        .whileTrue(flywheelSubsystem.shootCommand())
+        .whileTrue(hoodSubsystem.shootCommand());
+
     // Shoot on the fly when X button is pressed
     // controller.x().whileTrue(shooterSubsystem.simShootOnTheFlyCommand());
 
