@@ -54,6 +54,8 @@ public class HoodConstants {
       Units.degreesToRadians(0.0); // Check interpolator for values
   public static final double debuggingAngle = Units.degreesToRadians(35); // Change as needed
 
+  public static final double staticAngle = Units.degreesToRadians(35);
+
   public static final double closedLoopAngularTolerance =
       Units.degreesToRadians(1.0); // Change to heuristic value
 

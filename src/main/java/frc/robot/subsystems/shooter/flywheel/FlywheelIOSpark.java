@@ -2,6 +2,7 @@ package frc.robot.subsystems.shooter.flywheel;
 
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.followerFlywheelEncoderPositionFactor;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.followerFlywheelEncoderVelocityFactor;
+import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.kAntilag;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.masterFlywheelEncoderPositionFactor;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.masterFlywheelEncoderVelocityFactor;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkFollowerFlywheelCanId;
@@ -73,7 +74,7 @@ public class FlywheelIOSpark implements FlywheelIO {
 
     var masterVortexConfig = new SparkFlexConfig();
     masterVortexConfig.idleMode(IdleMode.kCoast).smartCurrentLimit(50); // Amps
-    // .voltageCompensation(12.0);
+    // .voltageCompensation(12.0); // Try Again
     masterVortexConfig
         .encoder
         .positionConversionFactor(masterFlywheelEncoderPositionFactor) // Only used for logging
@@ -117,7 +118,7 @@ public class FlywheelIOSpark implements FlywheelIO {
         .idleMode(IdleMode.kCoast)
         .follow(masterVortex, true) // Confirm this inversion before running full speed
         .smartCurrentLimit(50); // Amps, Max Out reasonable value for most power
-    // .voltageCompensation(12.0);
+    // .voltageCompensation(12.0); // Try Again
     followerVortexConfig
         .encoder
         .uvwMeasurementPeriod(10)
@@ -253,8 +254,16 @@ public class FlywheelIOSpark implements FlywheelIO {
           case RECOVERY:
             // Bang-Bang Controller to maximize Duty-Cycle Output
             // If error > 0 (too slow), request +12V. If error < 0 (too fast), request -12V.
-            double outputVolts = (error > 0) ? 12.0 : 0;
-            masterVortex.setVoltage(outputVolts);
+            if (Math.abs(error) <= FlywheelConstants.idleTolerance * 2) {
+              currentPhase = FlywheelPhase.IDLE;
+            } else {
+              double outputVolts = (error > 0) ? 12.0 : 0;
+              masterVortex.setVoltage(outputVolts);
+            }
+
+            // Old
+            // double outputVolts = (error > 0) ? 12.0 : 0;
+            // masterVortex.setVoltage(outputVolts);
             break;
           case IDLE:
             if (error > 0) {
@@ -281,7 +290,8 @@ public class FlywheelIOSpark implements FlywheelIO {
             //     (FlywheelConstants.kIdleVelocityLinearCoefficient * setpoint)
             //         + FlywheelConstants.kAntilag;
             // masterVortexController.setSetpoint(ballCurrent, ControlType.kVoltage);
-            double idleVoltage = FlywheelConstants.IDLE_VOLTAGE_INTERPOLATOR.get(setpoint);
+            double idleVoltage =
+                FlywheelConstants.IDLE_VOLTAGE_INTERPOLATOR.get(setpoint) + kAntilag;
             masterVortex.setVoltage(idleVoltage);
             break;
         }

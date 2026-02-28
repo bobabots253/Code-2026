@@ -41,7 +41,8 @@ public class HoodSubsystem extends FullSubsystem {
     // Static angular state for subsystem testing
     DEBUGGING(() -> HoodConstants.debuggingAngle),
     DEBUGGING_VOLT_UP(() -> HoodConstants.kDebuggingVoltageUP),
-    DEBUGGING_VOLT_DOWN(() -> HoodConstants.kDebuggingVoltageDOWN);
+    DEBUGGING_VOLT_DOWN(() -> HoodConstants.kDebuggingVoltageDOWN),
+    STATIC(() -> HoodConstants.staticAngle);
 
     // Required Arguement for each enum state
     private final DoubleSupplier angleRads;
@@ -149,6 +150,10 @@ public class HoodSubsystem extends FullSubsystem {
 
   public Command runDebuggingCommand() {
     return startEnd(() -> setGoal(Goal.DEBUGGING), () -> setGoal(Goal.IDLE)).withName("Hood Debug");
+  }
+
+  public Command runStaticAngleCommand() {
+    return startEnd(() -> setGoal(Goal.STATIC), () -> setGoal(Goal.IDLE)).withName("Hood Static");
   }
 
   public Command runDebuggingVoltageUpCommand() {

@@ -54,7 +54,8 @@ public class FlywheelSubsystem extends FullSubsystem {
     // Static speed state for subsystem testing
     DEBUGGING(() -> FlywheelConstants.kDebuggingVoltage), // VOLTAGE
     CURRENT(() -> FlywheelConstants.kDebuggingCurrent),
-    DEBUGGING_VELOCITY(() -> FlywheelConstants.kDebuggingVelocity);
+    DEBUGGING_VELOCITY(() -> FlywheelConstants.kDebuggingVelocity),
+    STATIC(() -> FlywheelConstants.kStaticVelocity);
 
     // Required Arguement for each enum state
     private final DoubleSupplier velocityRadsPerSec;
@@ -195,6 +196,11 @@ public class FlywheelSubsystem extends FullSubsystem {
   public Command runDebuggingVelocityCommand() {
     return startEnd(() -> setGoal(Goal.DEBUGGING_VELOCITY), () -> setGoal(Goal.IDLE))
         .withName("Flywheels Debug");
+  }
+
+  public Command runStaticVelocitCommand() {
+    return startEnd(() -> setGoal(Goal.STATIC), () -> setGoal(Goal.IDLE))
+        .withName("Flywheels Static");
   }
 
   public Command runCurentCommand() {

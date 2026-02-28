@@ -55,6 +55,8 @@ public class FlywheelConstants {
   // Testing Velocity Values
   public static final double kDebuggingVelocity =
       Units.rotationsPerMinuteToRadiansPerSecond(3000); // 3000
+  public static final double kStaticVelocity =
+      Units.rotationsPerMinuteToRadiansPerSecond(3000); // 3000
 
   // Calculating Max Acceleration of a Two-Motor Flywheel System
   // Use the flywheelReductionRatio constant from above
@@ -123,6 +125,5 @@ public class FlywheelConstants {
    */
   // This value accounts for the amount of torque it takes for the ball to clear shooter wheel
   // compression
-  public static final double kAntilag =
-      0.0; // volts now | SOLVE KADEN, DONT FORGET, Set AMP to 10 when starting
+  public static final double kAntilag = 1.0; // volts now
 }

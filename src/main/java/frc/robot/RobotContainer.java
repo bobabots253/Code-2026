@@ -95,7 +95,8 @@ public class RobotContainer {
   //       new LoggedDashboardChooser<>("Clamp Vision Estimates");
 
   // Controller
-  private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController driver = new CommandXboxController(0);
+  private final CommandXboxController operator = new CommandXboxController(1);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -279,67 +280,109 @@ public class RobotContainer {
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   *
+   * <p>Driver: - Indexer, Agitator, Kicker - Left Bumper - Angle Lock - Right Bumper Operator: -
+   * Intake - Pivot, Roller, Unjam - Pivot, Left Bumper (Down), Right Bumper (Up) - Roller, Agitator
+   * - X (Intake), B (Unjam) - Flywheel, Hood - Y (Queue Static Shot) - Hood - DPad Manual (Up,
+   * Down) - Flywheel - Dpad Manual (Right)
    */
   private void configureButtonBindings() {
-    // Default command, normal field-relative drive
+
+    // ------- DT
+
     swerveSubsystem.setDefaultCommand(
         DriveCommands.joystickDrive(
             swerveSubsystem,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+            () -> -driver.getLeftY(),
+            () -> -driver.getLeftX(),
+            () -> -driver.getRightX()));
 
-    // // Lock to Hub when A button is held
+    driver
+        .leftBumper()
+        .whileTrue(indexerSubsystem.runCurrentCommand())
+        .whileTrue(kickerSubsystem.indexCommand())
+        .whileTrue(agitatorSubsystem.indexCommand());
+
+    driver
+        .rightBumper()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                swerveSubsystem,
+                () -> -driver.getLeftY(),
+                () -> -driver.getLeftX(),
+                () -> shotCalculator.getFieldToHubAngle()));
+
+    operator.leftBumper().onTrue(pivotSubsystem.deployCommand());
+    operator.rightBumper().onTrue(pivotSubsystem.stowCommand());
+
+    operator
+        .x()
+        .whileTrue(rollerSubsystem.intakeCommand())
+        .whileTrue(agitatorSubsystem.intakeCommand());
+
+    operator.b().whileTrue(rollerSubsystem.runUnjamCommand());
+
+    operator
+        .y()
+        .whileTrue(flywheelSubsystem.runStaticVelocitCommand())
+        .whileTrue(hoodSubsystem.runStaticAngleCommand());
+
+    operator.povDown().whileTrue(hoodSubsystem.runDebuggingVoltageDownCommand());
+    operator.povUp().whileTrue(hoodSubsystem.runDebuggingVoltageUpCommand());
+
+    operator.povRight().whileTrue(flywheelSubsystem.runDebuggingVelocityCommand());
+
+    // ------ Debugging
+
+    // Default command, normal field-relative drive
+    // swerveSubsystem.setDefaultCommand(
+    //     DriveCommands.joystickDrive(
+    //         swerveSubsystem,
+    //         () -> -controller.getLeftY(),
+    //         () -> -controller.getLeftX(),
+    //         () -> -controller.getRightX()));
+
+    // controller.a().onTrue(pivotSubsystem.deployCommand());
+
     // controller
-    //     .a()
+    //     .b()
+    //     .whileTrue(flywheelSubsystem.runDebuggingVelocityCommand())
+    //     .whileTrue(hoodSubsystem.runDebuggingCommand());
+
+    // controller.y().onTrue(pivotSubsystem.stowCommand());
+
+    // controller
+    //     .x()
     //     .whileTrue(
     //         DriveCommands.joystickDriveAtAngle(
     //             swerveSubsystem,
     //             () -> -controller.getLeftY(),
     //             () -> -controller.getLeftX(),
-    //             () -> shotCalculator.getCorrectTargetRotation()));
+    //             () -> shotCalculator.getFieldToHubAngle()));
 
-    controller.a().onTrue(pivotSubsystem.deployCommand());
+    // controller
+    //     .leftBumper()
+    //     .whileTrue(rollerSubsystem.intakeCommand())
+    //     .whileTrue(agitatorSubsystem.intakeCommand());
 
-    controller
-        .b()
-        .whileTrue(flywheelSubsystem.runDebuggingVelocityCommand())
-        .whileTrue(hoodSubsystem.runDebuggingCommand());
+    // controller
+    //     .rightBumper()
+    //     .whileTrue(indexerSubsystem.runCurrentCommand())
+    //     .whileTrue(kickerSubsystem.indexCommand())
+    //     .whileTrue(agitatorSubsystem.indexCommand());
 
-    controller.y().onTrue(pivotSubsystem.stowCommand());
+    // controller.povDown().whileTrue(hoodSubsystem.runDebuggingVoltageDownCommand());
+    // controller.povUp().whileTrue(hoodSubsystem.runDebuggingVoltageUpCommand());
 
-    controller
-        .x()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                swerveSubsystem,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> shotCalculator.getFieldToHubAngle()));
+    // controller.rightTrigger().whileTrue(rollerSubsystem.runUnjamCommand());
 
-    controller
-        .leftBumper()
-        .whileTrue(rollerSubsystem.intakeCommand())
-        .whileTrue(agitatorSubsystem.intakeCommand());
+    // controller.povRight().whileTrue(flywheelSubsystem.runDebuggingVelocityCommand());
 
-    controller
-        .rightBumper()
-        .whileTrue(indexerSubsystem.runCurrentCommand())
-        .whileTrue(kickerSubsystem.indexCommand())
-        .whileTrue(agitatorSubsystem.indexCommand());
-
-    controller.povDown().whileTrue(hoodSubsystem.runDebuggingVoltageDownCommand());
-    controller.povUp().whileTrue(hoodSubsystem.runDebuggingVoltageUpCommand());
-
-    controller.rightTrigger().whileTrue(rollerSubsystem.runUnjamCommand());
-
-    controller.povRight().whileTrue(flywheelSubsystem.runDebuggingVelocityCommand());
-
-    // Bug, Only Updated Hood Angle Once
-    controller
-        .povLeft()
-        .whileTrue(flywheelSubsystem.shootCommand())
-        .whileTrue(hoodSubsystem.shootCommand());
+    // // Bug, Only Updated Hood Angle Once
+    // controller
+    //     .povLeft()
+    //     .whileTrue(flywheelSubsystem.shootCommand())
+    //     .whileTrue(hoodSubsystem.shootCommand());
 
     // Shoot on the fly when X button is pressed
     // controller.x().whileTrue(shooterSubsystem.simShootOnTheFlyCommand());
