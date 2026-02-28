@@ -52,8 +52,8 @@ public class VisionConstants {
   // Manual Variance Weighting: (Adjust to trust some cameras more than others)
   public static double[] cameraStdDevFactors =
       new double[] {
-        0.5, // Camera 0
-        0.5, // Camera 1
+        1.0, // Camera 0
+        1.0, // Camera 1
         1.0, // Camera 2
         1.0, // Camera 3
       };

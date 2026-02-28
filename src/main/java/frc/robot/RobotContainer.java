@@ -129,8 +129,8 @@ public class RobotContainer {
                 // swerveSubsystem::getRotation),
                 // new VisionIOLimelight(VisionConstants.cameraOrange,
                 // swerveSubsystem::getRotation),
-                new VisionIOLimelight(VisionConstants.cameraYellow, swerveSubsystem::getRotation));
-        // new VisionIOLimelight(VisionConstants.cameraPink, swerveSubsystem::getRotation));
+                new VisionIOLimelight(VisionConstants.cameraYellow, swerveSubsystem::getRotation),
+                new VisionIOLimelight(VisionConstants.cameraPink, swerveSubsystem::getRotation));
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
 
@@ -301,7 +301,10 @@ public class RobotContainer {
 
     controller.a().onTrue(pivotSubsystem.deployCommand());
 
-    controller.b().whileTrue(flywheelSubsystem.runDebuggingVelocityCommand());
+    controller
+        .b()
+        .whileTrue(flywheelSubsystem.runDebuggingVelocityCommand())
+        .whileTrue(hoodSubsystem.runDebuggingCommand());
 
     controller.y().onTrue(pivotSubsystem.stowCommand());
 
@@ -327,6 +330,8 @@ public class RobotContainer {
 
     controller.povDown().whileTrue(hoodSubsystem.runDebuggingVoltageDownCommand());
     controller.povUp().whileTrue(hoodSubsystem.runDebuggingVoltageUpCommand());
+
+    controller.rightTrigger().whileTrue(rollerSubsystem.runUnjamCommand());
 
     // Shoot on the fly when X button is pressed
     // controller.x().whileTrue(shooterSubsystem.simShootOnTheFlyCommand());
