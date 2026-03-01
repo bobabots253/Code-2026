@@ -14,6 +14,7 @@ public class RobotState {
       double shooterToCorrectTargetPoseDistance,
       double shooterToCorrectTargetPoseDistance3D) {}
 
+  @AutoLogOutput(key = "RobotState/ShotData")
   private ShootingParameters latestShotData =
       new ShootingParameters(Pose2d.kZero, 0.0, 0.0, 0.0, Rotation2d.kZero, 0.0, 0.0);
 

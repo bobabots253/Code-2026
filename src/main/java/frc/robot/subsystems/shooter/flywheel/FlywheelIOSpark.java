@@ -254,16 +254,16 @@ public class FlywheelIOSpark implements FlywheelIO {
           case RECOVERY:
             // Bang-Bang Controller to maximize Duty-Cycle Output
             // If error > 0 (too slow), request +12V. If error < 0 (too fast), request -12V.
-            if (Math.abs(error) <= FlywheelConstants.idleTolerance * 2) {
-              currentPhase = FlywheelPhase.IDLE;
-            } else {
-              double outputVolts = (error > 0) ? 12.0 : 0;
-              masterVortex.setVoltage(outputVolts);
-            }
+            // if (Math.abs(error) <= FlywheelConstants.idleTolerance * 2) {
+            //   currentPhase = FlywheelPhase.IDLE;
+            // } else {
+            //   double outputVolts = (error > 0) ? 12.0 : 0;
+            //   masterVortex.setVoltage(outputVolts);
+            // }
 
             // Old
-            // double outputVolts = (error > 0) ? 12.0 : 0;
-            // masterVortex.setVoltage(outputVolts);
+            double outputVolts = (error > 0) ? 12.0 : 0;
+            masterVortex.setVoltage(outputVolts);
             break;
           case IDLE:
             if (error > 0) {

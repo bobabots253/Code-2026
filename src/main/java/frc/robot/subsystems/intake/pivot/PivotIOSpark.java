@@ -15,7 +15,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.filter.Debouncer;
-import frc.robot.subsystems.shooter.hood.HoodConstants;
 import java.util.function.DoubleSupplier;
 
 public class PivotIOSpark implements PivotIO {
@@ -82,7 +81,7 @@ public class PivotIOSpark implements PivotIO {
     ifOk(
         masterVortex,
         masterRelativeEncoder::getPosition,
-        (value) -> inputs.masterPositionRads = value + HoodConstants.hoodOffsetRad);
+        (value) -> inputs.masterPositionRads = value);
     ifOk(
         masterVortex,
         masterRelativeEncoder::getVelocity,

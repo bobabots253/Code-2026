@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter.flywheel;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -32,6 +33,7 @@ public class FlywheelSubsystem extends FullSubsystem {
   private double deltaTime;
 
   double acceleration;
+  static boolean isWarm;
 
   @RequiredArgsConstructor
   /*
@@ -40,7 +42,7 @@ public class FlywheelSubsystem extends FullSubsystem {
   // ADD MVP STATE
   public enum Goal {
     // Stop the flywheel and chooses COAST Mode
-    IDLE(() -> 0.0),
+    IDLE(() -> isWarm ? 0.0 : Units.rotationsPerMinuteToRadiansPerSecond(500)),
     // Velocity setpoint calculated by the ShotCalculator for the Hub.
     PREPARE_HUB(() -> RobotState.getInstance().getCustomShotData().correctTargetVelocity()),
     // Currently mirrors PREPARE_HUB but I added it so it can edited/tuned separately
@@ -95,7 +97,7 @@ public class FlywheelSubsystem extends FullSubsystem {
     }
 
     // Re-poll the supplier every loop to handle new shot calculations
-    if (currentGoal == Goal.IDLE) {
+    if (currentGoal == Goal.IDLE && !isWarm) {
       stop();
     } else if (currentGoal == Goal.DEBUGGING) {
       runVoltage(currentGoal.getGoal());
@@ -174,8 +176,13 @@ public class FlywheelSubsystem extends FullSubsystem {
   // }
 
   public Command shootCommand() {
-    return startEnd(() -> setGoal(Goal.SHOOT), () -> setGoal(Goal.IDLE))
+    return run(() ->
+            runVelocity(RobotState.getInstance().getCustomShotData().correctTargetVelocity()))
         .withName("Flywheels Shoot");
+  }
+
+  public Command dynamicUpdatedShootCommand(double velocityRadPerSec) {
+    return run(() -> runVelocity(velocityRadPerSec)).withName("Flywheels Dyanmic Updated Shoot");
   }
 
   public Command prepareHubCommand() {
@@ -240,5 +247,16 @@ public class FlywheelSubsystem extends FullSubsystem {
   private void stop() {
     outputs.mode = FlywheelIOOutputMode.COAST;
     outputs.velocityRadsPerSec = 0.0;
+  }
+
+  /*
+   * Set isWarm to True
+   */
+  public void toggleWarmup() {
+    if (isWarm) {
+      isWarm = false;
+    } else {
+      isWarm = true;
+    }
   }
 }

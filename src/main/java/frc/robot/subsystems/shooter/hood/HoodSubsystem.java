@@ -136,7 +136,13 @@ public class HoodSubsystem extends FullSubsystem {
   }
 
   public Command shootCommand() {
-    return startEnd(() -> setGoal(Goal.SHOOT), () -> setGoal(Goal.IDLE)).withName("Hood Shoot");
+    return run(() ->
+            runAngular(RobotState.getInstance().getCustomShotData().correctedTargetAngle()))
+        .withName("Hood Shoot");
+  }
+
+  public Command dynamicUpdatedShootCommand(double positionRad) {
+    return run(() -> runAngular(positionRad)).withName("Hood Shoot");
   }
 
   public Command prepareHubCommand() {
