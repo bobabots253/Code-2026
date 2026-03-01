@@ -1,5 +1,7 @@
 package frc.robot.subsystems.shooter.flywheel;
 
+import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.kVelocityThreshold;
+
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -7,6 +9,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.RobotState;
+import frc.robot.RobotState.RobotCoordinator;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIO.FlywheelIOOutputMode;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIO.FlywheelIOOutputs;
 import frc.robot.util.FullSubsystem;
@@ -82,6 +85,9 @@ public class FlywheelSubsystem extends FullSubsystem {
 
     lastMeasuredVelocity = 0.0;
     lastTime = Timer.getFPGATimestamp();
+    RobotCoordinator newCoordinator = new RobotCoordinator(0, kVelocityThreshold);
+    RobotState.getInstance()
+        .setRobotCoordinator(newCoordinator); // sets flywheelRPM to kStaticVelocity
   }
 
   @Override
@@ -110,6 +116,9 @@ public class FlywheelSubsystem extends FullSubsystem {
 
     // Update Acceleration
     measuredVelocity = inputs.masterVelocityRads;
+    RobotCoordinator newCoordinator = new RobotCoordinator(measuredVelocity, kVelocityThreshold);
+    RobotState.getInstance()
+        .setRobotCoordinator(newCoordinator); // sets flywheelRPM to kStaticVelocity
     setpoint = outputs.velocityRadsPerSec;
     isWarm = outputs.isWarm;
 
