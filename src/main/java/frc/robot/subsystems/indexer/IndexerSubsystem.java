@@ -4,6 +4,8 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
+import frc.robot.RobotState;
+import frc.robot.RobotState.RobotCoordinator;
 import frc.robot.subsystems.indexer.IndexerIO.IndexerIOOutputMode;
 import frc.robot.subsystems.indexer.IndexerIO.IndexerIOOutputs;
 import frc.robot.util.FullSubsystem;
@@ -124,7 +126,15 @@ public class IndexerSubsystem extends FullSubsystem {
   }
 
   public Command runCurrentCommand() {
-    return startEnd(() -> setGoal(Goal.CURRENT), () -> setGoal(Goal.IDLE))
+
+    return startEnd(
+            () -> {
+              RobotCoordinator coordinator = RobotState.getInstance().getRobotCoordinatorData();
+              if (coordinator.flywheelGoalRPM() <= coordinator.flywheelRPM()) {
+                setGoal(Goal.CURRENT);
+              }
+            },
+            () -> setGoal(Goal.IDLE))
         .withName("Indexer Current");
   }
 
