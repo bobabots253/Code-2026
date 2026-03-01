@@ -34,7 +34,6 @@ public class FlywheelSubsystem extends FullSubsystem {
 
   double acceleration;
   static boolean isWarm;
-  
 
   @RequiredArgsConstructor
   /*
@@ -42,30 +41,69 @@ public class FlywheelSubsystem extends FullSubsystem {
    */
   // ADD MVP STATE
   public enum Goal {
+    IDLE,
+    SHOOT,
+    JUGGLE,
+    DEBUGGING,
+    CURRENT,
+    DEBUGGING_VELOCITY,
+    STATIC,
+    PREPARE_HUB
     // Stop the flywheel and chooses COAST Mode
-    IDLE(() -> isWarm ? 0.0 : Units.rotationsPerMinuteToRadiansPerSecond(500)),
-    // Velocity setpoint calculated by the ShotCalculator for the Hub.
-    PREPARE_HUB(() -> RobotState.getInstance().getCustomShotData().correctTargetVelocity()),
-    // Currently mirrors PREPARE_HUB but I added it so it can edited/tuned separately
-    SHOOT(
-        () ->
-            RobotState.getInstance()
-                .getCustomShotData()
-                .correctTargetVelocity()), // Change if Necessary
-    // Low-speed state for juggling them balls into our own hopper LOL
-    JUGGLE(() -> FlywheelConstants.jugglingVelocity),
-    // Static speed state for subsystem testing
-    DEBUGGING(() -> FlywheelConstants.kDebuggingVoltage), // VOLTAGE
-    CURRENT(() -> FlywheelConstants.kDebuggingCurrent),
-    DEBUGGING_VELOCITY(() -> FlywheelConstants.kDebuggingVelocity),
-    STATIC(() -> FlywheelConstants.kStaticVelocity);
+    // IDLE(() -> isWarm ? 0.0 : Units.rotationsPerMinuteToRadiansPerSecond(500)),
+    // // Use a helper functions to
+    // // Velocity setpoint calculated by the ShotCalculator for the Hub.
+    // PREPARE_HUB(() -> RobotState.getInstance().getCustomShotData().correctTargetVelocity()),
+    // // Currently mirrors PREPARE_HUB but I added it so it can edited/tuned separately
+    // SHOOT(
+    //     () ->
+    //         RobotState.getInstance()
+    //             .getCustomShotData()
+    //             .correctTargetVelocity()), // Change if Necessary
+    // // Low-speed state for juggling them balls into our own hopper LOL
+    // JUGGLE(() -> FlywheelConstants.jugglingVelocity),
+    // // Static speed state for subsystem testing
+    // DEBUGGING(() -> FlywheelConstants.kDebuggingVoltage), // VOLTAGE
+    // CURRENT(() -> FlywheelConstants.kDebuggingCurrent),
+    // DEBUGGING_VELOCITY(() -> FlywheelConstants.kDebuggingVelocity),
+    // STATIC(() -> FlywheelConstants.kStaticVelocity);
 
-    // Required Arguement for each enum state
-    private final DoubleSupplier velocityRadsPerSec;
+    // // Required Arguement for each enum state
+    // private final DoubleSupplier velocityRadsPerSec;
 
-    /** Returns the current target velocity for this goal state. */
-    private double getGoal() {
-      return velocityRadsPerSec.getAsDouble();
+    // /** Returns the current target velocity for this goal state. */
+    // private double getGoal() {
+    //   return velocityRadsPerSec.getAsDouble();
+    // }
+
+    // private double getAsDouble() {
+    //   switch this {
+    //     case JUGGLE:
+    //       return FlywheelConstants.jugglingVelocity;
+    //   }
+    // }
+  }
+
+  private double getAsDouble(Goal currentGoal) {
+    switch (currentGoal) {
+      case IDLE:
+        return (!isWarm) ? 0.0 : Units.rotationsPerMinuteToRadiansPerSecond(1500);
+      case SHOOT:
+        return RobotState.getInstance().getCustomShotData().correctTargetVelocity();
+      case JUGGLE:
+        return FlywheelConstants.jugglingVelocity;
+      case DEBUGGING:
+        return FlywheelConstants.jugglingVelocity;
+      case DEBUGGING_VELOCITY:
+        return FlywheelConstants.kDebuggingVelocity;
+      case CURRENT:
+        return FlywheelConstants.kDebuggingCurrent;
+      case STATIC:
+        return FlywheelConstants.kStaticVelocity;
+      case PREPARE_HUB:
+        return RobotState.getInstance().getCustomShotData().correctTargetVelocity();
+      default:
+        return 0.0;
     }
   }
 
@@ -97,21 +135,24 @@ public class FlywheelSubsystem extends FullSubsystem {
       setGoal(Goal.IDLE);
     }
 
+    isWarm = outputs.isWarm;
+
     // Re-poll the supplier every loop to handle new shot calculations
     if (currentGoal == Goal.IDLE && !isWarm) {
       stop();
+    } else if (currentGoal == Goal.IDLE && isWarm) {
+      runVelocity(getAsDouble(currentGoal));
     } else if (currentGoal == Goal.DEBUGGING) {
-      runVoltage(currentGoal.getGoal());
+      runVoltage(getAsDouble(currentGoal));
     } else if (currentGoal == Goal.CURRENT) {
-      runCurrent(currentGoal.getGoal());
+      runCurrent(getAsDouble(currentGoal));
     } else {
-      runVelocity(currentGoal.getGoal());
+      runVelocity(getAsDouble(currentGoal));
     }
 
     // Update Acceleration
     measuredVelocity = inputs.masterVelocityRads;
     setpoint = outputs.velocityRadsPerSec;
-    isWarm = outputs.isWarm;
 
     currentTime = Timer.getFPGATimestamp();
     deltaTime = currentTime - lastTime;
@@ -125,6 +166,8 @@ public class FlywheelSubsystem extends FullSubsystem {
   @Override
   public void periodicAfterScheduler() {
     Logger.recordOutput("Flywheel/Mode", outputs.mode);
+    Logger.recordOutput("Flywheel/localIsWarm", isWarm);
+    Logger.recordOutput("Flywheel/getAsADouble", getAsDouble(currentGoal));
     io.applyOutputs(outputs);
   }
 
@@ -144,7 +187,7 @@ public class FlywheelSubsystem extends FullSubsystem {
    */
   public boolean atGoal() {
     return currentGoal == Goal.IDLE
-        || Math.abs(getVelocity() - currentGoal.getGoal())
+        || Math.abs(getVelocity() - getAsDouble(currentGoal))
             <= FlywheelConstants.closedLoopVelocityTolerance;
   }
 
@@ -170,10 +213,10 @@ public class FlywheelSubsystem extends FullSubsystem {
     outputs.current = current;
   }
 
-  private void toggleWarmup(){
-    if(isWarm){
-      outputs.isWarm=false;
-    }else{
+  private void toggleWarmup() {
+    if (isWarm) {
+      outputs.isWarm = false;
+    } else {
       outputs.isWarm = true;
     }
   }
@@ -191,12 +234,13 @@ public class FlywheelSubsystem extends FullSubsystem {
         .withName("Flywheels Shoot");
   }
 
-  public Command toggleWarm(){
-    return runOnce(()-> toggleWarmup());
+  public Command toggleWarm() {
+    return runOnce(() -> toggleWarmup());
   }
 
   public Command dynamicUpdatedShootCommand(DoubleSupplier velocityRadPerSec) {
-    return run(() -> runVelocity(velocityRadPerSec.getAsDouble())).withName("Flywheels Dyanmic Updated Shoot");
+    return run(() -> runVelocity(velocityRadPerSec.getAsDouble()))
+        .withName("Flywheels Dyanmic Updated Shoot");
   }
 
   public Command prepareHubCommand() {
