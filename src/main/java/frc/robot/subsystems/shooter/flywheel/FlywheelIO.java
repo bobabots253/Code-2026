@@ -46,6 +46,9 @@ public interface FlywheelIO {
 
     @AutoLogOutput(key = "FlywheelOutputs/Current")
     public double current = 0.0;
+
+    @AutoLogOutput(key = "FlywheelOutputs/isWarm")
+    public boolean isWarm = false;
   }
 
   default void updateInputs(FlywheelIOInputs inputs) {}

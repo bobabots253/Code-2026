@@ -141,8 +141,8 @@ public class HoodSubsystem extends FullSubsystem {
         .withName("Hood Shoot");
   }
 
-  public Command dynamicUpdatedShootCommand(double positionRad) {
-    return run(() -> runAngular(positionRad)).withName("Hood Shoot");
+  public Command dynamicUpdatedShootCommand(DoubleSupplier positionRad) {
+    return run(() -> runAngular(positionRad.getAsDouble())).withName("Hood Shoot");
   }
 
   public Command prepareHubCommand() {

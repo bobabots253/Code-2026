@@ -34,6 +34,7 @@ public class FlywheelSubsystem extends FullSubsystem {
 
   double acceleration;
   static boolean isWarm;
+  
 
   @RequiredArgsConstructor
   /*
@@ -110,6 +111,7 @@ public class FlywheelSubsystem extends FullSubsystem {
     // Update Acceleration
     measuredVelocity = inputs.masterVelocityRads;
     setpoint = outputs.velocityRadsPerSec;
+    isWarm = outputs.isWarm;
 
     currentTime = Timer.getFPGATimestamp();
     deltaTime = currentTime - lastTime;
@@ -168,6 +170,14 @@ public class FlywheelSubsystem extends FullSubsystem {
     outputs.current = current;
   }
 
+  private void toggleWarmup(){
+    if(isWarm){
+      outputs.isWarm=false;
+    }else{
+      outputs.isWarm = true;
+    }
+  }
+
   // private void runFlywheelControlLoop(double velocityRadsPerSec){
   //   double measuredVelocity = inputs.masterVelocityRads;
   //   double setpoint = velocityRadsPerSec;
@@ -181,8 +191,12 @@ public class FlywheelSubsystem extends FullSubsystem {
         .withName("Flywheels Shoot");
   }
 
-  public Command dynamicUpdatedShootCommand(double velocityRadPerSec) {
-    return run(() -> runVelocity(velocityRadPerSec)).withName("Flywheels Dyanmic Updated Shoot");
+  public Command toggleWarm(){
+    return runOnce(()-> toggleWarmup());
+  }
+
+  public Command dynamicUpdatedShootCommand(DoubleSupplier velocityRadPerSec) {
+    return run(() -> runVelocity(velocityRadPerSec.getAsDouble())).withName("Flywheels Dyanmic Updated Shoot");
   }
 
   public Command prepareHubCommand() {
@@ -252,11 +266,11 @@ public class FlywheelSubsystem extends FullSubsystem {
   /*
    * Set isWarm to True
    */
-  public void toggleWarmup() {
-    if (isWarm) {
-      isWarm = false;
-    } else {
-      isWarm = true;
-    }
-  }
+  // public void toggleWarmup() {
+  //   if (isWarm) {
+  //     isWarm = false;
+  //   } else {
+  //     isWarm = true;
+  //   }
+  // }
 }
