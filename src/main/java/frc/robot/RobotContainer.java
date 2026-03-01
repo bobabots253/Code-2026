@@ -456,32 +456,32 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
-  }
-  public Command preLoadAutoCommand(){
-    // Pose2d firstTargetPose2d = (DriverStation.getAlliance().get() == Alliance.Red) ? new Pose2d(15.205, 2.127, new Rotation2d()) : new Pose2d(1.154, 5.391, new Rotation2d(Math.PI)); 
-    return Commands.sequence(
-      // Commands.runOnce(
-      //   () -> {
-      //     new HolonomicAutoAlign(swerveSubsystem, new Pose2d(0,0, new Rotation2d()));
-      //   }),
+   }
+//   public Command preLoadAutoCommand(){
+//     // Pose2d firstTargetPose2d = (DriverStation.getAlliance().get() == Alliance.Red) ? new Pose2d(15.205, 2.127, new Rotation2d()) : new Pose2d(1.154, 5.391, new Rotation2d(Math.PI)); 
+//     return Commands.sequence(
+//       // Commands.runOnce(
+//       //   () -> {
+//       //     new HolonomicAutoAlign(swerveSubsystem, new Pose2d(0,0, new Rotation2d()));
+//       //   }),
       
-      Commands.parallel(flywheelSubsystem.runStaticVelocitCommand(), hoodSubsystem.runStaticAngleCommand()),
-      new WaitCommand(4),
-      Commands.parallel(
-        DriveCommands.joystickDriveAtAngle(
-                swerveSubsystem,
-                () -> -driver.getLeftY(),
-                () -> -driver.getLeftX(),
-                () -> shotCalculator.getFieldToHubAngle()),
-        indexerSubsystem.runCurrentCommand(),
-        agitatorSubsystem.indexCommand(),
-        kickerSubsystem.indexCommand()
-        )
-        );
+//       Commands.parallel(flywheelSubsystem.runStaticVelocitCommand(), hoodSubsystem.runStaticAngleCommand()),
+//       new WaitCommand(4),
+//       Commands.parallel(
+//         DriveCommands.joystickDriveAtAngle(
+//                 swerveSubsystem,
+//                 () -> -driver.getLeftY(),
+//                 () -> -driver.getLeftX(),
+//                 () -> shotCalculator.getFieldToHubAngle()),
+//         indexerSubsystem.runCurrentCommand(),
+//         agitatorSubsystem.indexCommand(),
+//         kickerSubsystem.indexCommand()
+//         )
+//         );
     
-    // return Commands.runOnce(() -> {flywheelSubsystem.shootCommand();});
+//     // return Commands.runOnce(() -> {flywheelSubsystem.shootCommand();});
 
-  }
+//   }
 
   //   public Command depotAutoCommand(){
   //    Pose2d firstTargetPose2d = (DriverStation.getAlliance().get() == Alliance.Red) ? new Pose2d(15.205, 2.127, new Rotation2d()) : new Pose2d(1.154, 5.391, new Rotation2d(Math.PI)); 
