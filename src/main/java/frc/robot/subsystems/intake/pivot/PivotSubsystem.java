@@ -104,6 +104,11 @@ public class PivotSubsystem extends FullSubsystem {
     return inputs.masterPositionRads;
   }
 
+  @AutoLogOutput(key = "Pivot/GetMeasuredCurrentAmps")
+  public double getCurrentAmps() {
+    return inputs.masterSupplyCurrentAmps;
+  }
+
   public Command deployCommand() {
     return startEnd(() -> setGoal(Goal.DEPLOYED), () -> setGoal(Goal.IDLE)).withName("Pivot Stow");
   }

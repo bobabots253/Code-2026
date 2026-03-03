@@ -106,6 +106,11 @@ public class IndexerSubsystem extends FullSubsystem {
     return inputs.masterAppliedVolts;
   }
 
+  @AutoLogOutput(key = "Indexer/GetMeasuredCurrentAmps")
+  public double getCurrentAmps() {
+    return inputs.masterSupplyCurrentAmps;
+  }
+
   public Command indexCommand() {
     return startEnd(() -> setGoal(Goal.INDEXING), () -> setGoal(Goal.IDLE))
         .withName("Indexer Index");

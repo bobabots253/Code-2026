@@ -169,6 +169,11 @@ public class KickerSubsystem extends FullSubsystem {
     return inputs.masterVelocityRads;
   }
 
+  @AutoLogOutput(key = "Kicker/GetMeasuredCurrentAmps")
+  public double getCurrentAmps() {
+    return inputs.masterSupplyCurrentAmps;
+  }
+
   private void stop() {
     outputs.mode = KickerIOOutputMode.COAST;
     outputs.velocityRadsPerSec = 0.0;

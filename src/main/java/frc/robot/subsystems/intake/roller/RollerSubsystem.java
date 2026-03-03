@@ -97,6 +97,11 @@ public class RollerSubsystem extends FullSubsystem {
     return inputs.masterAppliedVolts;
   }
 
+  @AutoLogOutput(key = "Roller/GetMeasuredCurrentAmps")
+  public double getCurrentAmps() {
+    return inputs.masterSupplyCurrentAmps;
+  }
+
   public Command intakeCommand() {
     return startEnd(() -> setGoal(Goal.DEPLOYED), () -> setGoal(Goal.IDLE))
         .withName("Roller Deploy");
