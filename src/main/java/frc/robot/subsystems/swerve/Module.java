@@ -20,6 +20,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Module {
@@ -87,6 +89,14 @@ public class Module {
   /** Returns the current turn angle of the module. */
   public Rotation2d getAngle() {
     return inputs.turnPosition;
+  }
+  
+  public double getDriveCurrentAmps(){
+    return inputs.driveCurrentAmps;
+  }
+
+   public double getTurnCurrentAmps(){
+    return inputs.turnCurrentAmps;
   }
 
   /** Returns the current drive position of the module in meters. */

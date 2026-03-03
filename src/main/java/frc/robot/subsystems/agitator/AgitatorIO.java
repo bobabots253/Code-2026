@@ -9,6 +9,7 @@ public interface AgitatorIO {
 
     public double masterAppliedVolts = 0.0;
     public double masterSupplyCurrentAmps = 0.0;
+    public double masterTempCelsius = 0.0;
   }
 
   public static enum AgitatorIOOutputMode {

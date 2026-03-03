@@ -173,6 +173,7 @@ public class FlywheelIOSpark implements FlywheelIO {
         (value) -> inputs.masterSupplyCurrentAmps = value);
     inputs.masterMotorConnected =
         masterVortexDebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
+    inputs.masterTempCelsius = masterVortex.getMotorTemperature();
 
     // Update all the FlywheelIO inputs for the follower motor
     // Use SparkStickyFaults to track motor connectivity (See SparkUtil for Implementation)
@@ -195,6 +196,7 @@ public class FlywheelIOSpark implements FlywheelIO {
         (value) -> inputs.followerSupplyCurrentAmps = value);
     inputs.followerMotorConnected =
         followerVortexDebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
+    inputs.followerTempCelsius = followerVortex.getMotorTemperature();
   }
 
   @Override

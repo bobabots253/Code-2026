@@ -97,6 +97,11 @@ public class AgitatorSubsystem extends FullSubsystem {
     return inputs.masterAppliedVolts;
   }
 
+  @AutoLogOutput(key= "Agitator/MeasuredCurrentAmps")
+  public double getCurrentAmps(){
+    return inputs.masterSupplyCurrentAmps;
+  }
+
   public Command indexCommand() {
     return startEnd(() -> setGoal(Goal.INDEXING), () -> setGoal(Goal.IDLE))
         .withName("Agitator Index");

@@ -135,6 +135,11 @@ public class HoodSubsystem extends FullSubsystem {
     return inputs.masterPositionRads;
   }
 
+  @AutoLogOutput(key= "Hood/MeasuredCurrentAmps")
+  public double getCurrentAmps(){
+    return inputs.masterSupplyCurrentAmps;
+  }
+
   public Command shootCommand() {
     return run(() ->
             runAngular(RobotState.getInstance().getCustomShotData().correctedTargetAngle()))
