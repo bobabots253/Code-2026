@@ -135,9 +135,8 @@ public class HoodSubsystem extends FullSubsystem {
     return inputs.masterPositionRads;
   }
 
-  @AutoLogOutput(key= "Hood/MeasuredCurrentAmps")
-  public double getCurrentAmps(){
-    return inputs.masterSupplyCurrentAmps;
+public boolean isDrawingHighCurrent(){
+     return Math.abs(inputs.masterSupplyCurrentAmps) > 50.0;
   }
 
   public Command shootCommand() {

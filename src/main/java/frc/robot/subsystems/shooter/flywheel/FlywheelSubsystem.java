@@ -311,11 +311,6 @@ public class FlywheelSubsystem extends FullSubsystem {
     return acceleration;
   }
 
-  @AutoLogOutput(key= "Flywheel/MeasuredCurrentAmps")
-  public double getCurrentAmps(){
-    return inputs.masterSupplyCurrentAmps;
-  }
-
   private void stop() {
     outputs.mode = FlywheelIOOutputMode.COAST;
     outputs.velocityRadsPerSec = 0.0;

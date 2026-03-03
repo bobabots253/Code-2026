@@ -97,9 +97,9 @@ public class AgitatorSubsystem extends FullSubsystem {
     return inputs.masterAppliedVolts;
   }
 
-  @AutoLogOutput(key= "Agitator/MeasuredCurrentAmps")
-  public double getCurrentAmps(){
-    return inputs.masterSupplyCurrentAmps;
+  public boolean isDrawingHighCurrent(){
+     return Math.abs(inputs.masterSupplyCurrentAmps) > 50.0
+        || Math.abs(inputs.followerSupplyCurrentAmps) > 50.0;
   }
 
   public Command indexCommand() {
