@@ -57,8 +57,7 @@ public class FlywheelConstants {
       Units.rotationsPerMinuteToRadiansPerSecond(3000); // 3000
   public static final double kStaticVelocity =
       Units.rotationsPerMinuteToRadiansPerSecond(3000); // 3000
-  public static final double kVelocityThreshold =
-      Units.rotationsPerMinuteToRadiansPerSecond(2900); // 3000
+  public static final double kShotTolerance = Units.rotationsPerMinuteToRadiansPerSecond(100);
 
   // Calculating Max Acceleration of a Two-Motor Flywheel System
   // Use the flywheelReductionRatio constant from above

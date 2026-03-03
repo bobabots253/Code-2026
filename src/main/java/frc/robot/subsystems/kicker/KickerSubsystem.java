@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.RobotState;
-import frc.robot.RobotState.RobotCoordinator;
+import frc.robot.RobotState.ShotCoordinator;
 import frc.robot.subsystems.kicker.KickerIO.KickerIOOutputMode;
 import frc.robot.subsystems.kicker.KickerIO.KickerIOOutputs;
 import frc.robot.util.FullSubsystem;
@@ -117,8 +117,9 @@ public class KickerSubsystem extends FullSubsystem {
 
     return startEnd(
             () -> {
-              RobotCoordinator coordinator = RobotState.getInstance().getRobotCoordinatorData();
-              if (coordinator.flywheelGoalRPM() <= coordinator.flywheelRPM()) {
+              ShotCoordinator coordinator = RobotState.getInstance().getShotCoordinatorData();
+              double error = Math.abs(coordinator.flywheelRadPerSec() - coordinator.flywheelGoalRadPerSec());
+              if ( error <= coordinator.shotTolerance()) {
                 setGoal(Goal.INDEXING);
               }
             },
