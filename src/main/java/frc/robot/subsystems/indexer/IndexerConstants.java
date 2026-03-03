@@ -11,4 +11,6 @@ public class IndexerConstants {
   public static final double debuggingVolts = 0.0;
 
   public static final double debuggingCurrent = 40;
+    public static final double highCurrentThreshold = 50;
+
 }

@@ -53,9 +53,8 @@ public class AgitatorIOSpark implements AgitatorIO {
         (values) -> inputs.masterAppliedVolts = values[0] * values[1]);
 
     ifOk(masterNEO, masterNEO::getOutputCurrent, (value) -> inputs.masterSupplyCurrentAmps = value);
-    inputs.masterMotorConnected =
-        masterNEODebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
-    inputs.masterTempCelsius = masterNEO.getMotorTemperature();
+    
+    ifOk(masterNEO, masterNEO::getMotorTemperature, (value) -> inputs.masterTempCelsius = value);
   }
 
   @Override

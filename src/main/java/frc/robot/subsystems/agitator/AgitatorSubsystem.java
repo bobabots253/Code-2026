@@ -98,8 +98,7 @@ public class AgitatorSubsystem extends FullSubsystem {
   }
 
   public boolean isDrawingHighCurrent(){
-     return Math.abs(inputs.masterSupplyCurrentAmps) > 50.0
-        || Math.abs(inputs.followerSupplyCurrentAmps) > 50.0;
+     return Math.abs(inputs.masterSupplyCurrentAmps) > AgitatorConstants.highCurrentThreshold;
   }
 
   public Command indexCommand() {

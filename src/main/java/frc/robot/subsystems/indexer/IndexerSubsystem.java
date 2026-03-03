@@ -108,7 +108,7 @@ public class IndexerSubsystem extends FullSubsystem {
 
   @SuppressWarnings("unused")
   private boolean isDrawingHighCurrent() {
-    return Math.abs(inputs.masterSupplyCurrentAmps) > 50.0;
+    return Math.abs(inputs.masterSupplyCurrentAmps) > IndexerConstants.highCurrentThreshold;
   }
 
   public Command indexCommand() {
