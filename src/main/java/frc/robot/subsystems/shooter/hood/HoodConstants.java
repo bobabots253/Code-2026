@@ -61,4 +61,5 @@ public class HoodConstants {
 
   public static final double kDebuggingVoltageUP = -1.0;
   public static final double kDebuggingVoltageDOWN = 1.0;
+    public static final double highCurrentAmps = 50.0;
 }

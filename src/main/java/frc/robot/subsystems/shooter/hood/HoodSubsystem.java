@@ -8,6 +8,9 @@ import frc.robot.RobotState;
 import frc.robot.subsystems.shooter.hood.HoodIO.HoodIOOutputMode;
 import frc.robot.subsystems.shooter.hood.HoodIO.HoodIOOutputs;
 import frc.robot.util.FullSubsystem;
+
+import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.highCurrentAmps;
+
 import java.util.function.DoubleSupplier;
 import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -136,7 +139,7 @@ public class HoodSubsystem extends FullSubsystem {
   }
 
 public boolean isDrawingHighCurrent(){
-     return Math.abs(inputs.masterSupplyCurrentAmps) > 50.0;
+     return Math.abs(inputs.masterSupplyCurrentAmps) > highCurrentAmps;
   }
 
   public Command shootCommand() {

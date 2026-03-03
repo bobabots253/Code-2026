@@ -7,6 +7,9 @@ import frc.robot.Robot;
 import frc.robot.subsystems.intake.roller.RollerIO.RollerIOOutputMode;
 import frc.robot.subsystems.intake.roller.RollerIO.RollerIOOutputs;
 import frc.robot.util.FullSubsystem;
+
+import static frc.robot.subsystems.intake.pivot.PivotConstants.highCurrentAmps;
+
 import java.util.function.DoubleSupplier;
 import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -99,7 +102,7 @@ public class RollerSubsystem extends FullSubsystem {
 
   @SuppressWarnings("unused")
   private boolean isDrawingHighCurrent() {
-    return Math.abs(inputs.masterSupplyCurrentAmps) > 50.0;
+    return Math.abs(inputs.masterSupplyCurrentAmps) > highCurrentAmps;
   }
 
   public Command intakeCommand() {

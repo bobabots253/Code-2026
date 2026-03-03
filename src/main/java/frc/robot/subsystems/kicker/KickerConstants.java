@@ -31,4 +31,5 @@ public class KickerConstants {
   public static final double indexingVoltage = 9.0;
 
   public static final double closedLoopVelocityTolerance = 0.0; // Change to heuristic value
+  public static final double highCurrentAmps = 50.0;
 }

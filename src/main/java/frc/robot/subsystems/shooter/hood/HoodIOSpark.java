@@ -101,7 +101,9 @@ public class HoodIOSpark implements HoodIO {
     ifOk(masterNEO, masterNEO::getOutputCurrent, (value) -> inputs.masterSupplyCurrentAmps = value);
     inputs.masterMotorConnected =
         masterNEODebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
-    inputs.masterTempCelsius = masterNEO.getMotorTemperature();
+    ifOk(masterNEO,
+     masterNEO::getMotorTemperature,
+     (value) -> inputs.masterTempCelsius = value);
   }
 
   @Override

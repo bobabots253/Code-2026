@@ -9,6 +9,9 @@ import frc.robot.RobotState.ShotCoordinator;
 import frc.robot.subsystems.kicker.KickerIO.KickerIOOutputMode;
 import frc.robot.subsystems.kicker.KickerIO.KickerIOOutputs;
 import frc.robot.util.FullSubsystem;
+
+import static frc.robot.subsystems.intake.pivot.PivotConstants.highCurrentAmps;
+
 import java.util.function.DoubleSupplier;
 import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -166,7 +169,7 @@ public class KickerSubsystem extends FullSubsystem {
 
   @SuppressWarnings("unused")
   private boolean isDrawingHighCurrent() {
-    return Math.abs(inputs.masterSupplyCurrentAmps) > 50.0;
+    return Math.abs(inputs.masterSupplyCurrentAmps) > highCurrentAmps;
   }
 
   private void stop() {

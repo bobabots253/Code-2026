@@ -127,4 +127,5 @@ public class FlywheelConstants {
   // This value accounts for the amount of torque it takes for the ball to clear shooter wheel
   // compression
   public static final double kAntilag = 1.0; // volts now
+    public static final double highCurrentAmps = 50.0;
 }

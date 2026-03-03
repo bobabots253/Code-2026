@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter.flywheel;
 
+import static frc.robot.subsystems.intake.pivot.PivotConstants.highCurrentAmps;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.kShotTolerance;
 
 import edu.wpi.first.math.util.Units;
@@ -297,8 +298,8 @@ public class FlywheelSubsystem extends FullSubsystem {
 
   @SuppressWarnings("unused")
   private boolean isDrawingHighCurrent() {
-    return Math.abs(inputs.masterSupplyCurrentAmps) > 50.0
-        || Math.abs(inputs.followerSupplyCurrentAmps) > 50.0;
+    return Math.abs(inputs.masterSupplyCurrentAmps) > highCurrentAmps
+        || Math.abs(inputs.followerSupplyCurrentAmps) > highCurrentAmps;
   }
 
   @AutoLogOutput(key = "Flywheel/MeasuredVelocity")
