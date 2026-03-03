@@ -97,9 +97,9 @@ public class RollerSubsystem extends FullSubsystem {
     return inputs.masterAppliedVolts;
   }
 
-  @AutoLogOutput(key = "Roller/GetMeasuredCurrentAmps")
-  public double getCurrentAmps() {
-    return inputs.masterSupplyCurrentAmps;
+  @SuppressWarnings("unused")
+  private boolean isDrawingHighCurrent() {
+    return Math.abs(inputs.masterSupplyCurrentAmps) > 50.0;
   }
 
   public Command intakeCommand() {

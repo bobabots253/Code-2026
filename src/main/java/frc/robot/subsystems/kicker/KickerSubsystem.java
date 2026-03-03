@@ -159,19 +159,14 @@ public class KickerSubsystem extends FullSubsystem {
     return runOnce(this::stop);
   }
 
-  @SuppressWarnings("unused")
-  private boolean isDrawingHighCurrent() {
-    return Math.abs(inputs.masterSupplyCurrentAmps) > 50.0;
-  }
-
   @AutoLogOutput(key = "Kicker/MeasuredVelocity")
   public double getVelocity() {
     return inputs.masterVelocityRads;
   }
 
-  @AutoLogOutput(key = "Kicker/GetMeasuredCurrentAmps")
-  public double getCurrentAmps() {
-    return inputs.masterSupplyCurrentAmps;
+  @SuppressWarnings("unused")
+  private boolean isDrawingHighCurrent() {
+    return Math.abs(inputs.masterSupplyCurrentAmps) > 50.0;
   }
 
   private void stop() {
