@@ -106,6 +106,11 @@ public class IndexerSubsystem extends FullSubsystem {
     return inputs.masterAppliedVolts;
   }
 
+  @SuppressWarnings("unused")
+  private boolean isDrawingHighCurrent() {
+    return Math.abs(inputs.masterSupplyCurrentAmps) > 50.0;
+  }
+
   public Command indexCommand() {
     return startEnd(() -> setGoal(Goal.INDEXING), () -> setGoal(Goal.IDLE))
         .withName("Indexer Index");

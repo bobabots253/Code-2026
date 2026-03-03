@@ -108,6 +108,7 @@ public class KickerIOSpark implements KickerIO {
     ifOk(masterNEO, masterNEO::getOutputCurrent, (value) -> inputs.masterSupplyCurrentAmps = value);
     inputs.masterMotorConnected =
         masterNEODebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
+    inputs.masterTempCelsius = masterNEO.getMotorTemperature();
   }
 
   @Override

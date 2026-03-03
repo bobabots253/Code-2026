@@ -96,6 +96,7 @@ public class PivotIOSpark implements PivotIO {
         (value) -> inputs.masterSupplyCurrentAmps = value);
     inputs.masterMotorConnected =
         masterNEODebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
+    inputs.masterTempCelsius = masterVortex.getMotorTemperature();
   }
 
   @Override
