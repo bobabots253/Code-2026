@@ -97,6 +97,11 @@ public class RollerSubsystem extends FullSubsystem {
     return inputs.masterAppliedVolts;
   }
 
+  @SuppressWarnings("unused")
+  private boolean isDrawingHighCurrent() {
+    return Math.abs(inputs.masterSupplyCurrentAmps) > 50.0;
+  }
+
   public Command intakeCommand() {
     return startEnd(() -> setGoal(Goal.DEPLOYED), () -> setGoal(Goal.IDLE))
         .withName("Roller Deploy");

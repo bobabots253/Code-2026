@@ -104,16 +104,14 @@ public class PivotSubsystem extends FullSubsystem {
     return inputs.masterPositionRads;
   }
 
+  @SuppressWarnings("unused")
+  private boolean isDrawingHighCurrent() {
+    return Math.abs(inputs.masterSupplyCurrentAmps) > 50.0;
+  }
+
   public Command deployCommand() {
-    return startEnd(() -> setGoal(Goal.DEPLOYED), () -> setGoal(Goal.IDLE)).withName("Pivot Stow");
-  }
-
-  public Command simpleDeployCommand() {
-    return run(() -> io.lazyClosedLoop(PivotConstants.deployedAngle));
-  }
-
-  public Command simpleStowCommand() {
-    return run(() -> io.lazyClosedLoop(PivotConstants.stowAngle));
+    return startEnd(() -> setGoal(Goal.DEPLOYED), () -> setGoal(Goal.IDLE))
+        .withName("Pivot Deploy");
   }
 
   public Command stowCommand() {

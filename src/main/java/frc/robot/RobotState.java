@@ -5,6 +5,20 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class RobotState {
+
+  /* A record is a class that is used to store an immutable dataset,
+   * meaning all vars in a record are private & final
+   * this means that once created, a record can't be changed, and
+   * so we must create a new record every time we want a new set of data.
+   * Records also automatically create getter and setter methods for all contained vars,
+   * making it more efficient than creating custom classes.
+   * More reading: https://docs.oracle.com/en/java/javase/17/language/records.html
+   * 
+   * ShootingParameters are used for shooting on the fly
+   * ShotCoordinator makes sure that the flywheel is spinning fast enough before
+   * letting fuel in, to avoid jamming fuel in hood
+   */
+
   public record ShootingParameters(
       Pose2d correctedTargetPose2d,
       double correctedTargetSpeedRPM,

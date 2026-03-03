@@ -11,6 +11,7 @@ public interface PivotIO {
     public double masterVelocityRads = 0.0;
     public double masterAppliedVolts = 0.0;
     public double masterSupplyCurrentAmps = 0.0;
+    public double masterTempCelsius = 0.0;
   }
 
   public static enum PivotIOOutputMode {

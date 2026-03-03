@@ -106,6 +106,11 @@ public class IndexerSubsystem extends FullSubsystem {
     return inputs.masterAppliedVolts;
   }
 
+  @SuppressWarnings("unused")
+  private boolean isDrawingHighCurrent() {
+    return Math.abs(inputs.masterSupplyCurrentAmps) > 50.0;
+  }
+
   public Command indexCommand() {
     return startEnd(() -> setGoal(Goal.INDEXING), () -> setGoal(Goal.IDLE))
         .withName("Indexer Index");
@@ -131,7 +136,7 @@ public class IndexerSubsystem extends FullSubsystem {
             () -> {
               ShotCoordinator coordinator = RobotState.getInstance().getShotCoordinatorData();
               double error = Math.abs(coordinator.flywheelRadPerSec() - coordinator.flywheelGoalRadPerSec());
-              if ( error <= coordinator.shotTolerance()) {
+              if (error <= coordinator.shotTolerance()) {
               }
             },
             () -> setGoal(Goal.IDLE))
