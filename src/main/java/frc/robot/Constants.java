@@ -55,4 +55,8 @@ public final class Constants {
   public static void disableHAL() {
     disableHAL = true;
   }
+
+  public static RobotType getRobot() {
+    return robot;
+  }
 }

@@ -18,13 +18,16 @@ import edu.wpi.first.math.geometry.Transform3d;
 public class VisionConstants {
   // AprilTag layout
   public static AprilTagFieldLayout aprilTagLayout =
-      AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+      AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField); // Fix to 2026 Layout
 
   // Camera names, must match names configured on coprocessor
-  public static String cameraPurple = "limelight-purple";
-  public static String cameraOrange = "limelight-orange";
-  public static String cameraGreen = "limelight-green";
-  public static String cameraBlue = "limelight-blue";
+  public static String cameraPurple = "limelight-purple"; // BL
+  public static String cameraOrange = "limelight-orange"; // BR
+  public static String cameraYellow = "limelight-yellow"; // FL
+  public static String cameraPink = "limelight-pink"; // FR
+
+  // Unused
+  public static String cameraPlaceholder = "limelight-placeholder";
 
   // Robot to camera transforms
   // (Not used by Limelight, configure in LL Finder UI instead)
@@ -42,15 +45,15 @@ public class VisionConstants {
   public static double maxZError = 0.75;
 
   // Standard deviation baselines at 1 meter
-  public static double linearStdDevBaseline = 0.02; // Meters
-  public static double angularStdDevBaseline = 0.06; // Radians
+  public static double linearStdDevBaseline = 0.04; // Meters
+  public static double angularStdDevBaseline = Double.POSITIVE_INFINITY; // Radians
 
   // Standard deviation multipliers for each camera
   // Manual Variance Weighting: (Adjust to trust some cameras more than others)
   public static double[] cameraStdDevFactors =
       new double[] {
-        0.5, // Camera 0
-        0.5, // Camera 1
+        1.0, // Camera 0
+        1.0, // Camera 1
         1.0, // Camera 2
         1.0, // Camera 3
       };

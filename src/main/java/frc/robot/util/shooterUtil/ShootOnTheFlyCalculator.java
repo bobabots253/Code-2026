@@ -1,11 +1,11 @@
 package frc.robot.util.shooterUtil;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.util.swerveUtil.ChassisAccelerations;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * Provides static methods to calculate the effective target position to aim for when shooting on
@@ -23,7 +23,11 @@ public class ShootOnTheFlyCalculator {
    */
   public static double getTimeToShootUsingPhysics(Pose3d robotPose, Pose3d targetPose) { // GRAVITY
 
-    Transform3d diff = (robotPose).minus(targetPose);
+    // I AM A BRICK
+    // robotPose.minus(targetPose) returns a Transform3d in targetPose's LOCAL coordinates,
+    // not field coords. Individual x and y components would be wrong if targetPose is rotated.
+    // NOTE: Using the norm of Translation3d subtraction is always correct in field frame.
+    Translation3d diff = robotPose.getTranslation().minus(targetPose.getTranslation());
     double xyDistance = new Translation2d(diff.getX(), diff.getY()).getNorm();
 
     double projectileVelocity =
@@ -38,13 +42,17 @@ public class ShootOnTheFlyCalculator {
 
     double hMax = ShootOnTheFlyConstants.shooterHeightOffset + ((vY * vY) / (2 * GRAVITY));
     // h_max = h0 + (v * sin(theta))^2 / (2g)
-    double heightFromApex = hMax - targetPose.getZ();
+
+    // Flat Shot Edge Case if shooter is above the target and apex is below shooter, heightFromApex
+    // could be negative — clamp to zero
+    double heightFromApex = Math.max(0.0, hMax - targetPose.getZ());
 
     double timeFromApexToHub =
         Math.sqrt((2 * heightFromApex) / GRAVITY); // t2 = sqrt( 2 * (h_max - h_f) / g )
 
     double totalTime = timeToApex + timeFromApexToHub;
 
+    Logger.recordOutput("SOTFCalculator/TimeToShootUsingPhysics", totalTime);
     return totalTime;
   }
 
@@ -78,11 +86,16 @@ public class ShootOnTheFlyCalculator {
 
       double newShotTime = getTimeToShootUsingPhysics(robotPose, correctedTargetPose);
 
-      shotTime = newShotTime;
       if (Math.abs(newShotTime - shotTime) <= 0.010) {
+        shotTime = newShotTime;
+        Logger.recordOutput("SOTFCalculator/ConvergedIteration", i + 1);
         break;
       }
+      shotTime = newShotTime;
     }
+
+    Logger.recordOutput("SOTFCalculator/EffectiveTargetPose", correctedTargetPose);
+    Logger.recordOutput("SOTFCalculator/EffectiveShotTime", shotTime);
 
     return correctedTargetPose;
   }

@@ -13,13 +13,16 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.util.FullSubsystem;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.fuelSimUtil.FuelSim;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -37,6 +40,10 @@ import org.littletonrobotics.urcl.URCL;
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
+
+  // Flag to ensure we only apply the alliance offset once per DS connection
+  @AutoLogOutput(key = "Robot/HasInitializedAlliancePose")
+  private boolean hasInitializedAlliancePose = false;
 
   public Robot() {
     // Record metadata
@@ -103,6 +110,14 @@ public class Robot extends LoggedRobot {
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
     CommandScheduler.getInstance().run();
+    FullSubsystem.runAllPeriodicAfterScheduler();
+
+    // System.gc();
+    // Optionally call the garbage collector which manually suggest GC reduce memory usage
+    // However, Java Garbage Collection should already be optimized to not have to call this
+    // function manually.
+    // Instead, reduce the amount of logging and induce static {} calls in individual subsystem
+    // constants to dedicate single memory location
 
     // Return to non-RT thread priority (do not modify the first argument)
     // Threads.setCurrentThreadPriority(false, 10);
@@ -116,26 +131,41 @@ public class Robot extends LoggedRobot {
     // LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 0);
     LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 0);
     LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 0);
+    LimelightHelpers.SetIMUMode(VisionConstants.cameraYellow, 0);
+    LimelightHelpers.SetIMUMode(VisionConstants.cameraPink, 0);
+
+    // Reset flag so it redoes its thingy if DS reconnects or alliance changes
+    if (robotContainer.isAllianceHandledAlready()) {
+      hasInitializedAlliancePose = true;
+    } else {
+      hasInitializedAlliancePose = false;
+    }
   }
 
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
-    // LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 0); // Disable IMU mode
-    // LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 0); // Disable IMU mode
+
+    // Only apply nce per time DS connects to robot
+    if (!hasInitializedAlliancePose && DriverStation.getAlliance().isPresent()) {
+      robotContainer.applyAlliancePoseOffset();
+      hasInitializedAlliancePose = true;
+    }
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    // PathPlanner resets pose from path start
+    // Note: Reset flag so if teleop follows without a disable, we don't re-apply
+    hasInitializedAlliancePose = true;
+
     autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(autonomousCommand);
     }
-    LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 1);
-    LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 1);
   }
 
   /** This function is called periodically during autonomous. */
@@ -152,8 +182,11 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-    LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 1);
-    LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 1);
+
+    // Handle edge case where alliance data isn't recieved before enabled
+    if (!hasInitializedAlliancePose) {
+      robotContainer.applyAlliancePoseOffset();
+    }
   }
 
   /** This function is called periodically during operator control. */

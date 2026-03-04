@@ -5,31 +5,30 @@ import org.littletonrobotics.junction.AutoLog;
 public interface HoodIO {
   @AutoLog
   public static class HoodIOInputs {
-    boolean motorConnected = false;
-    double positionRads = 0.0;
-    double positionRadsPerSec = 0.0;
-    double positionDegrees = 0.0;
-    double velocityDegPerSec = 0.0;
-    double appliedVoltage = 0.0;
-    double supplyCurrentAmps = 0.0;
-    double torqueCurrentAmps = 0.0;
+    public boolean masterMotorConnected = true;
+
+    public double masterPositionRads = 0.0;
+    public double masterAppliedVolts = 0.0;
+    public double masterSupplyCurrentAmps = 0.0;
+    public double masterTempCelsius = 0.0;
   }
 
   public static enum HoodIOOutputMode {
-    COAST,
     BRAKE,
-    CLOSED_LOOP
+    CLOSED_LOOP,
+    VOLTAGE
   }
 
   public static class HoodIOOutputs {
     public HoodIOOutputMode mode = HoodIOOutputMode.BRAKE;
-    public double positionDegrees = 0.0;
-    // PID Gains
-    public double kP = 0.0;
-    public double kD = 0.0;
+    public double positionRad = 0.0;
+    public double velocityRadsPerSec = 0.0;
+    public double voltage = 0.0;
   }
 
   public default void updateInputs(HoodIOInputs inputs) {}
 
   public default void applyOutputs(HoodIOOutputs outputs) {}
+
+  default void runOpenLoop(double decimalPercentage) {}
 }

@@ -1,0 +1,16 @@
+package frc.robot.subsystems.agitator;
+
+public class AgitatorConstants {
+  public static final int sparkMasterAgitatorCanId = 11;
+  public static final int masterCurrentLimit = 50; // amps
+
+  // Temporary Values (Confirm Functionality)
+  public static final double indexingVolts = -6.0;
+  public static final double passiveVolts = -3.0;
+  public static final double intakingVolts = -6.0;
+  public static final double jugglingVolts = 0.0;
+  public static final double debuggingVolts = 4.0;
+
+  // Used as an early warning if the Agitator is jammed
+  public static final double highCurrentThreshold = 50.0;
+}
