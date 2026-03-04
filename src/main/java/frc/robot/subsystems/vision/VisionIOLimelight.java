@@ -28,11 +28,13 @@ public class VisionIOLimelight implements VisionIO {
   private final DoubleArrayPublisher orientationPublisher;
 
   private final DoubleSubscriber latencySubscriber;
-  private final DoubleSubscriber txSubscriber;
-  private final DoubleSubscriber tySubscriber;
-  private final DoubleArraySubscriber megatag1Subscriber;
+  // private final DoubleSubscriber txSubscriber;
+  // private final DoubleSubscriber tySubscriber;
+  // private final DoubleArraySubscriber megatag1Subscriber; // Rm MT1 Measurements due to Poor
+  // Limelight Mounts (Measurements never meet rotational std dev threshold and will always be
+  // rejected)
   private final DoubleArraySubscriber megatag2Subscriber;
-  private final DoubleArraySubscriber homeworkSubscriber;
+  // private final DoubleArraySubscriber homeworkSubscriber;
 
   /**
    * Creates a new VisionIOLimelight.
@@ -52,18 +54,11 @@ public class VisionIOLimelight implements VisionIO {
         table
             .getDoubleTopic("tl")
             .subscribe(0.0); // Select pipeline's latency in ms. Total Latency = tl + cl.
-    txSubscriber =
-        table.getDoubleTopic("tx").subscribe(0.0); // Horizontal Offset From Crosshair To Target
-    tySubscriber =
-        table.getDoubleTopic("ty").subscribe(0.0); // Vertical Offset From Crosshair To Target
-    megatag1Subscriber = table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
     // Translation (X,Y,Z) in meters Rotation(Roll,Pitch,Yaw) in degrees, total latency (cl+tl),
     // tag count, tag span, average tag distance from camera, average tag area ()
     // Should be "botpose_wpiblue", but don't fix what isn't broken
     megatag2Subscriber =
         table.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
-
-    homeworkSubscriber = table.getDoubleArrayTopic("hw").subscribe(new double[] {});
   }
 
   @Override
@@ -71,11 +66,6 @@ public class VisionIOLimelight implements VisionIO {
     // Update connection status based on whether an update has been seen in the last 250ms
     inputs.connected =
         ((RobotController.getFPGATime() - latencySubscriber.getLastChange()) / 1000) < 250;
-
-    // Update target observation
-    inputs.latestTargetObservation =
-        new TargetObservation(
-            Rotation2d.fromDegrees(txSubscriber.get()), Rotation2d.fromDegrees(tySubscriber.get()));
 
     // Update orientation for MegaTag 2
     orientationPublisher.accept(
@@ -86,31 +76,6 @@ public class VisionIOLimelight implements VisionIO {
     // Read new pose observations from NetworkTables
     Set<Integer> tagIds = new HashSet<>();
     List<PoseObservation> poseObservations = new LinkedList<>();
-    for (var rawSample : megatag1Subscriber.readQueue()) {
-      if (rawSample.value.length == 0) continue;
-      for (int i = 11; i < rawSample.value.length; i += 7) {
-        tagIds.add((int) rawSample.value[i]);
-      }
-      poseObservations.add(
-          new PoseObservation(
-              // Timestamp, based on server timestamp of publish and latency
-              rawSample.timestamp * 1.0e-6 - rawSample.value[6] * 1.0e-3,
-
-              // 3D pose estimate
-              parsePose(rawSample.value),
-
-              // Ambiguity, using only the first tag because ambiguity isn't applicable for multitag
-              rawSample.value.length >= 18 ? rawSample.value[17] : 0.0,
-
-              // Tag count
-              (int) rawSample.value[7],
-
-              // Average tag distance
-              rawSample.value[9],
-
-              // Observation type
-              PoseObservationType.MEGATAG_1));
-    }
     for (var rawSample : megatag2Subscriber.readQueue()) {
       if (rawSample.value.length == 0) continue;
       for (int i = 11; i < rawSample.value.length; i += 7) {

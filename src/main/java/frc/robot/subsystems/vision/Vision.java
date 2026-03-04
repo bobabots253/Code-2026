@@ -40,8 +40,11 @@ public class Vision extends FullSubsystem {
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
 
-  // private int periodicCounter = 0;
-  // private final int UPDATE_INTERVAL = 3;
+  // Initialize logging values
+  List<Pose3d> allTagPoses = new LinkedList<>();
+  List<Pose3d> allRobotPoses = new LinkedList<>();
+  List<Pose3d> allRobotPosesAccepted = new LinkedList<>();
+  List<Pose3d> allRobotPosesRejected = new LinkedList<>();
 
   public Vision(
       VisionConsumer consumer,
@@ -68,15 +71,6 @@ public class Vision extends FullSubsystem {
     }
   }
 
-  /**
-   * Returns the X angle to the best target.
-   *
-   * @param cameraIndex The index of the camera to use.
-   */
-  public Rotation2d getTargetX(int cameraIndex) {
-    return inputs[cameraIndex].latestTargetObservation.tx();
-  }
-
   @Override
   public void periodic() {
 
@@ -85,16 +79,9 @@ public class Vision extends FullSubsystem {
       Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
     }
 
-    // Initialize logging values
-    List<Pose3d> allTagPoses = new LinkedList<>();
-    List<Pose3d> allRobotPoses = new LinkedList<>();
-    List<Pose3d> allRobotPosesAccepted = new LinkedList<>();
-    List<Pose3d> allRobotPosesRejected = new LinkedList<>();
-
     // Update Robot State
     Rotation3d currentGyroRotation = new Rotation3d(gyroRotationSupplier.get());
     ChassisSpeeds currentSpeeds = robotSpeedsSupplier.get();
-    // int clampMode = visionClampModeSupplier.get();
 
     // Calculate Speed Magnitudes
     double linearSpeed =
@@ -152,25 +139,6 @@ public class Vision extends FullSubsystem {
           }
         }
 
-        // if (!rejectPose) {
-        //   if (clampMode == VisionConstants.LOCK_MODE) {
-        //     if (observation
-        //             .pose()
-        //             .toPose2d()
-        //             .getTranslation()
-        //             .getDistance(currentRobotPose.getTranslation())
-        //         > VisionConstants.maxTranslationError) {
-        //       rejectPose = true;
-        //     }
-        //   } else {
-        //     // Unlocked (Initialization): Only accept the selected camera index
-        //     // Note: Allows any distance <-- Edit this later if needed
-        //     if (cameraIndex != clampMode) {
-        //       rejectPose = true;
-        //     }
-        //   }
-        // }
-
         // Add pose to log
         robotPoses.add(observation.pose());
         if (rejectPose) {
@@ -186,7 +154,8 @@ public class Vision extends FullSubsystem {
 
         // Calculate dynamically standard deviation scalar factor
         double stdDevFactor =
-            Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
+            Math.pow(observation.averageTagDistance(), 2.0)
+                / observation.tagCount(); // Square tag count if vision is more trustworthy
 
         double linearStdDev = linearStdDevBaseline * stdDevFactor;
         double angularStdDev = angularStdDevBaseline * stdDevFactor;
@@ -208,13 +177,8 @@ public class Vision extends FullSubsystem {
             VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
       }
 
-      // Log camera datadata
-      Logger.recordOutput(
-          "Vision/Camera" + Integer.toString(cameraIndex) + "/TagPoses",
-          tagPoses.toArray(new Pose3d[0]));
-      Logger.recordOutput(
-          "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPoses",
-          robotPoses.toArray(new Pose3d[0]));
+      // Log camera data (Disable in Match to save Bandwidth)
+      // Use Limelight Replay Feature Instead of Logging Poses to Dashboard
       Logger.recordOutput(
           "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesAccepted",
           robotPosesAccepted.toArray(new Pose3d[0]));
@@ -226,14 +190,6 @@ public class Vision extends FullSubsystem {
       allRobotPosesAccepted.addAll(robotPosesAccepted);
       allRobotPosesRejected.addAll(robotPosesRejected);
     }
-
-    // Log summary data
-    Logger.recordOutput("Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[0]));
-    Logger.recordOutput("Vision/Summary/RobotPoses", allRobotPoses.toArray(new Pose3d[0]));
-    Logger.recordOutput(
-        "Vision/Summary/RobotPosesAccepted", allRobotPosesAccepted.toArray(new Pose3d[0]));
-    Logger.recordOutput(
-        "Vision/Summary/RobotPosesRejected", allRobotPosesRejected.toArray(new Pose3d[0]));
   }
 
   @FunctionalInterface
@@ -245,5 +201,13 @@ public class Vision extends FullSubsystem {
   }
 
   @Override
-  public void periodicAfterScheduler() {}
+  public void periodicAfterScheduler() {
+    // Log summary data
+    Logger.recordOutput("Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[0]));
+    Logger.recordOutput("Vision/Summary/RobotPoses", allRobotPoses.toArray(new Pose3d[0]));
+    Logger.recordOutput(
+        "Vision/Summary/RobotPosesAccepted", allRobotPosesAccepted.toArray(new Pose3d[0]));
+    Logger.recordOutput(
+        "Vision/Summary/RobotPosesRejected", allRobotPosesRejected.toArray(new Pose3d[0]));
+  }
 }

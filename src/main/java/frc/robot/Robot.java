@@ -112,7 +112,12 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
     FullSubsystem.runAllPeriodicAfterScheduler();
 
-    System.gc();
+    // System.gc();
+    // Optionally call the garbage collector which manually suggest GC reduce memory usage
+    // However, Java Garbage Collection should already be optimized to not have to call this
+    // function manually.
+    // Instead, reduce the amount of logging and induce static {} calls in individual subsystem
+    // constants to dedicate single memory location
 
     // Return to non-RT thread priority (do not modify the first argument)
     // Threads.setCurrentThreadPriority(false, 10);
