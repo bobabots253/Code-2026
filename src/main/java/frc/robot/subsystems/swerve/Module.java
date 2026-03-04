@@ -89,7 +89,6 @@ public class Module {
     return inputs.turnPosition;
   }
 
-
   /** Returns the current drive position of the module in meters. */
   public double getPositionMeters() {
     return inputs.drivePositionRad * wheelRadiusMeters;

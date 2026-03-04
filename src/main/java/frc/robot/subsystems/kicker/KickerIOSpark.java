@@ -95,10 +95,6 @@ public class KickerIOSpark implements KickerIO {
     sparkStickyFault = false;
     ifOk(
         masterNEO,
-        masterRelativeEncoder::getPosition,
-        (value) -> inputs.masterPositionRads = value);
-    ifOk(
-        masterNEO,
         masterRelativeEncoder::getVelocity,
         (value) -> inputs.masterVelocityRads = value);
     ifOk(
@@ -108,9 +104,7 @@ public class KickerIOSpark implements KickerIO {
     ifOk(masterNEO, masterNEO::getOutputCurrent, (value) -> inputs.masterSupplyCurrentAmps = value);
     inputs.masterMotorConnected =
         masterNEODebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
-        ifOk(masterNEO,
-     masterNEO::getMotorTemperature,
-     (value) -> inputs.masterTempCelsius = value);
+    ifOk(masterNEO, masterNEO::getMotorTemperature, (value) -> inputs.masterTempCelsius = value);
   }
 
   @Override

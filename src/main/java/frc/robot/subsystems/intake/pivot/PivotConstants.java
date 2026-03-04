@@ -27,5 +27,7 @@ public class PivotConstants {
   public static final double deployedAngle = -2.198803; // //-2.23
   public static final double jugglingAngle = Units.degreesToRadians(0.0);
   public static final double debuggingAngle = Units.degreesToRadians(0.0); // Change as needed
+
+  // Used as an early warning if the Pivot is jammed
   public static final double highCurrentAmps = 50.0;
 }

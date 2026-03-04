@@ -9,14 +9,12 @@ public interface FlywheelIO {
     public boolean masterMotorConnected = true;
     public boolean followerMotorConnected = true;
 
-    public double masterPositionRads = 0.0;
     public double masterVelocityRads = 0.0;
     public double masterAppliedVolts = 0.0;
     public double masterSupplyCurrentAmps = 0.0;
     public double masterTempCelsius = 0.0;
     public double masterAccelerationRadPerSecSquared = 0.0;
 
-    public double followerPositionRads = 0.0;
     public double followerVelocityRads = 0.0;
     public double followerAppliedVolts = 0.0;
     public double followerSupplyCurrentAmps = 0.0;

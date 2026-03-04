@@ -84,10 +84,6 @@ public class PivotIOSpark implements PivotIO {
         (value) -> inputs.masterPositionRads = value);
     ifOk(
         masterVortex,
-        masterRelativeEncoder::getVelocity,
-        (value) -> inputs.masterVelocityRads = value);
-    ifOk(
-        masterVortex,
         new DoubleSupplier[] {masterVortex::getAppliedOutput, masterVortex::getBusVoltage},
         (values) -> inputs.masterAppliedVolts = values[0] * values[1]);
     ifOk(
@@ -96,9 +92,10 @@ public class PivotIOSpark implements PivotIO {
         (value) -> inputs.masterSupplyCurrentAmps = value);
     inputs.masterMotorConnected =
         masterNEODebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
-    ifOk(masterVortex, 
-    masterVortex::getMotorTemperature, 
-    (value) -> inputs.masterTempCelsius = value);
+    ifOk(
+        masterVortex,
+        masterVortex::getMotorTemperature,
+        (value) -> inputs.masterTempCelsius = value);
   }
 
   @Override

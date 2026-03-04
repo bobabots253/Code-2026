@@ -1,5 +1,7 @@
 package frc.robot.subsystems.kicker;
 
+import static frc.robot.subsystems.intake.pivot.PivotConstants.highCurrentAmps;
+
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -9,9 +11,6 @@ import frc.robot.RobotState.ShotCoordinator;
 import frc.robot.subsystems.kicker.KickerIO.KickerIOOutputMode;
 import frc.robot.subsystems.kicker.KickerIO.KickerIOOutputs;
 import frc.robot.util.FullSubsystem;
-
-import static frc.robot.subsystems.intake.pivot.PivotConstants.highCurrentAmps;
-
 import java.util.function.DoubleSupplier;
 import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -121,8 +120,9 @@ public class KickerSubsystem extends FullSubsystem {
     return startEnd(
             () -> {
               ShotCoordinator coordinator = RobotState.getInstance().getShotCoordinatorData();
-              double error = Math.abs(coordinator.flywheelRadPerSec() - coordinator.flywheelGoalRadPerSec());
-              if ( error <= coordinator.shotTolerance()) {
+              double error =
+                  Math.abs(coordinator.flywheelRadPerSec() - coordinator.flywheelGoalRadPerSec());
+              if (error <= coordinator.shotTolerance()) {
                 setGoal(Goal.INDEXING);
               }
             },

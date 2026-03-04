@@ -44,12 +44,12 @@ public class ShotCalculator extends FullSubsystem {
 
   Rotation2d fieldToHubAngle;
 
-  double deltaX;
-  double deltaY;
+  double deltaX = 0.0;
+  double deltaY = 0.0;
 
-  Double targetSpeedRPM;
-  Double targetSpeedMPS;
-  Double targetAngle;
+  Double targetSpeedRPM = 0.0;
+  Double targetSpeedMPS = 0.0;
+  Double targetAngle = 0.0;
 
   public ShotCalculator(SwerveSubsystem swerveSubsystem) {
     this.swerveSubsystem = swerveSubsystem;

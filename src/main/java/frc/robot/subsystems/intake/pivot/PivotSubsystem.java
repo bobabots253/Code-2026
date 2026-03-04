@@ -1,5 +1,7 @@
 package frc.robot.subsystems.intake.pivot;
 
+import static frc.robot.subsystems.intake.pivot.PivotConstants.highCurrentAmps;
+
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -7,9 +9,6 @@ import frc.robot.subsystems.intake.pivot.PivotIO.PivotIOOutputMode;
 import frc.robot.subsystems.intake.pivot.PivotIO.PivotIOOutputs;
 import frc.robot.subsystems.shooter.hood.HoodConstants;
 import frc.robot.util.FullSubsystem;
-
-import static frc.robot.subsystems.intake.pivot.PivotConstants.highCurrentAmps;
-
 import java.util.function.DoubleSupplier;
 import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.AutoLogOutput;

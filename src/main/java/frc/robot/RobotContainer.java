@@ -312,24 +312,6 @@ public class RobotContainer {
                 () -> -driver.getLeftX(),
                 () -> shotCalculator.getFieldToHubAngle()));
 
-    // Testing
-    // operator
-    //     .povLeft()
-    //     .whileTrue(
-    //
-    // flywheelSubsystem.dynamicUpdatedShootCommand(shotCalculator.getCorrectTargetVelocity()))
-    //     .whileTrue(
-    //         hoodSubsystem.dynamicUpdatedShootCommand(shotCalculator.getCorrectedTargetAngle()));
-
-    // operator
-    //   .povLeft()
-    //   .whileTrue(
-    //     flywheelSubsystem.dynamicUpdatedShootCommand(() ->
-    // shotCalculator.getCorrectTargetVelocity()))
-    //   .whileTrue(
-    //     hoodSubsystem.dynamicUpdatedShootCommand(() ->
-    // shotCalculator.getCorrectedTargetAngle()));
-
     operator.povLeft().onTrue(flywheelSubsystem.toggleWarm());
     // .whileTrue(
     //   hoodSubsystem.dynamicUpdatedShootCommand(() -> shotCalculator.getCorrectedTargetAngle()));
@@ -551,44 +533,9 @@ public class RobotContainer {
     lastAppliedAlliance = alliance;
   }
 
-  // public boolean isAllianceHandledAlready() {
-  //   boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
-
-  //   Rotation2d currentHeading = swerveSubsystem.getRotation();
-
-  //   if (isRed
-  //       && ((currentHeading.getDegrees() > 170 && currentHeading.getDegrees() < 190)
-  //           || (currentHeading.getDegrees() > -190 && currentHeading.getDegrees() < -170))) {
-  //     return true;
-  //   } else {
-  //     return false;
-  //   }
-  // }
-
   public boolean isAllianceHandledAlready() {
     if (!DriverStation.getAlliance().isPresent()) return false;
     if (lastAppliedAlliance == null) return false;
     return lastAppliedAlliance == DriverStation.getAlliance().get();
   }
-  //   boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
-
-  //   Rotation2d currentHeading = swerveSubsystem.getRotation();
-
-  //   if (isRed
-  //       && ((currentHeading.getDegrees() > 170 && currentHeading.getDegrees() < 190)
-  //           || (currentHeading.getDegrees() > -190 && currentHeading.getDegrees() < -170))) {
-  //     return true;
-  //   } else {
-  //     return false;
-  //   }
-  // }
-
-  /**
-   * Returns whether vision estimates should be clamped.
-   *
-   * @return true if vision estimates should be clamped. Enabled by default.
-   */
-  //   public Integer enableVisionClamp() {
-  //     return clampVisionChooser.get();
-  //   }
 }

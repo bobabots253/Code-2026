@@ -151,8 +151,6 @@ public class Robot extends LoggedRobot {
       robotContainer.applyAlliancePoseOffset();
       hasInitializedAlliancePose = true;
     }
-    // LimelightHelpers.SetIMUMode(VisionConstants.cameraPurple, 0); // Disable IMU mode
-    // LimelightHelpers.SetIMUMode(VisionConstants.cameraOrange, 0); // Disable IMU mode
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */

@@ -28,13 +28,7 @@ public class VisionIOLimelight implements VisionIO {
   private final DoubleArrayPublisher orientationPublisher;
 
   private final DoubleSubscriber latencySubscriber;
-  // private final DoubleSubscriber txSubscriber;
-  // private final DoubleSubscriber tySubscriber;
-  // private final DoubleArraySubscriber megatag1Subscriber; // Rm MT1 Measurements due to Poor
-  // Limelight Mounts (Measurements never meet rotational std dev threshold and will always be
-  // rejected)
   private final DoubleArraySubscriber megatag2Subscriber;
-  // private final DoubleArraySubscriber homeworkSubscriber;
 
   /**
    * Creates a new VisionIOLimelight.

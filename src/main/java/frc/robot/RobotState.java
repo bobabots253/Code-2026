@@ -13,7 +13,7 @@ public class RobotState {
    * Records also automatically create getter and setter methods for all contained vars,
    * making it more efficient than creating custom classes.
    * More reading: https://docs.oracle.com/en/java/javase/17/language/records.html
-   * 
+   *
    * ShootingParameters are used for shooting on the fly
    * ShotCoordinator makes sure that the flywheel is spinning fast enough before
    * letting fuel in, to avoid jamming fuel in hood
@@ -28,7 +28,8 @@ public class RobotState {
       double shooterToCorrectTargetPoseDistance,
       double shooterToCorrectTargetPoseDistance3D) {}
 
-  public record ShotCoordinator(double flywheelRadPerSec, double flywheelGoalRadPerSec, double shotTolerance) {}
+  public record ShotCoordinator(
+      double flywheelRadPerSec, double flywheelGoalRadPerSec, double shotTolerance) {}
 
   @AutoLogOutput(key = "RobotState/ShotData")
   private ShootingParameters latestShotData =

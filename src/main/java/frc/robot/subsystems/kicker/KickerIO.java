@@ -7,11 +7,9 @@ public interface KickerIO {
   public static class KickerIOInputs {
     public boolean masterMotorConnected = true;
 
-    public double masterPositionRads = 0.0;
     public double masterVelocityRads = 0.0;
     public double masterAppliedVolts = 0.0;
     public double masterSupplyCurrentAmps = 0.0;
-    public double masterTorqueCurrentAmps = 0.0;
     public double masterTempCelsius = 0.0;
   }
 

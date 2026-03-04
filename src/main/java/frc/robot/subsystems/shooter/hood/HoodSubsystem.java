@@ -1,5 +1,7 @@
 package frc.robot.subsystems.shooter.hood;
 
+import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.highCurrentAmps;
+
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -8,9 +10,6 @@ import frc.robot.RobotState;
 import frc.robot.subsystems.shooter.hood.HoodIO.HoodIOOutputMode;
 import frc.robot.subsystems.shooter.hood.HoodIO.HoodIOOutputs;
 import frc.robot.util.FullSubsystem;
-
-import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.highCurrentAmps;
-
 import java.util.function.DoubleSupplier;
 import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -138,8 +137,8 @@ public class HoodSubsystem extends FullSubsystem {
     return inputs.masterPositionRads;
   }
 
-public boolean isDrawingHighCurrent(){
-     return Math.abs(inputs.masterSupplyCurrentAmps) > highCurrentAmps;
+  public boolean isDrawingHighCurrent() {
+    return Math.abs(inputs.masterSupplyCurrentAmps) > highCurrentAmps;
   }
 
   public Command shootCommand() {

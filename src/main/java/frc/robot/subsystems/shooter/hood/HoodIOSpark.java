@@ -92,18 +92,12 @@ public class HoodIOSpark implements HoodIO {
         (value) -> inputs.masterPositionRads = value);
     ifOk(
         masterNEO,
-        masterRelativeEncoder::getVelocity,
-        (value) -> inputs.masterVelocityRads = value);
-    ifOk(
-        masterNEO,
         new DoubleSupplier[] {masterNEO::getAppliedOutput, masterNEO::getBusVoltage},
         (values) -> inputs.masterAppliedVolts = values[0] * values[1]);
     ifOk(masterNEO, masterNEO::getOutputCurrent, (value) -> inputs.masterSupplyCurrentAmps = value);
     inputs.masterMotorConnected =
         masterNEODebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
-    ifOk(masterNEO,
-     masterNEO::getMotorTemperature,
-     (value) -> inputs.masterTempCelsius = value);
+    ifOk(masterNEO, masterNEO::getMotorTemperature, (value) -> inputs.masterTempCelsius = value);
   }
 
   @Override

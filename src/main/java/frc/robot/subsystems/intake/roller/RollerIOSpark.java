@@ -54,9 +54,7 @@ public class RollerIOSpark implements RollerIO {
     inputs.masterMotorConnected =
         masterNEODebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
     inputs.masterTempCelsius = masterNEO.getMotorTemperature();
-    ifOk(masterNEO, 
-    masterNEO::getMotorTemperature,
-    (value) -> inputs.masterTempCelsius = value);
+    ifOk(masterNEO, masterNEO::getMotorTemperature, (value) -> inputs.masterTempCelsius = value);
   }
 
   @Override

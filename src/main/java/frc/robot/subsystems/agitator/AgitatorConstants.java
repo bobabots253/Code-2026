@@ -10,5 +10,7 @@ public class AgitatorConstants {
   public static final double intakingVolts = -6.0;
   public static final double jugglingVolts = 0.0;
   public static final double debuggingVolts = 4.0;
+
+  // Used as an early warning if the Agitator is jammed
   public static final double highCurrentThreshold = 50.0;
 }

@@ -10,5 +10,7 @@ public class RollerConstants {
   public static final double jugglingVolts = 0.0;
   public static final double debuggingVolts = 0.0;
   public static final double unjamVolts = 9.0;
+
+  // Used as an early warning if the Roller on the Intake is jammed
   public static final double highCurrentAmps = 50.0;
 }

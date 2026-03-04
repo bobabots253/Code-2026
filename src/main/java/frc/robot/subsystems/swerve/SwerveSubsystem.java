@@ -57,6 +57,14 @@ public class SwerveSubsystem extends FullSubsystem {
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
+  // SparkOdometryThread runs at 250 hz. This means about 5 samples are collected every periodic
+  // loop. Counting the loop, this creates 10 blank arrays and 20 SwerveModulePos objects,
+  // discounting internal memory objects for kinematics Twist2d calculations
+  SwerveModulePosition[] modulePositions = new SwerveModulePosition[4]; // publicly mutable
+  SwerveModulePosition[] moduleDeltas = new SwerveModulePosition[4]; // publically mutable
+  SwerveModulePosition[] cachedMeasuredStates =
+      new SwerveModulePosition[4]; // Used in getter function
+
   private final SysIdRoutine sysId;
   private final Alert gyroDisconnectedAlert =
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
@@ -137,23 +145,17 @@ public class SwerveSubsystem extends FullSubsystem {
   @Override
   public void periodic() {
 
-    // Implement timing for each subsystem process
-    long startTimeNano = System.nanoTime();
-
     odometryLock.lock(); // Prevents odometry updates while reading data
-    gyroIO.updateInputs(gyroInputs);
-    Logger.processInputs("Drive/Gyro", gyroInputs);
-
-    long gyroTimeNano = System.nanoTime();
-    Logger.recordOutput("Drive/Time/GyroUpdate", (gyroTimeNano - startTimeNano) / 1e6);
-
-    for (var module : modules) {
-      module.periodic();
+    // https://stackoverflow.com/questions/8286589/reentrantlock-lock-unlock-speed-in-single-threaded-application
+    try {
+      gyroIO.updateInputs(gyroInputs);
+      Logger.processInputs("Drive/Gyro", gyroInputs);
+      for (var module : modules) {
+        module.periodic();
+      }
+    } finally {
+      odometryLock.unlock(); // Release lock as fast as possible
     }
-    odometryLock.unlock();
-
-    long moduleTimeNano = System.nanoTime();
-    Logger.recordOutput("Drive/Time/ModuleUpdate", (moduleTimeNano - gyroTimeNano) / 1e6);
 
     double robotRelativeChassisAccelerationsTimestamp = Timer.getFPGATimestamp();
     double dt =
@@ -174,7 +176,6 @@ public class SwerveSubsystem extends FullSubsystem {
 
     lastRobotRelativeChassisAccelerationsTimestamp = robotRelativeChassisAccelerationsTimestamp;
 
-    long disabledStartNano = moduleTimeNano;
     // Stop moving when disabled
     if (DriverStation.isDisabled()) {
       for (var module : modules) {
@@ -182,25 +183,17 @@ public class SwerveSubsystem extends FullSubsystem {
       }
     }
 
-    long disabledTimeNano = System.nanoTime();
-    Logger.recordOutput("Drive/Time/DisabledStop", (disabledTimeNano - disabledStartNano) / 1e6);
-
     // Log empty setpoint states when disabled
     if (DriverStation.isDisabled()) {
       Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
 
-    long odometryStartNano = disabledTimeNano;
-
     // Update odometry
     double[] sampleTimestamps =
         modules[0].getOdometryTimestamps(); // All signals are sampled together
     int sampleCount = sampleTimestamps.length;
     for (int i = 0; i < sampleCount; i++) {
-      // Read wheel positions and deltas from each module
-      SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
-      SwerveModulePosition[] moduleDeltas = new SwerveModulePosition[4];
       for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
         modulePositions[moduleIndex] = modules[moduleIndex].getOdometryPositions()[i];
         moduleDeltas[moduleIndex] =
@@ -224,9 +217,6 @@ public class SwerveSubsystem extends FullSubsystem {
       // Apply update
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
     }
-
-    long odometryTimeNano = System.nanoTime();
-    Logger.recordOutput("Drive/Time/OdometryUpdate", (odometryTimeNano - odometryStartNano) / 1e6);
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
@@ -401,7 +391,5 @@ public class SwerveSubsystem extends FullSubsystem {
     // Logger.recordOutput(
     //     "Drive/fieldRelativeChassisAccelerations/Omega",
     //     fieldRelativeChassisAccelerations.omegaRadiansPerSecondSquared);
-
-    // System.gc(); // Call if Garbage Collection is needed
   }
 }
