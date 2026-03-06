@@ -26,7 +26,8 @@ public interface FlywheelIO {
     COAST,
     VELOCITY_SETPOINT,
     VOLTAGE,
-    CURRENT
+    CURRENT,
+    VELOCITY_SPARK
   }
 
   public static class FlywheelIOOutputs {

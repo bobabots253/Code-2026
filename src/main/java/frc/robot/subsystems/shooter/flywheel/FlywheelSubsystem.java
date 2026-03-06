@@ -52,7 +52,9 @@ public class FlywheelSubsystem extends FullSubsystem {
     CURRENT,
     DEBUGGING_VELOCITY,
     STATIC,
-    PREPARE_HUB
+    PREPARE_HUB,
+    VELOCITY_PID,
+    STATIC_VELOCITY_PID,
     // Stop the flywheel and chooses COAST Mode
     // IDLE(() -> isWarm ? 0.0 : Units.rotationsPerMinuteToRadiansPerSecond(500)),
     // // Use a helper functions to
@@ -104,6 +106,8 @@ public class FlywheelSubsystem extends FullSubsystem {
         return FlywheelConstants.kDebuggingCurrent;
       case STATIC:
         return FlywheelConstants.kStaticVelocity;
+      case STATIC_VELOCITY_PID:
+        return FlywheelConstants.kStaticVelocity;
       case PREPARE_HUB:
         return RobotState.getInstance().getCustomShotData().correctTargetVelocity();
       default:
@@ -153,6 +157,8 @@ public class FlywheelSubsystem extends FullSubsystem {
       runVoltage(getAsDouble(currentGoal));
     } else if (currentGoal == Goal.CURRENT) {
       runCurrent(getAsDouble(currentGoal));
+    } else if (currentGoal == Goal.STATIC_VELOCITY_PID) {
+      runVelocityPIDSpark(getAsDouble(currentGoal));
     } else {
       runVelocity(getAsDouble(currentGoal));
     }
@@ -224,6 +230,11 @@ public class FlywheelSubsystem extends FullSubsystem {
     outputs.current = current;
   }
 
+  private void runVelocityPIDSpark(double velocityRadsPerSec) {
+    outputs.mode = FlywheelIOOutputMode.VELOCITY_SPARK;
+    outputs.velocityRadsPerSec = velocityRadsPerSec;
+  }
+
   private void toggleWarmup() {
     if (isWarm) {
       outputs.isWarm = false;
@@ -281,6 +292,11 @@ public class FlywheelSubsystem extends FullSubsystem {
 
   public Command runCurentCommand() {
     return run(() -> setGoal(Goal.CURRENT)).withName("Flywheels Current");
+  }
+
+  public Command runVelocityPIDCommand() {
+    return startEnd(() -> setGoal(Goal.STATIC_VELOCITY_PID), () -> setGoal(Goal.IDLE))
+        .withName("Flywheels Sparkmax PID");
   }
 
   /**
