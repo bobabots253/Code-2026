@@ -9,6 +9,8 @@ import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.kV;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.masterFlywheelEncoderPositionFactor;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.masterFlywheelEncoderVelocityFactor;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkFollowerFlywheelCanId;
+import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkMasterFlyWheelkD;
+import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkMasterFlyWheelkP;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkMasterFlywheelCanId;
 import static frc.robot.util.SparkUtil.ifOk;
 import static frc.robot.util.SparkUtil.sparkStickyFault;
@@ -95,9 +97,9 @@ public class FlywheelIOSpark implements FlywheelIO {
     masterVortexConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .pid(0.03302, 0.0, 0.0, ClosedLoopSlot.kSlot1)
+        .pid(sparkMasterFlyWheelkP, 0.0, 0.0, ClosedLoopSlot.kSlot1)
         .allowedClosedLoopError(
-            Units.rotationsPerMinuteToRadiansPerSecond(100), ClosedLoopSlot.kSlot1);
+            Units.rotationsPerMinuteToRadiansPerSecond(50), ClosedLoopSlot.kSlot1);
     masterVortexConfig.closedLoop.feedForward.sva(kS, kV, kA, ClosedLoopSlot.kSlot1);
     // Since Current Control (CC) uses internal motor measurements,
     // does this even affect
