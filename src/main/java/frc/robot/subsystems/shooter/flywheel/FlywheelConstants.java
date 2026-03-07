@@ -24,7 +24,8 @@ public class FlywheelConstants {
   public static final int sparkMasterFlywheelCanId = 15;
   public static final int sparkFollowerFlywheelCanId = 16;
 
-  public static final double sparkMasterFlyWheelkP = 0.65 * Units.inchesToMeters(2) * 0.8; //  V*s/m -> V*s/rad
+  public static final double sparkMasterFlyWheelkP =
+      0.65 * Units.inchesToMeters(2) * 0.2; //  V*s/m -> V*s/rad
   public static final double sparkMasterFlyWheelkI = 0.0; // default: 0.0
   public static final double sparkMasterFlyWheelkD = 0.0; // default: 0.0
 
@@ -57,7 +58,7 @@ public class FlywheelConstants {
       Units.rotationsPerMinuteToRadiansPerSecond(3000); // 3000
   public static final double kStaticVelocity =
       Units.rotationsPerMinuteToRadiansPerSecond(3000); // 3000
-  public static final double kShotTolerance = Units.rotationsPerMinuteToRadiansPerSecond(100);
+  public static final double kShotTolerance = Units.rotationsPerMinuteToRadiansPerSecond(200);
 
   // Calculating Max Acceleration of a Two-Motor Flywheel System
   // Use the flywheelReductionRatio constant from above

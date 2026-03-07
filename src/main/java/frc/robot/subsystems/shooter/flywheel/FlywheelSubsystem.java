@@ -165,11 +165,11 @@ public class FlywheelSubsystem extends FullSubsystem {
 
     // Update Acceleration
     measuredVelocity = inputs.masterVelocityRads;
+    setpoint = outputs.velocityRadsPerSec;
     ShotCoordinator newCoordinator =
         new ShotCoordinator(measuredVelocity, setpoint, kShotTolerance);
     RobotState.getInstance()
         .setShotCoordinator(newCoordinator); // sets flywheelRPM to kStaticVelocity
-    setpoint = outputs.velocityRadsPerSec;
 
     currentTime = Timer.getFPGATimestamp();
     deltaTime = currentTime - lastTime;

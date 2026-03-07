@@ -137,7 +137,9 @@ public class IndexerSubsystem extends FullSubsystem {
               ShotCoordinator coordinator = RobotState.getInstance().getShotCoordinatorData();
               double error =
                   Math.abs(coordinator.flywheelRadPerSec() - coordinator.flywheelGoalRadPerSec());
-              if (error <= coordinator.shotTolerance()) {}
+              if (error <= coordinator.shotTolerance()) {
+                setGoal(Goal.CURRENT);
+              }
             },
             () -> setGoal(Goal.IDLE))
         .withName("Indexer Current");
