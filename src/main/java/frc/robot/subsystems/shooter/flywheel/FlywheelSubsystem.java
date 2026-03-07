@@ -159,6 +159,8 @@ public class FlywheelSubsystem extends FullSubsystem {
       runCurrent(getAsDouble(currentGoal));
     } else if (currentGoal == Goal.STATIC_VELOCITY_PID) {
       runVelocityPIDSpark(getAsDouble(currentGoal));
+    } else if (currentGoal == Goal.JUGGLE) {
+      runVelocityPIDSpark(getAsDouble(currentGoal));
     } else {
       runVelocity(getAsDouble(currentGoal));
     }

@@ -51,7 +51,7 @@ public class HoodConstants {
 
   // Temporary holding for subsystem variables
   public static final double jugglingAngle =
-      Units.degreesToRadians(0.0); // Check interpolator for values
+      Units.degreesToRadians(71.5); // Check interpolator for values
   public static final double debuggingAngle = Units.degreesToRadians(35); // Change as needed
 
   public static final double staticAngle = Units.degreesToRadians(35);

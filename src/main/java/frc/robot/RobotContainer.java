@@ -312,6 +312,11 @@ public class RobotContainer {
                 () -> -driver.getLeftX(),
                 () -> shotCalculator.getFieldToHubAngle()));
 
+    driver
+        .b()
+        .whileTrue(flywheelSubsystem.juggleCommand())
+        .whileTrue(hoodSubsystem.juggleCommand());
+
     operator.povLeft().onTrue(flywheelSubsystem.toggleWarm());
     // .whileTrue(
     //   hoodSubsystem.dynamicUpdatedShootCommand(() -> shotCalculator.getCorrectedTargetAngle()));
