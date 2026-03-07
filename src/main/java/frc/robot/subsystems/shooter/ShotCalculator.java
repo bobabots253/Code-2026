@@ -74,7 +74,7 @@ public class ShotCalculator extends FullSubsystem {
     // https://stackoverflow.com/questions/21483999/using-atan2-to-find-angle-between-two-vectors
     // I swear atan2 is supposed to be right
     // angleToTargetRad = Math.atan2(deltaY, deltaX);
-
+    //12:48 josh is saying that its using the shooter pose which is transformed off the robot pose so check this value by measuring from shooter to center of hub.
     Translation2d fieldToHubAngleTranslation = targetLocation.toPose2d().getTranslation();
     fieldToHubAngle =
         (fieldToHubAngleTranslation)
@@ -148,7 +148,7 @@ public class ShotCalculator extends FullSubsystem {
   public Rotation2d getFieldToHubAngle() {
     return fieldToHubAngle;
   }
-
+  //log this value if you can 12:50
   @AutoLogOutput(key = "ShotCalculator/Distance2D")
   public double getShooterToCorrectTargetPoseDistance() {
     return distance2D;

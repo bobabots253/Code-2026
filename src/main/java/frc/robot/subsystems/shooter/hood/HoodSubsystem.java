@@ -1,6 +1,10 @@
 package frc.robot.subsystems.shooter.hood;
 
+import static frc.robot.subsystems.intake.pivot.PivotConstants.debuggingAngle;
+import static frc.robot.subsystems.intake.pivot.PivotConstants.jugglingAngle;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.highCurrentAmps;
+import static frc.robot.subsystems.shooter.hood.HoodConstants.kDebuggingVoltageDOWN;
+import static frc.robot.subsystems.shooter.hood.HoodConstants.kDebuggingVoltageUP;
 
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -27,32 +31,65 @@ public class HoodSubsystem extends FullSubsystem {
    * Defines all possible states for the hood. Each goal state has a DoubleSupplier arguement that updates from Robot State
    */
   // ADD MVP STATE
+  //1:02 make sure this is tested to work as expected isn't causing any issues.
   public enum Goal {
+    IDLE,
+    PREPARE_HUB,
+    SHOOT,
+    JUGGLE,
+    DEBUGGING,
+    DEBUGGING_VOLT_UP,
+    DEBUGGING_VOLT_DOWN,
+    STATIC
     // Stop ClosedLoopControl on the Hood, Remains in Brake Mode
-    IDLE(() -> 0.0),
-    // Angular setpoint calculated by the ShotCalculator for the Hub.
-    PREPARE_HUB(() -> RobotState.getInstance().getCustomShotData().correctedTargetAngle()),
-    // Currently mirrors PREPARE_HUB but I added it so it can edited/tuned separately
-    SHOOT(
-        () ->
-            RobotState.getInstance()
-                .getCustomShotData()
-                .correctedTargetAngle()), // Change if Necessary
-    // Static angle for juggling them balls into our own hopper LOL
-    JUGGLE(() -> HoodConstants.jugglingAngle),
-    // Static angular state for subsystem testing
-    DEBUGGING(() -> HoodConstants.debuggingAngle),
-    DEBUGGING_VOLT_UP(() -> HoodConstants.kDebuggingVoltageUP),
-    DEBUGGING_VOLT_DOWN(() -> HoodConstants.kDebuggingVoltageDOWN),
-    STATIC(() -> HoodConstants.staticAngle);
+    // IDLE(() -> 0.0),
+    // // Angular setpoint calculated by the ShotCalculator for the Hub.
+    // PREPARE_HUB(() -> RobotState.getInstance().getCustomShotData().correctedTargetAngle()),
+    // // Currently mirrors PREPARE_HUB but I added it so it can edited/tuned separately
+    // SHOOT(
+    //     () ->
+    //         RobotState.getInstance()
+    //             .getCustomShotData()
+    //             .correctedTargetAngle()), // Change if Necessary
+    // // Static angle for juggling them balls into our own hopper LOL
+    // JUGGLE(() -> HoodConstants.jugglingAngle),
+    // // Static angular state for subsystem testing
+    // DEBUGGING(() -> HoodConstants.debuggingAngle),
+    // DEBUGGING_VOLT_UP(() -> HoodConstants.kDebuggingVoltageUP),
+    // DEBUGGING_VOLT_DOWN(() -> HoodConstants.kDebuggingVoltageDOWN),
+    // STATIC(() -> HoodConstants.staticAngle);
 
-    // Required Arguement for each enum state
-    private final DoubleSupplier angleRads;
+    // // Required Arguement for each enum state
+    // private final DoubleSupplier angleRads;
 
     /** Returns the current target angle for this goal state. */
-    private double getGoal() {
-      return angleRads.getAsDouble();
+    // private double getGoal() {
+    //   return angleRads.getAsDouble();
+    // }
+  }
+
+  private double getAsDouble(Goal currentGoal){
+    switch(currentGoal){
+      case IDLE:
+        return 0.0;
+      case PREPARE_HUB:
+        return RobotState.getInstance().getCustomShotData().correctedTargetAngle();
+      case SHOOT:
+        return RobotState.getInstance().getCustomShotData().correctedTargetAngle();
+      case JUGGLE:
+        return HoodConstants.jugglingAngle;
+      case DEBUGGING:
+        return HoodConstants.debuggingAngle;
+      case DEBUGGING_VOLT_UP:
+        return HoodConstants.kDebuggingVoltageUP;
+      case DEBUGGING_VOLT_DOWN:
+        return HoodConstants.kDebuggingVoltageDOWN;
+      case STATIC:
+        return HoodConstants.staticAngle;
+      default:
+        return 0.0;
     }
+
   }
 
   @AutoLogOutput(key = "Hood/Goal")
@@ -81,9 +118,9 @@ public class HoodSubsystem extends FullSubsystem {
     if (currentGoal == Goal.IDLE) {
       stop();
     } else if (currentGoal == Goal.DEBUGGING_VOLT_UP || currentGoal == Goal.DEBUGGING_VOLT_DOWN) {
-      runVoltage(currentGoal.getGoal());
+      runVoltage(getAsDouble(currentGoal));
     } else {
-      runAngular(currentGoal.getGoal());
+      runAngular(getAsDouble(currentGoal));
     }
   }
 
@@ -109,7 +146,7 @@ public class HoodSubsystem extends FullSubsystem {
    */
   public boolean atGoal() {
     return currentGoal == Goal.IDLE
-        || Math.abs(getAngle() - currentGoal.getGoal()) <= HoodConstants.closedLoopAngularTolerance;
+        || Math.abs(getAngle() - getAsDouble(currentGoal)) <= HoodConstants.closedLoopAngularTolerance;
   }
 
   /**

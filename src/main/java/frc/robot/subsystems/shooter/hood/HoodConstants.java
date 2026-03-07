@@ -26,8 +26,9 @@ public class HoodConstants {
   // https://cad.onshape.com/documents/4e82030250652400505b5189/w/167427ae385287ae525c40f5/e/b221a965ecb48b8e800aa181
   private static final double kPinionHerringboneDiametralPitch = 10.0; // Solved via CAD
   private static final double kHoodHerringboneDiametralPitch = 10.0; // Solved via CAD
-  private static final double kPinionHerringbonePitchDiameter = Units.inchesToMeters(1.4);
-  private static final double kHoodHerringbonePitchDiameter = Units.inchesToMeters(14);
+  //check but from memory it is .9 so maybe switch it out so that its .9 instead of 1.4
+  private static final double kPinionHerringbonePitchDiameter = 8;
+  private static final double kHoodHerringbonePitchDiameter = 146;
   private static final double kPinionHerringbonePitchRadius =
       kPinionHerringbonePitchDiameter / 2; // Unused
   private static final double kHoodHarringtonPitchRadius =
@@ -36,8 +37,8 @@ public class HoodConstants {
   private static final double kTotalReduction =
       kMotorToBottomPulleyReduction
           * kBottomPulleyToTopPulleyReduction
-          * (kHoodHerringbonePitchDiameter / kPinionHerringbonePitchDiameter);
-
+          * (kPinionHerringbonePitchDiameter / kHoodHerringbonePitchDiameter );
+    //since kaden hasen't pushed make sure these are changed
   public static final double minAngleRad = Math.toRadians(minAngleDeg);
   public static final double maxAngleRad = Math.toRadians(maxAngleDeg);
 
