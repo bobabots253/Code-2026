@@ -95,7 +95,8 @@ public class FlywheelSubsystem extends FullSubsystem {
       case IDLE:
         return (!isWarm) ? 0.0 : Units.rotationsPerMinuteToRadiansPerSecond(1500);
       case SHOOT:
-        //also 12:51 make sure that this works properly after checking that the distance and the interpolating map is correct.(debatable to test if this works before the map)
+        // also 12:51 make sure that this works properly after checking that the distance and the
+        // interpolating map is correct.(debatable to test if this works before the map)
         return RobotState.getInstance().getCustomShotData().correctTargetVelocity();
       case JUGGLE:
         return FlywheelConstants.jugglingVelocity;

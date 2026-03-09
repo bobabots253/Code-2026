@@ -1,10 +1,6 @@
 package frc.robot.subsystems.shooter.hood;
 
-import static frc.robot.subsystems.intake.pivot.PivotConstants.debuggingAngle;
-import static frc.robot.subsystems.intake.pivot.PivotConstants.jugglingAngle;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.highCurrentAmps;
-import static frc.robot.subsystems.shooter.hood.HoodConstants.kDebuggingVoltageDOWN;
-import static frc.robot.subsystems.shooter.hood.HoodConstants.kDebuggingVoltageUP;
 
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -31,7 +27,7 @@ public class HoodSubsystem extends FullSubsystem {
    * Defines all possible states for the hood. Each goal state has a DoubleSupplier arguement that updates from Robot State
    */
   // ADD MVP STATE
-  //1:02 make sure this is tested to work as expected isn't causing any issues.
+  // 1:02 make sure this is tested to work as expected isn't causing any issues.
   public enum Goal {
     IDLE,
     PREPARE_HUB,
@@ -68,8 +64,8 @@ public class HoodSubsystem extends FullSubsystem {
     // }
   }
 
-  private double getAsDouble(Goal currentGoal){
-    switch(currentGoal){
+  private double getAsDouble(Goal currentGoal) {
+    switch (currentGoal) {
       case IDLE:
         return 0.0;
       case PREPARE_HUB:
@@ -89,7 +85,6 @@ public class HoodSubsystem extends FullSubsystem {
       default:
         return 0.0;
     }
-
   }
 
   @AutoLogOutput(key = "Hood/Goal")
@@ -146,7 +141,8 @@ public class HoodSubsystem extends FullSubsystem {
    */
   public boolean atGoal() {
     return currentGoal == Goal.IDLE
-        || Math.abs(getAngle() - getAsDouble(currentGoal)) <= HoodConstants.closedLoopAngularTolerance;
+        || Math.abs(getAngle() - getAsDouble(currentGoal))
+            <= HoodConstants.closedLoopAngularTolerance;
   }
 
   /**

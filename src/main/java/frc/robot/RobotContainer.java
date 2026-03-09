@@ -131,7 +131,7 @@ public class RobotContainer {
                 // new VisionIOLimelight(VisionConstants.cameraOrange,
                 // swerveSubsystem::getRotation),
                 new VisionIOLimelight(VisionConstants.cameraYellow, swerveSubsystem::getRotation),
-                new VisionIOLimelight(VisionConstants.cameraPink, swerveSubsystem::getRotation));
+                new VisionIOLimelight(VisionConstants.cameraPurple, swerveSubsystem::getRotation));
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
 

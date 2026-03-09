@@ -178,7 +178,7 @@ public class Vision extends FullSubsystem {
         consumer.accept(
             observation.pose().toPose2d(),
             observation.timestamp(),
-            VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+            VecBuilder.fill(linearStdDev, linearStdDev, 9999999999999999999.0));
       }
 
       // Log camera data (Disable in Match to save Bandwidth)
