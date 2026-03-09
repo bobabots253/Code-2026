@@ -13,7 +13,7 @@ public class HoodConstants {
   public static final double toleranceRad = Units.degreesToRadians(toleranceDeg);
 
   public static final double minAngleDeg = 0.0;
-  public static final double maxAngleDeg = 40.0;
+  public static final double maxAngleDeg = 54.0;
 
   public static final double hoodOffsetRad = Units.degreesToRadians(45); // Radians, Solve
 
@@ -26,9 +26,8 @@ public class HoodConstants {
   // https://cad.onshape.com/documents/4e82030250652400505b5189/w/167427ae385287ae525c40f5/e/b221a965ecb48b8e800aa181
   private static final double kPinionHerringboneDiametralPitch = 10.0; // Solved via CAD
   private static final double kHoodHerringboneDiametralPitch = 10.0; // Solved via CAD
-  //check but from memory it is .9 so maybe switch it out so that its .9 instead of 1.4
-  private static final double kPinionHerringbonePitchDiameter = 8;
-  private static final double kHoodHerringbonePitchDiameter = 146;
+  private static final double kPinionHerringbonePitchDiameter = Units.inchesToMeters(0.9);
+  private static final double kHoodHerringbonePitchDiameter = Units.inchesToMeters(14);
   private static final double kPinionHerringbonePitchRadius =
       kPinionHerringbonePitchDiameter / 2; // Unused
   private static final double kHoodHarringtonPitchRadius =
@@ -37,8 +36,8 @@ public class HoodConstants {
   private static final double kTotalReduction =
       kMotorToBottomPulleyReduction
           * kBottomPulleyToTopPulleyReduction
-          * (kPinionHerringbonePitchDiameter / kHoodHerringbonePitchDiameter );
-    //since kaden hasen't pushed make sure these are changed
+          * (kHoodHerringbonePitchDiameter / kPinionHerringbonePitchDiameter);
+  // since kaden hasen't pushed make sure these are changed
   public static final double minAngleRad = Math.toRadians(minAngleDeg);
   public static final double maxAngleRad = Math.toRadians(maxAngleDeg);
 
@@ -55,7 +54,7 @@ public class HoodConstants {
       Units.degreesToRadians(71.5); // Check interpolator for values
   public static final double debuggingAngle = Units.degreesToRadians(35); // Change as needed
 
-  public static final double staticAngle = Units.degreesToRadians(35);
+  public static final double staticAngle = Units.degreesToRadians(45.25);
 
   public static final double closedLoopAngularTolerance =
       Units.degreesToRadians(1.0); // Change to heuristic value

@@ -334,7 +334,6 @@ public class RobotContainer {
         .y()
         .whileTrue(flywheelSubsystem.runVelocityPIDCommand())
         .whileTrue(hoodSubsystem.runStaticAngleCommand());
-    ;
     // .whileTrue(flywheelSubsystem.runStaticVelocitCommand())
 
     operator.povDown().whileTrue(hoodSubsystem.runDebuggingVoltageDownCommand());
