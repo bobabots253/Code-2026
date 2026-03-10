@@ -90,12 +90,12 @@ public class ShootOnTheFlyCalculator {
       Pose3d targetPose,
       ChassisSpeeds fieldRelRobotVelocity,
       ChassisAccelerations fieldRelRobotAcceleration,
-      double goalPositionIterations,
+      int goalPositionIterations,
       double accelerationCompensationFactor) {
 
     double shotTime = getTimeToShootUsingPhysics(shooterPose, targetPose);
 
-    Pose3d correctedTargetPose = new Pose3d();
+    Pose3d correctedTargetPose = targetPose;
     for (int i = 0; i < goalPositionIterations; i++) {
       double virtualGoalX =
           targetPose.getX()

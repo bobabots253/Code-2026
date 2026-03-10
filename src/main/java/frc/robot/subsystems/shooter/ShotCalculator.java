@@ -1,6 +1,7 @@
 package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -9,45 +10,71 @@ import frc.robot.RobotState;
 import frc.robot.fieldSetup;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.util.FullSubsystem;
+import frc.robot.util.shooterUtil.ShootOnTheFlyCalculator;
 import frc.robot.util.shooterUtil.ShootOnTheFlyConstants;
 import frc.robot.util.swerveUtil.ChassisAccelerations;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class ShotCalculator extends FullSubsystem {
+
+  public enum CompensationMode {
+    // Aim directly at hub. No robot motion factored in.
+    STATIC,
+    // Shift virtual target opposite to robot velocity × flight time.
+    VELOCITY,
+    // Shift virtual target opposite to robot velocity + acceleration × flight time.
+    VELOCITY_AND_ACCELERATION
+  }
+
+  private CompensationMode currentCompensationMode = CompensationMode.STATIC;
+
+  // Tunable Constants for SOTF Calculations
+  private static final double ACCELERATION_COMPENSATION_FACTOR = 0.001;
+  private static final int SOTF_ITERATIONS = 5;
+
   private final SwerveSubsystem swerveSubsystem;
 
-  private Pose2d targetLocation;
+  private Pose2d targetLocation = Pose2d.kZero;
   private Translation2d blueHubTarget = fieldSetup.blueHubCenter.toTranslation2d();
   private Translation2d redHubTarget = fieldSetup.redHubCenter.toTranslation2d();
 
-  private Pose2d shooterPose = Pose2d.kZero;
-
   @AutoLogOutput(key = "ShotCalculator/CorrectedTargetPose")
-  private Pose2d correctedTargetPose = Pose2d.kZero;
+  private Pose3d correctedTargetPose3d = Pose3d.kZero;
+
+  private Pose3d shooterPose3d = Pose3d.kZero;
 
   private Pose2d robotPose = Pose2d.kZero;
 
   @AutoLogOutput(key = "ShotCalculator/DrivetrainSpeeds")
-  ChassisSpeeds drivetrainSpeeds;
+  private ChassisSpeeds drivetrainSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
-  @AutoLogOutput(key = "ShotCalculator/Error")
+  @AutoLogOutput(key = "ShotCalculator/AngularError")
   private Rotation2d angularError = Rotation2d.kZero;
 
   ChassisAccelerations drivetrainAccelerations =
       new ChassisAccelerations(0.0, 0.0, 0.0); // Initialize with zero accelerations
 
-  private double distanceToHub2D;
-  private double distanceToHub3D;
+  private double distanceToHub2D = 0.0;
+  private double distanceToHub3D = 0.0;
 
-  Rotation2d fieldToHubAngle;
+  private Rotation2d fieldToHubAngle = Rotation2d.kZero;
 
-  Double targetSpeedRPM = 0.0;
-  Double targetSpeedMPS = 0.0;
-  Double targetAngle = 0.0;
+  private double targetSpeedRPM = 0.0;
+  private double targetSpeedMPS = 0.0;
+  private double targetAngleDeg = 0.0;
 
   public ShotCalculator(SwerveSubsystem swerveSubsystem) {
     this.swerveSubsystem = swerveSubsystem;
+  }
+
+  public void setCompensationMode(CompensationMode mode) {
+    this.currentCompensationMode = mode;
+  }
+
+  @AutoLogOutput(key = "ShotCalculator/CompensationMode")
+  public String getCompensationModeString() {
+    return currentCompensationMode.name();
   }
 
   @Override
@@ -55,42 +82,61 @@ public class ShotCalculator extends FullSubsystem {
     robotPose = swerveSubsystem.getPose(); // Good
     updateTargetByAlliance(); // Good
 
-    correctedTargetPose = targetLocation;
-
-    shooterPose = (robotPose);
-    // .plus(ShootOnTheFlyConstants.SHOOTER_TRANSFORM_CENTER);
-
     drivetrainSpeeds = swerveSubsystem.getChassisSpeeds();
     drivetrainAccelerations = swerveSubsystem.getFieldRelativeChassisAccelerations();
 
-    // Default to uncorrected target pose
-    // ShootOnTheFlyCalculator.calculateEffectiveTargetLocation(
-    //     shooterPose, targetLocation, drivetrainSpeeds, drivetrainAccelerations, 5, 0.001)
+    shooterPose3d = new Pose3d(robotPose).plus(ShootOnTheFlyConstants.SHOOTER_TRANSFORM_CENTER);
+
+    Pose3d rawTargetPose3d =
+        new Pose3d(
+            targetLocation.getX(),
+            targetLocation.getY(),
+            fieldSetup.blueHubCenter.getZ(), // CHECK THIS VALUE, hub inner opening (meters)
+            Pose3d.kZero.getRotation());
+
+    switch (currentCompensationMode) {
+      case STATIC:
+        // Default to uncorrected target pose
+        correctedTargetPose3d = rawTargetPose3d;
+        break;
+      case VELOCITY:
+        correctedTargetPose3d =
+            ShootOnTheFlyCalculator.calculateEffectiveTargetLocation(
+                shooterPose3d,
+                rawTargetPose3d,
+                drivetrainSpeeds,
+                drivetrainAccelerations,
+                SOTF_ITERATIONS,
+                0.0);
+        break;
+      case VELOCITY_AND_ACCELERATION:
+        correctedTargetPose3d =
+            ShootOnTheFlyCalculator.calculateEffectiveTargetLocation(
+                shooterPose3d,
+                rawTargetPose3d,
+                drivetrainSpeeds,
+                drivetrainAccelerations,
+                SOTF_ITERATIONS,
+                ACCELERATION_COMPENSATION_FACTOR);
+        break;
+    }
 
     // https://stackoverflow.com/questions/21483999/using-atan2-to-find-angle-between-two-vectors
-    // 12:48 josh is saying that its using the shooter pose which is transformed off the robot pose
-    // so check this value by measuring from shooter to center of hub.
 
-    Translation2d fieldToHubTranslation = correctedTargetPose.getTranslation();
+    Translation2d correctedTargetXYCoords =
+        new Translation2d(correctedTargetPose3d.getX(), correctedTargetPose3d.getY());
+    Translation2d shooterXYCoords = shooterPose3d.toPose2d().getTranslation();
 
-    fieldToHubAngle =
-        new Rotation2d(
-            Math.atan2(
-                fieldToHubTranslation.getY() - shooterPose.getTranslation().getY(),
-                fieldToHubTranslation.getX() - shooterPose.getTranslation().getX()));
+    fieldToHubAngle = correctedTargetXYCoords.minus(shooterXYCoords).getAngle();
+    // Functionally equivalent to atan2(dy, dx) but avoids the manual subtraction + easier to read
 
-    // 6328: Rotation2d fieldToHubAngle = target.minus(robotPose.getTranslation()).getAngle();
-    // Functionally equivalent to atan2(dy, dx) but avoids the manual subtraction
-
-    distanceToHub2D =
-        correctedTargetPose.getTranslation().getDistance(shooterPose.getTranslation());
-
+    distanceToHub2D = shooterXYCoords.getDistance(correctedTargetXYCoords);
     distanceToHub3D =
-        correctedTargetPose.getTranslation().getDistance(shooterPose.getTranslation());
+        shooterPose3d.getTranslation().getDistance(correctedTargetPose3d.getTranslation());
 
     targetSpeedRPM = ShootOnTheFlyConstants.FLYWHEEL_RPM_INTERPOLATOR.get(distanceToHub2D);
     targetSpeedMPS = ShootOnTheFlyConstants.FLYWHEEL_VELOCITY_INTERPOLATOR.get(distanceToHub2D);
-    targetAngle = ShootOnTheFlyConstants.HOOD_DEGREES_INTERPOLATOR.get(distanceToHub2D);
+    targetAngleDeg = ShootOnTheFlyConstants.HOOD_DEGREES_INTERPOLATOR.get(distanceToHub2D);
 
     angularError = fieldToHubAngle.minus(robotPose.getRotation());
 
@@ -111,7 +157,7 @@ public class ShotCalculator extends FullSubsystem {
    * Note: the rotation of this Pose2d is meaningless
    */
   public Pose2d getCorrectedTargetPose2d() {
-    return correctedTargetPose;
+    return new Pose2d(correctedTargetPose3d.getX(), correctedTargetPose3d.getY(), new Rotation2d());
   }
 
   public double getCorrectedTargetSpeedRPM() {
@@ -125,7 +171,7 @@ public class ShotCalculator extends FullSubsystem {
 
   @AutoLogOutput(key = "ShotCalculator/CorrectedTargetAngle")
   public double getCorrectedTargetAngle() {
-    return targetAngle;
+    return targetAngleDeg;
   }
 
   @AutoLogOutput(key = "ShotCalculator/CorrectTargetRotation")
