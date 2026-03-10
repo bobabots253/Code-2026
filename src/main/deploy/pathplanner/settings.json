@@ -2,8 +2,14 @@
   "robotWidth": 0.8,
   "robotLength": 0.8,
   "holonomicMode": true,
-  "pathFolders": [],
-  "autoFolders": [],
+  "pathFolders": [
+    "Citrus Auto",
+    "Default NZ Auto",
+    "Depot Auto"
+  ],
+  "autoFolders": [
+    "Default NZ Auto"
+  ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,

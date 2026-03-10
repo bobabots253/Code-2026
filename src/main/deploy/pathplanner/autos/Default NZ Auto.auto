@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CLT_Entry"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CLT_Pass1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CLT_Shoot1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CLT_Pass2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CLT_Shoot2"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": false,
+  "folder": "Default NZ Auto",
+  "choreoAuto": false
+}
