@@ -104,7 +104,7 @@ public class HoodIOSpark implements HoodIO {
   public void applyOutputs(HoodIOOutputs outputs) {
 
     // Safety check to prevent over/under extension
-    // May need additional acceleration limits if the rack teeth start shearing
+    // THE USER MUST GET THIS RIGHT
     double safeSetpoint = Math.max(minAngleRad, Math.min(maxAngleRad, outputs.positionRad));
 
     switch (outputs.mode) {

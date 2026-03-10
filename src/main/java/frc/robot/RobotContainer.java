@@ -289,7 +289,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
 
-    // ------- DT
+    // ------- Driver Controls -------- \\
 
     swerveSubsystem.setDefaultCommand(
         DriveCommands.joystickDrive(
@@ -324,6 +324,8 @@ public class RobotContainer {
             hoodSubsystem.dynamicUpdatedShootCommand(
                 () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())));
 
+    // ------- Operator Controls -------- \\
+
     operator.povLeft().onTrue(flywheelSubsystem.toggleWarm());
     // .whileTrue(
     //   hoodSubsystem.dynamicUpdatedShootCommand(() -> shotCalculator.getCorrectedTargetAngle()));
@@ -339,16 +341,15 @@ public class RobotContainer {
 
     operator
         .y()
-        .whileTrue(flywheelSubsystem.runVelocityPIDCommand())
-        .whileTrue(hoodSubsystem.runStaticAngleCommand());
-    // .whileTrue(flywheelSubsystem.runStaticVelocitCommand())
+        .whileTrue(flywheelSubsystem.runLayupCommand())
+        .whileTrue(hoodSubsystem.runLayupCommand());
 
     operator.povDown().whileTrue(hoodSubsystem.runDebuggingVoltageDownCommand());
     operator.povUp().whileTrue(hoodSubsystem.runDebuggingVoltageUpCommand());
 
     operator.povRight().whileTrue(flywheelSubsystem.runDebuggingVelocityCommand());
 
-    // ------ Debugging
+    // ------ Debugging -------- \\
 
     // Default command, normal field-relative drive
     // swerveSubsystem.setDefaultCommand(
@@ -357,63 +358,6 @@ public class RobotContainer {
     //         () -> -controller.getLeftY(),
     //         () -> -controller.getLeftX(),
     //         () -> -controller.getRightX()));
-
-    // controller.a().onTrue(pivotSubsystem.deployCommand());
-
-    // controller
-    //     .b()
-    //     .whileTrue(flywheelSubsystem.runDebuggingVelocityCommand())
-    //     .whileTrue(hoodSubsystem.runDebuggingCommand());
-
-    // controller.y().onTrue(pivotSubsystem.stowCommand());
-
-    // controller
-    //     .x()
-    //     .whileTrue(
-    //         DriveCommands.joystickDriveAtAngle(
-    //             swerveSubsystem,
-    //             () -> -controller.getLeftY(),
-    //             () -> -controller.getLeftX(),
-    //             () -> shotCalculator.getFieldToHubAngle()));
-
-    // controller
-    //     .leftBumper()
-    //     .whileTrue(rollerSubsystem.intakeCommand())
-    //     .whileTrue(agitatorSubsystem.intakeCommand());
-
-    // controller
-    //     .rightBumper()
-    //     .whileTrue(indexerSubsystem.runCurrentCommand())
-    //     .whileTrue(kickerSubsystem.indexCommand())
-    //     .whileTrue(agitatorSubsystem.indexCommand());
-
-    // controller.povDown().whileTrue(hoodSubsystem.runDebuggingVoltageDownCommand());
-    // controller.povUp().whileTrue(hoodSubsystem.runDebuggingVoltageUpCommand());
-
-    // controller.rightTrigger().whileTrue(rollerSubsystem.runUnjamCommand());
-
-    // controller.povRight().whileTrue(flywheelSubsystem.runDebuggingVelocityCommand());
-
-    // // Bug, Only Updated Hood Angle Once
-    // controller
-    //     .povLeft()
-    //     .whileTrue(flywheelSubsystem.shootCommand())
-    //     .whileTrue(hoodSubsystem.shootCommand());
-
-    // Shoot on the fly when X button is pressed
-    // controller.x().whileTrue(shooterSubsystem.simShootOnTheFlyCommand());
-
-    // Shoot on the fly while Y button is held, With drive control
-    // controller
-    //     .y()
-    //     .whileTrue(
-    //         Commands.parallel(
-    //             DriveCommands.joystickDriveAtAngle(
-    //                 swerveSubsystem,
-    //                 () -> -controller.getLeftY(),
-    //                 () -> -controller.getLeftX(),
-    //                 () -> shotCalculator.getCorrectTargetRotation()),
-    //             shooterSubsystem.simShootOnTheFlyCommand()));
 
     // Reset gyro to 0° when B button is pressed
     // controller
@@ -427,32 +371,6 @@ public class RobotContainer {
     //                 swerveSubsystem)
     //             .ignoringDisable(true));
   }
-
-  //   public void configureFuelSim() {
-  //     FuelSim instance = FuelSim.getInstance();
-  //     instance.spawnStartingFuel();
-  //     instance.registerRobot(
-  //         SwerveConstants.ROBOT_LENGTH.in(Meters),
-  //         SwerveConstants.ROBOT_WIDTH.in(Meters),
-  //         SwerveConstants.BUMPER_HEIGHT.in(Meters),
-  //         swerveSubsystem::getPose,
-  //         swerveSubsystem::getChassisSpeeds);
-  //     instance.registerIntake(
-  //         SwerveConstants.ROBOT_LENGTH.div(2).in(Meters),
-  //         SwerveConstants.ROBOT_LENGTH.div(2).plus(Inches.of(5)).in(Meters),
-  //         SwerveConstants.ROBOT_WIDTH.div(2).unaryMinus().in(Meters),
-  //         SwerveConstants.ROBOT_WIDTH.div(2).in(Meters),
-  //         () -> true && shooterSubsystem.simAbleToIntake(),
-  //         shooterSubsystem::simIntake);
-
-  //     instance.start();
-  //     Commands.runOnce(
-  //             () -> {
-  //               FuelSim.getInstance().clearFuel();
-  //               FuelSim.getInstance().spawnStartingFuel();
-  //             })
-  //         .schedule();
-  //   }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

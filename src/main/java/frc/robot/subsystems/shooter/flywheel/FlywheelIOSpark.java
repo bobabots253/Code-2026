@@ -215,6 +215,7 @@ public class FlywheelIOSpark implements FlywheelIO {
 
   @Override
   public void applyOutputs(FlywheelIOOutputs outputs) {
+    double setpoint = outputs.velocityRadsPerSec;
     // Better Implementation of Bang-Bang and TorqueCurrentFOC cuz REV API ;(
     // Strucutre:
     // https://www.chiefdelphi.com/t/frc-6328-mechanical-advantage-2026-build-thread/509595/272
@@ -226,17 +227,15 @@ public class FlywheelIOSpark implements FlywheelIO {
         break;
       case CURRENT: // DO NOT USE, BROKEN
         masterVortexController.setSetpoint(
-            FlywheelConstants.kDebuggingCurrent, ControlType.kCurrent, ClosedLoopSlot.kSlot0);
+            FlywheelConstants.debuggingCurrent, ControlType.kCurrent, ClosedLoopSlot.kSlot0);
         break;
-      case VELOCITY_SPARK:
-        double RPMsetpoint = outputs.velocityRadsPerSec;
-        double arrfeedForward = ffcalculator.calculate(RPMsetpoint);
+      case VELOCITY_PID:
+        double arrfeedForward = ffcalculator.calculate(setpoint);
         masterVortexController.setSetpoint(
-            RPMsetpoint, ControlType.kVelocity, ClosedLoopSlot.kSlot1, arrfeedForward);
+            setpoint, ControlType.kVelocity, ClosedLoopSlot.kSlot1, arrfeedForward);
         break;
-      case VELOCITY_SETPOINT:
+      case VELOCITY_BANG_BANG_TORQUE:
         double measuredVelocity = outputs.measuredVelocityRadPerSec;
-        double setpoint = outputs.velocityRadsPerSec;
 
         double error = setpoint - measuredVelocity;
         Logger.recordOutput("Flywheel/Error", error);

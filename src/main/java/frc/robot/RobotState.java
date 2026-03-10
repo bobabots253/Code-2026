@@ -28,14 +28,18 @@ public class RobotState {
       double shooterToCorrectTargetPoseDistance,
       double shooterToCorrectTargetPoseDistance3D) {}
 
-  public record ShotCoordinator(
-      double flywheelRadPerSec, double flywheelGoalRadPerSec, double shotTolerance) {}
+  public record ShooterSubsystemParameters(
+      double flywheelVelocityRadPerSec,
+      double flywheelVelocityGoalRadPerSec,
+      double flywheelVelocityToleranceRadPerSec) {}
 
   @AutoLogOutput(key = "RobotState/ShotData")
   private ShootingParameters latestShotData =
       new ShootingParameters(Pose2d.kZero, 0.0, 0.0, 0.0, Rotation2d.kZero, 0.0, 0.0);
 
-  private ShotCoordinator coordinator = new ShotCoordinator(0.0, 50000, 0.0);
+  @AutoLogOutput(key = "RobotState/ShotCoordinator")
+  private ShooterSubsystemParameters shooterSubsystemParameters =
+      new ShooterSubsystemParameters(0.0, 0.0, 0.0);
 
   private static RobotState instance;
 
@@ -48,8 +52,8 @@ public class RobotState {
     this.latestShotData = data;
   }
 
-  public void setShotCoordinator(ShotCoordinator data) {
-    this.coordinator = data;
+  public void setShotCoordinator(ShooterSubsystemParameters data) {
+    this.shooterSubsystemParameters = data;
   }
 
   @AutoLogOutput(key = "RobotState/ShootingParameters")
@@ -57,7 +61,7 @@ public class RobotState {
     return latestShotData;
   }
 
-  public ShotCoordinator getShotCoordinatorData() {
-    return coordinator;
+  public ShooterSubsystemParameters getShotCoordinatorData() {
+    return shooterSubsystemParameters;
   }
 }
