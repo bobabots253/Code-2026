@@ -16,6 +16,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -316,6 +317,12 @@ public class RobotContainer {
         .b()
         .whileTrue(flywheelSubsystem.juggleCommand())
         .whileTrue(hoodSubsystem.juggleCommand());
+
+    driver
+        .a()
+        .whileTrue(
+            hoodSubsystem.dynamicUpdatedShootCommand(
+                () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())));
 
     operator.povLeft().onTrue(flywheelSubsystem.toggleWarm());
     // .whileTrue(

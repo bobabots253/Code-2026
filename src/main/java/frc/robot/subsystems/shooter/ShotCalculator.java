@@ -32,7 +32,7 @@ public class ShotCalculator extends FullSubsystem {
   ChassisSpeeds drivetrainSpeeds;
 
   @AutoLogOutput(key = "ShotCalculator/Error")
-  private double angularError = 0.0;
+  private Rotation2d angularError = Rotation2d.kZero;
 
   ChassisAccelerations drivetrainAccelerations =
       new ChassisAccelerations(0.0, 0.0, 0.0); // Initialize with zero accelerations
@@ -91,7 +91,7 @@ public class ShotCalculator extends FullSubsystem {
     targetSpeedMPS = ShootOnTheFlyConstants.FLYWHEEL_VELOCITY_INTERPOLATOR.get(distanceToHub2D);
     targetAngle = ShootOnTheFlyConstants.HOOD_DEGREES_INTERPOLATOR.get(distanceToHub2D);
 
-    angularError = fieldToHubAngle.minus(robotPose.getRotation()).getDegrees();
+    angularError = fieldToHubAngle.minus(robotPose.getRotation());
 
     // Publish Shot Calculation Data to Robot State
     RobotState.getInstance()
