@@ -50,7 +50,7 @@ public class FlywheelSubsystem extends FullSubsystem {
     LAYUP
   }
 
-  private double getAsDouble(Goal currentGoal) {
+  private double getGoalAsDouble(Goal currentGoal) {
     switch (currentGoal) {
       case IDLE:
         return (!isWarm) ? 0.0 : Units.rotationsPerMinuteToRadiansPerSecond(1500);
@@ -105,13 +105,13 @@ public class FlywheelSubsystem extends FullSubsystem {
     if (currentGoal == Goal.IDLE && !isWarm) {
       stop();
     } else if (currentGoal == Goal.IDLE && isWarm) {
-      runVelocityPID(getAsDouble(currentGoal));
+      runVelocityPID(getGoalAsDouble(currentGoal));
     } else if (currentGoal == Goal.CURRENT) {
-      runCurrent(getAsDouble(currentGoal));
+      runCurrent(getGoalAsDouble(currentGoal));
     } else if (currentGoal == Goal.JUGGLE) {
-      runVelocityPID(getAsDouble(currentGoal));
+      runVelocityPID(getGoalAsDouble(currentGoal));
     } else {
-      runVelocityPID(getAsDouble(currentGoal));
+      runVelocityPID(getGoalAsDouble(currentGoal));
     }
 
     // Update Acceleration
@@ -135,7 +135,7 @@ public class FlywheelSubsystem extends FullSubsystem {
   public void periodicAfterScheduler() {
     Logger.recordOutput("Flywheel/Mode", outputs.mode);
     Logger.recordOutput("Flywheel/isWarm", isWarm);
-    Logger.recordOutput("Flywheel/getAsADouble", getAsDouble(currentGoal));
+    Logger.recordOutput("Flywheel/getAsADouble", getGoalAsDouble(currentGoal));
     io.applyOutputs(outputs);
   }
 
@@ -155,7 +155,7 @@ public class FlywheelSubsystem extends FullSubsystem {
    */
   public boolean atGoal() {
     return currentGoal == Goal.IDLE
-        || Math.abs(getVelocity() - getAsDouble(currentGoal))
+        || Math.abs(getVelocity() - getGoalAsDouble(currentGoal))
             <= FlywheelConstants.closedLoopVelocityTolerance;
   }
 

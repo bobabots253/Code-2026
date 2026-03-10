@@ -80,6 +80,7 @@ public class ShotCalculator extends FullSubsystem {
                 fieldToHubTranslation.getX() - shooterPose.getTranslation().getX()));
 
     // 6328: Rotation2d fieldToHubAngle = target.minus(robotPose.getTranslation()).getAngle();
+    // Functionally equivalent to atan2(dy, dx) but avoids the manual subtraction
 
     distanceToHub2D =
         correctedTargetPose.getTranslation().getDistance(shooterPose.getTranslation());

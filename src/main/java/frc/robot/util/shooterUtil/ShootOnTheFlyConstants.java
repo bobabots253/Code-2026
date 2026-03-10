@@ -8,6 +8,8 @@ import edu.wpi.first.math.util.Units;
 
 public class ShootOnTheFlyConstants {
 
+  public static final double FLYWHEEL_RADIUS_METERS = Units.inchesToMeters(2.0);
+
   public static final double shooterHeightOffset = 0.5; // Meters, height of shooter from ground
   public static final Transform3d SHOOTER_TRANSFORM_CENTER =
       new Transform3d(-0.24, 0, 0.5, Rotation3d.kZero);
