@@ -316,15 +316,6 @@ public class RobotContainer {
         .whileTrue(flywheelSubsystem.juggleCommand())
         .whileTrue(hoodSubsystem.juggleCommand());
 
-    driver
-        .a()
-        .whileTrue(
-            hoodSubsystem.dynamicUpdatedShootCommand(
-                () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())))
-        .whileTrue(
-            flywheelSubsystem.dynamicUpdatedShootCommand(
-                () -> shotCalculator.getCorrectTargetVelocity()));
-
     // ------- Operator Controls -------- \\
 
     operator.povLeft().onTrue(flywheelSubsystem.toggleWarm());
@@ -342,8 +333,12 @@ public class RobotContainer {
 
     operator
         .y()
-        .whileTrue(flywheelSubsystem.runLayupCommand())
-        .whileTrue(hoodSubsystem.runLayupCommand());
+        .whileTrue(
+            hoodSubsystem.dynamicUpdatedShootCommand(
+                () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())))
+        .whileTrue(
+            flywheelSubsystem.dynamicUpdatedShootCommand(
+                () -> shotCalculator.getCorrectTargetVelocity()));
 
     operator.povDown().whileTrue(hoodSubsystem.runDebuggingVoltageDownCommand());
     operator.povUp().whileTrue(hoodSubsystem.runDebuggingVoltageUpCommand());
