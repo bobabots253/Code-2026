@@ -16,9 +16,10 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 
 public class VisionConstants {
-  // AprilTag layout
+  // AprilTag layout - Test FieldConstants from 6328
   public static AprilTagFieldLayout aprilTagLayout =
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField); // Fix to 2026 Layout
+  //   FieldConstants();
 
   // Camera names, must match names configured on coprocessor
   public static String cameraPurple = "limelight-purple"; // BL
@@ -68,8 +69,8 @@ public class VisionConstants {
   // Clamping ranges for vision estimates (see units)
   static final double maxLinearSpeed = 3.0; // Meters per second
   static final double maxAngularSpeed =
-      DegreesPerSecond.of(360).in(RadiansPerSecond); // Radians per second
-  static final double maxGyroError = 5.0; // Degrees
+      DegreesPerSecond.of(270).in(RadiansPerSecond); // Radians per second
+  static final double maxGyroError = 3.0; // Degrees
   static final double maxTranslationError = 1.0; // Meters
   static final int LOCK_MODE = 10;
 }
