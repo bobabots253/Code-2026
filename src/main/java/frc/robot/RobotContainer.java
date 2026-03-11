@@ -331,7 +331,6 @@ public class RobotContainer {
 
     operator.b().whileTrue(rollerSubsystem.runUnjamCommand());
 
-    operator.a().onTrue(pivotSubsystem.halfDeployCommand());
 
     operator
         .y()
