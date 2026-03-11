@@ -22,6 +22,7 @@ public class SparkOdometryThread {
   private static SparkOdometryThread instance = null;
   private Notifier notifier = new Notifier(this::run);
   private double[] sparkValuesCache = new double[0];
+  private double[] genericValuesCache = new double[0];
 
   public static SparkOdometryThread getInstance() {
     if (instance == null) instance = new SparkOdometryThread();
@@ -35,6 +36,7 @@ public class SparkOdometryThread {
   public void start() {
     if (timestampQueues.size() > 0) {
       sparkValuesCache = new double[sparkSignals.size()];
+      genericValuesCache = new double[genericSignals.size()];
       notifier.startPeriodic(1.0 / SwerveConstants.odometryFrequency);
     }
   }
@@ -78,7 +80,14 @@ public class SparkOdometryThread {
   private void run() {
     // Read hardware outside the lock to prevent stalling the main loop
     double timestamp = RobotController.getFPGATime() / 1e6;
+
+    for (int i = 0; i < genericSignals.size(); i++) {
+      genericValuesCache[i] = genericSignals.get(i).getAsDouble();
+    }
+
+    // Local variable to track spark error
     boolean isValid = true;
+
     for (int i = 0; i < sparkSignals.size(); i++) {
       sparkValuesCache[i] = sparkSignals.get(i).getAsDouble();
       if (sparks.get(i).getLastError() != REVLibError.kOk) {
@@ -95,7 +104,7 @@ public class SparkOdometryThread {
         sparkQueues.get(i).offer(sparkValuesCache[i]);
       }
       for (int i = 0; i < genericSignals.size(); i++) {
-        genericQueues.get(i).offer(genericSignals.get(i).getAsDouble());
+        genericQueues.get(i).offer(genericValuesCache[i]);
       }
       for (int i = 0; i < timestampQueues.size(); i++) {
         timestampQueues.get(i).offer(timestamp);
