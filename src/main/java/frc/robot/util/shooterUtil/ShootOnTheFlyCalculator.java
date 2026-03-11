@@ -20,9 +20,16 @@ public class ShootOnTheFlyCalculator {
    * equations. Calculations ignore air resistance, magnus effect, etc. It's dtm. Why does this
    * exist? Used to seed iterative method to find effective target location.
    *
-   * <p>Physics Broken Down Here for Sanity: vX = angularVelocity (rad/s) * flywheelRadius (m) t1 =
-   * vY / g | aka time to reach apex hMax = shooterHeight + vY^2 / (2g) t2 = sqrt(2 * (hMax -
-   * targetZ) / g) | aka time to fall from apex to target (if target is above apex)
+   * <p>Physics Broken Down Here for Sanity:
+   *
+   * <p>vX = angularVelocity (rad/s) * flywheelRadius (m)
+   *
+   * <p>t1 = vY / g | aka time to reach apex
+   *
+   * <p>hMax = shooterHeight + vY^2 / (2g)
+   *
+   * <p>t2 = sqrt(2 * (hMax - targetZ) / g) | aka time to fall from apex to target (if target is
+   * above apex)
    *
    * <p>totalTime = t1 + t2
    *

@@ -55,12 +55,6 @@ public class HoodIOSpark implements HoodIO {
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .pid(sparkMasterHoodkP, sparkMasterHoodkI, sparkMasterHoodkD);
-    // masterNEOConfig
-    // .softLimit
-    // .reverseSoftLimitEnabled(true)
-    // .reverseSoftLimit(minAngleRad)
-    // .forwardSoftLimitEnabled(true)
-    // .forwardSoftLimit(maxAngleRad);
     masterNEOConfig
         .signals
         .primaryEncoderPositionAlwaysOn(true)

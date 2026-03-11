@@ -1,5 +1,7 @@
 package frc.robot.subsystems.indexer;
 
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -140,7 +142,7 @@ public class IndexerSubsystem extends FullSubsystem {
                   Math.abs(
                       coordinator.flywheelVelocityRadPerSec()
                           - coordinator.flywheelVelocityGoalRadPerSec());
-              if (error <= coordinator.flywheelVelocityToleranceRadPerSec()) {
+              if (coordinator.flywheelVelocityRadPerSec() > Units.rotationsPerMinuteToRadiansPerSecond(1000)) {
                 setGoal(Goal.CURRENT);
               }
             },

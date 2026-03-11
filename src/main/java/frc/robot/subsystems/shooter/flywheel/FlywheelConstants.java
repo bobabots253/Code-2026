@@ -102,7 +102,7 @@ public class FlywheelConstants {
 
   // ------- GOAL CONSTANTS -------- \\
 
-  public static final double debuggingVelocity = Units.rotationsPerMinuteToRadiansPerSecond(3000);
+  public static final double debuggingVelocity = Units.rotationsPerMinuteToRadiansPerSecond(3300);
 
   public static final double layupVelocity = Units.rotationsPerMinuteToRadiansPerSecond(3000);
 

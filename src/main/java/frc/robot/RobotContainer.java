@@ -127,12 +127,10 @@ public class RobotContainer {
                 swerveSubsystem::addVisionMeasurement,
                 swerveSubsystem::getRotation,
                 swerveSubsystem::getChassisSpeeds,
-                // new VisionIOLimelight(VisionConstants.cameraPurple,
-                // swerveSubsystem::getRotation),
-                // new VisionIOLimelight(VisionConstants.cameraOrange,
-                // swerveSubsystem::getRotation),
                 new VisionIOLimelight(VisionConstants.cameraYellow, swerveSubsystem::getRotation),
-                new VisionIOLimelight(VisionConstants.cameraPurple, swerveSubsystem::getRotation));
+                new VisionIOLimelight(VisionConstants.cameraPurple, swerveSubsystem::getRotation),
+                new VisionIOLimelight(VisionConstants.cameraPink, swerveSubsystem::getRotation),
+                new VisionIOLimelight(VisionConstants.cameraOrange, swerveSubsystem::getRotation));
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
 
@@ -318,6 +316,15 @@ public class RobotContainer {
         .whileTrue(flywheelSubsystem.juggleCommand())
         .whileTrue(hoodSubsystem.juggleCommand());
 
+    driver
+        .a()
+        .whileTrue(
+            hoodSubsystem.dynamicUpdatedShootCommand(
+                () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())))
+        .whileTrue(
+            flywheelSubsystem.dynamicUpdatedShootCommand(
+                () -> shotCalculator.getCorrectTargetVelocity()));
+
     // ------- Operator Controls -------- \\
 
     operator.povLeft().onTrue(flywheelSubsystem.toggleWarm());
@@ -337,15 +344,6 @@ public class RobotContainer {
         .y()
         .whileTrue(flywheelSubsystem.runLayupCommand())
         .whileTrue(hoodSubsystem.runLayupCommand());
-
-    driver
-        .a()
-        .whileTrue(
-            hoodSubsystem.dynamicUpdatedShootCommand(
-                () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())))
-        .whileTrue(
-            flywheelSubsystem.dynamicUpdatedShootCommand(
-                () -> shotCalculator.getCorrectTargetVelocity()));
 
     operator.povDown().whileTrue(hoodSubsystem.runDebuggingVoltageDownCommand());
     operator.povUp().whileTrue(hoodSubsystem.runDebuggingVoltageUpCommand());

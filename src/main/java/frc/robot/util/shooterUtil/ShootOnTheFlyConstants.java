@@ -47,20 +47,18 @@ public class ShootOnTheFlyConstants {
     // Key: Distance (meters), Value: Shooter Velocity (rad/sec)
     // USE THIS, BUT FIX FIRST
     // Touching Hub
-    FLYWHEEL_VELOCITY_INTERPOLATOR.put(1.5, Units.rotationsPerMinuteToRadiansPerSecond(3200));
-    FLYWHEEL_VELOCITY_INTERPOLATOR.put(2.0, Units.rotationsPerMinuteToRadiansPerSecond(3400));
-    FLYWHEEL_VELOCITY_INTERPOLATOR.put(2.5, Units.rotationsPerMinuteToRadiansPerSecond(3400));
-    FLYWHEEL_VELOCITY_INTERPOLATOR.put(3.0, Units.rotationsPerMinuteToRadiansPerSecond(3400));
-    FLYWHEEL_VELOCITY_INTERPOLATOR.put(3.5, Units.rotationsPerMinuteToRadiansPerSecond(3400));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(2.5, Units.rotationsPerMinuteToRadiansPerSecond(3300));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(3.0, Units.rotationsPerMinuteToRadiansPerSecond(3300));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(3.5, Units.rotationsPerMinuteToRadiansPerSecond(3300));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(4.0, Units.rotationsPerMinuteToRadiansPerSecond(3300));
     FLYWHEEL_VELOCITY_INTERPOLATOR.put(4.0, Units.rotationsPerMinuteToRadiansPerSecond(3400));
 
     // Key: Distance (meters), Value: Hood Angle (DEGREES)
     // Touching Hub, Using Distance 2d
-    HOOD_DEGREES_INTERPOLATOR.put(1.5, 40.0);
-    HOOD_DEGREES_INTERPOLATOR.put(2.0, 37.2);
-    HOOD_DEGREES_INTERPOLATOR.put(2.5, 36.0);
-    HOOD_DEGREES_INTERPOLATOR.put(3.0, 35.0);
-    HOOD_DEGREES_INTERPOLATOR.put(3.5, 28.0);
-    HOOD_DEGREES_INTERPOLATOR.put(4.0, 26.0);
+    HOOD_DEGREES_INTERPOLATOR.put(2.5, 44.7);
+    HOOD_DEGREES_INTERPOLATOR.put(3.0, 41.17);
+    HOOD_DEGREES_INTERPOLATOR.put(3.5, 30.4);
+    HOOD_DEGREES_INTERPOLATOR.put(4.0, 25.85);
+    HOOD_DEGREES_INTERPOLATOR.put(4.0, 31.31);
   }
 }

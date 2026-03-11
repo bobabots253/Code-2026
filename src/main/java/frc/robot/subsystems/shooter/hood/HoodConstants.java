@@ -18,6 +18,8 @@ public class HoodConstants {
   public static final double minAngleRad = Math.toRadians(0.0); // Hood Deg -> Hood Rads
   public static final double maxAngleRad = Math.toRadians(54.0); // Hood Deg -> Hood Rads
 
+  // Real Max Compression @ 44.5 degrees
+
   // Gear Ratio Calculations
   // Motor Rotations per Bottom Pinion Rotation
   private static final double kMotorToBottomPulleyReduction = 25.0; // 5:5
@@ -47,7 +49,7 @@ public class HoodConstants {
 
   // ------- GOAL CONSTANTS -------- \\
 
-  public static final double layupAngle = Units.degreesToRadians(45.25);
+  public static final double layupAngle = Units.degreesToRadians(41.55); // 41.55 @ 1.5m
 
   public static final double debuggingAngle = Units.degreesToRadians(0); // Change as needed
 
