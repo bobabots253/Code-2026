@@ -167,6 +167,12 @@
                 "data": {
                   "name": "kickerIndex"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "pivotShake"
+                }
               }
             ]
           }
@@ -333,6 +339,12 @@
                 "type": "named",
                 "data": {
                   "name": "hoodLayup"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "pivotShake"
                 }
               }
             ]
