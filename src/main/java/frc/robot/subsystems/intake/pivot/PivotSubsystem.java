@@ -5,6 +5,7 @@ import static frc.robot.subsystems.intake.pivot.PivotConstants.highCurrentAmps;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.intake.pivot.PivotIO.PivotIOOutputMode;
 import frc.robot.subsystems.intake.pivot.PivotIO.PivotIOOutputs;
 import frc.robot.subsystems.shooter.hood.HoodConstants;
@@ -123,6 +124,15 @@ public class PivotSubsystem extends FullSubsystem {
 
   public Command stowCommand() {
     return startEnd(() -> setGoal(Goal.STOW), () -> setGoal(Goal.IDLE)).withName("Pivot Stow");
+  }
+
+  public Command runSaltAndPepperCommand() {
+    return Commands.sequence(
+            deployCommand(),
+            Commands.waitSeconds(0.3),
+            halfDeployCommand(),
+            Commands.waitSeconds(0.3))
+        .repeatedly();
   }
 
   public Command juggleCommand() {

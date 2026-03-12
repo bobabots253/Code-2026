@@ -9,42 +9,100 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "parallel",
                 "data": {
-                  "name": "pivotDown"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "pivotDown"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "hoodLayup"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "toggleWarm"
+                      }
+                    }
+                  ]
                 }
               },
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.5
+                  "waitTime": 1.2
                 }
               }
             ]
           }
         },
         {
-          "type": "path",
+          "type": "race",
           "data": {
-            "pathName": "CLR_Entry"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "CLR_Entry"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "rollerIntake"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "path",
+          "type": "race",
           "data": {
-            "pathName": "CLR_Intake"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "CLR_Intake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "rollerIntake"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "path",
+          "type": "race",
           "data": {
-            "pathName": "CLR_StageShoot1"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "CLR_StageShoot1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "rollerIntake"
+                }
+              }
+            ]
           }
         }
       ]
     }
   },
   "resetOdom": false,
-  "folder": "Testing",
+  "folder": "TestingSpartan",
   "choreoAuto": false
 }

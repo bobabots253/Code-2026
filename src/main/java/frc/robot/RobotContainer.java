@@ -107,12 +107,6 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    // clampVisionChooser.addDefaultOption("Locked", 10);
-    // clampVisionChooser.addOption("Unlocked | Purple", 0);
-    // clampVisionChooser.addOption("Unlocked | Orange", 1);
-    // clampVisionChooser.addOption("Unlocked | Green", 2);
-    // clampVisionChooser.addOption("Unlocked | Blue", 3);
-
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -136,16 +130,6 @@ public class RobotContainer {
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
 
-        // hoodSubsystem = new HoodSubsystem(new frc.robot.subsystems.shooter.hood.HoodIOSpark());
-        // flywheelSubsystem =
-        //     new FlywheelSubsystem(new frc.robot.subsystems.shooter.flywheel.FlywheelIOSpark());
-        // shooterSubsystem =
-        //     new ShooterSubsystem(
-        //         flywheelSubsystem,
-        //         hoodSubsystem,
-        //         shotCalculator,
-        //         swerveSubsystem::getPose,
-        //         swerveSubsystem::getChassisSpeeds);
         pivotSubsystem = new PivotSubsystem(new PivotIOSpark());
         rollerSubsystem = new RollerSubsystem(new RollerIOSpark());
         agitatorSubsystem = new AgitatorSubsystem(new AgitatorIOSpark());
@@ -189,15 +173,7 @@ public class RobotContainer {
                     swerveSubsystem::getPose));
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
-        // hoodSubsystem = new HoodSubsystem(new HoodIOSim());
-        // flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
-        // shooterSubsystem =
-        //     new ShooterSubsystem(
-        //         flywheelSubsystem,
-        //         hoodSubsystem,
-        //         shotCalculator,
-        //         swerveSubsystem::getPose,
-        //         swerveSubsystem::getChassisSpeeds);
+
         pivotSubsystem = new PivotSubsystem(new PivotIOSim());
         rollerSubsystem = new RollerSubsystem(new RollerIOSim());
         agitatorSubsystem = new AgitatorSubsystem(new AgitatorIOSim());
@@ -228,15 +204,7 @@ public class RobotContainer {
                 new VisionIO() {});
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
-        // hoodSubsystem = new HoodSubsystem(new HoodIOSim());
-        // flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
-        // shooterSubsystem =
-        //     new ShooterSubsystem(
-        //         new FlywheelSubsystem(new FlywheelIO() {}),
-        //         new HoodSubsystem(new HoodIO() {}),
-        //         new ShotCalculator(swerveSubsystem),
-        //         swerveSubsystem::getPose,
-        //         swerveSubsystem::getChassisSpeeds);
+
         pivotSubsystem = new PivotSubsystem(new PivotIO() {});
         rollerSubsystem = new RollerSubsystem(new RollerIO() {});
         agitatorSubsystem = new AgitatorSubsystem(new AgitatorIO() {});
@@ -248,12 +216,39 @@ public class RobotContainer {
         break;
     }
 
+    // ------- Intake Auto NamedCommands -------- \\
+
     NamedCommands.registerCommand("pivotDown", pivotSubsystem.deployCommand());
     NamedCommands.registerCommand("pivotUp", pivotSubsystem.stowCommand());
-    // NamedCommands.registerCommand("rollerIntake", rollerSubsystem.intakeCommand());
-    // NamedCommands.registerCommand("rollerIntake", rollerSubsystem.stowCommand());
-    // NamedCommands.registerCommand("agitatorIntake", agitatorSubsystem.intakeCommand());
-    // NamedCommands.registerCommand("agitatorIntake", agitatorSubsystem.intakeCommand());
+    NamedCommands.registerCommand("pivotShake", pivotSubsystem.runSaltAndPepperCommand());
+
+    NamedCommands.registerCommand("rollerIntake", rollerSubsystem.intakeCommand());
+
+    // ------- Agitator Auto NamedCommands -------- \\
+
+    NamedCommands.registerCommand("agitatorIntake", agitatorSubsystem.intakeCommand());
+    NamedCommands.registerCommand("agitatorIndex", agitatorSubsystem.indexCommand());
+
+    // ------- Indexer Auto NamedCommands -------- \\
+
+    NamedCommands.registerCommand("indexerIndex", indexerSubsystem.runCurrentCommand());
+
+    // ------- Kicker Auto NamedCommands -------- \\
+
+    NamedCommands.registerCommand("kickerIndex", kickerSubsystem.indexCommand());
+
+    // ------- Shooter Auto NamedCommands -------- \\
+
+    NamedCommands.registerCommand("flywheelLayup", flywheelSubsystem.runLayupCommand());
+    NamedCommands.registerCommand("toggleWarm", flywheelSubsystem.toggleWarm());
+
+    NamedCommands.registerCommand("hoodLayup", hoodSubsystem.runLayupCommand());
+
+    // ------- Drive Auto NamedCommands -------- \\
+
+    NamedCommands.registerCommand(
+        "driveHubLock",
+        DriveCommands.pointAtHub(swerveSubsystem, () -> shotCalculator.getFieldToHubAngle()));
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
