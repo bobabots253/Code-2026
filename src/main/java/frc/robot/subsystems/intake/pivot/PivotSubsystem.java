@@ -25,6 +25,7 @@ public class PivotSubsystem extends FullSubsystem {
   public enum Goal {
     IDLE(() -> 0.0),
     DEPLOYED(() -> PivotConstants.deployedAngle),
+    HALF_DEPLOYED (() -> PivotConstants.halfDeployedAngle),
     STOW(() -> PivotConstants.stowAngle), // Change if Necessary
     JUGGLE(() -> HoodConstants.jugglingAngle),
     DEBUGGING(() -> HoodConstants.debuggingAngle);
@@ -114,6 +115,11 @@ public class PivotSubsystem extends FullSubsystem {
   public Command deployCommand() {
     return startEnd(() -> setGoal(Goal.DEPLOYED), () -> setGoal(Goal.IDLE))
         .withName("Pivot Deploy");
+  }
+
+ public Command halfDeployCommand() {
+    return startEnd(() -> setGoal(Goal.HALF_DEPLOYED), () -> setGoal(Goal.IDLE))
+        .withName("Pivot Half Deploy");
   }
 
   public Command stowCommand() {
