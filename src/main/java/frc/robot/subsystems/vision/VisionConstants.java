@@ -67,10 +67,10 @@ public class VisionConstants {
   public static double angularStdDevMegatag2Factor = Double.POSITIVE_INFINITY; // Never Trust
 
   // Clamping ranges for vision estimates (see units)
-  static final double maxLinearSpeed = 3.0; // Meters per second
+  static final double maxLinearSpeed = 2.0; // Meters per second
   static final double maxAngularSpeed =
       DegreesPerSecond.of(270).in(RadiansPerSecond); // Radians per second
-  static final double maxGyroError = 3.0; // Degrees
+  static final double maxGyroError = 2.0; // Degrees
   static final double maxTranslationError = 1.0; // Meters
   static final int LOCK_MODE = 10;
 }

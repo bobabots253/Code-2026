@@ -26,7 +26,8 @@ public class HoodSubsystem extends FullSubsystem {
   public enum Goal {
     IDLE,
     JUGGLE,
-    DEBUGGING,
+    DEBUGGING_PID_UP,
+    DEBUGGING_PID_DOWN,
     DEBUGGING_VOLT_UP,
     DEBUGGING_VOLT_DOWN,
     LAYUP;
@@ -38,8 +39,10 @@ public class HoodSubsystem extends FullSubsystem {
         return 0.0;
       case JUGGLE:
         return HoodConstants.jugglingAngle;
-      case DEBUGGING:
-        return HoodConstants.debuggingAngle;
+      case DEBUGGING_PID_UP:
+        return HoodConstants.debuggingAngleUp;
+      case DEBUGGING_PID_DOWN:
+        return HoodConstants.debuggingAngleDown;
       case DEBUGGING_VOLT_UP:
         return HoodConstants.debuggingVoltageUP;
       case DEBUGGING_VOLT_DOWN:
@@ -170,9 +173,14 @@ public class HoodSubsystem extends FullSubsystem {
         .withName("Hood Debug Voltage Down");
   }
 
-  /** Unused */
-  public Command runDebuggingCommand() {
-    return startEnd(() -> setGoal(Goal.DEBUGGING), () -> setGoal(Goal.IDLE)).withName("Hood Debug");
+  public Command runDebuggingUpCommand() {
+    return startEnd(() -> setGoal(Goal.DEBUGGING_PID_UP), () -> setGoal(Goal.IDLE))
+        .withName("Hood Debug");
+  }
+
+  public Command runDebuggingDownCommand() {
+    return startEnd(() -> setGoal(Goal.DEBUGGING_PID_DOWN), () -> setGoal(Goal.IDLE))
+        .withName("Hood Debug");
   }
 
   // ----------------------------------JUGGLE COMMANDS------------------------------//

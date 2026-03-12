@@ -43,7 +43,7 @@ public class HoodIOSpark implements HoodIO {
     masterNEOConfig
         .idleMode(IdleMode.kBrake)
         .inverted(false)
-        .smartCurrentLimit(35); // Current Limit reduced for safety
+        .smartCurrentLimit(50); // Current Limit reduced for safety
     masterNEOConfig
         .encoder
         .positionConversionFactor(masterPositionConversionFactor) // THE USER MUST GET THIS RIGHT

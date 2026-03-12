@@ -25,10 +25,9 @@ public class PivotSubsystem extends FullSubsystem {
   public enum Goal {
     IDLE(() -> 0.0),
     DEPLOYED(() -> PivotConstants.deployedAngle),
-    HALF_DEPLOYED (() -> PivotConstants.halfDeployedAngle),
+    HALF_DEPLOYED(() -> PivotConstants.halfDeployedAngle),
     STOW(() -> PivotConstants.stowAngle), // Change if Necessary
-    JUGGLE(() -> HoodConstants.jugglingAngle),
-    DEBUGGING(() -> HoodConstants.debuggingAngle);
+    JUGGLE(() -> HoodConstants.jugglingAngle);
 
     // Required Arguement for each enum state
     private final DoubleSupplier angleRads;
@@ -117,7 +116,7 @@ public class PivotSubsystem extends FullSubsystem {
         .withName("Pivot Deploy");
   }
 
- public Command halfDeployCommand() {
+  public Command halfDeployCommand() {
     return startEnd(() -> setGoal(Goal.HALF_DEPLOYED), () -> setGoal(Goal.IDLE))
         .withName("Pivot Half Deploy");
   }
@@ -128,11 +127,6 @@ public class PivotSubsystem extends FullSubsystem {
 
   public Command juggleCommand() {
     return startEnd(() -> setGoal(Goal.JUGGLE), () -> setGoal(Goal.IDLE)).withName("Pivot Juggle");
-  }
-
-  public Command runDebuggingCommand() {
-    return startEnd(() -> setGoal(Goal.DEBUGGING), () -> setGoal(Goal.IDLE))
-        .withName("Pivot Debug");
   }
 
   public Command stopCommand() {

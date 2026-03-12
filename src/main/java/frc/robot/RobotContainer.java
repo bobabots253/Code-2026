@@ -326,6 +326,9 @@ public class RobotContainer {
         .whileTrue(flywheelSubsystem.juggleCommand())
         .whileTrue(hoodSubsystem.juggleCommand());
 
+    driver.povUp().onTrue(hoodSubsystem.runDebuggingUpCommand());
+    driver.povDown().onTrue(hoodSubsystem.runDebuggingDownCommand());
+
     // ------- Operator Controls -------- \\
 
     operator.povLeft().onTrue(flywheelSubsystem.toggleWarm());
@@ -340,7 +343,6 @@ public class RobotContainer {
         .whileTrue(agitatorSubsystem.intakeCommand());
 
     operator.b().whileTrue(rollerSubsystem.runUnjamCommand());
-
 
     operator
         .y()

@@ -5,7 +5,7 @@ import edu.wpi.first.math.util.Units;
 public class HoodConstants {
   public static final int sparkMasterHoodCanId = 14;
 
-  public static final double sparkMasterHoodkP = 2.0; // TO-DO: Retune for faster response
+  public static final double sparkMasterHoodkP = 20.0; // TO-DO: Retune for faster response
   public static final double sparkMasterHoodkI = 0.00;
   public static final double sparkMasterHoodkD = 0.00;
 
@@ -51,7 +51,8 @@ public class HoodConstants {
 
   public static final double layupAngle = Units.degreesToRadians(41.55); // 41.55 @ 1.5m
 
-  public static final double debuggingAngle = Units.degreesToRadians(0); // Change as needed
+  public static final double debuggingAngleDown = Units.degreesToRadians(5.0); // Change as needed
+  public static final double debuggingAngleUp = Units.degreesToRadians(42); // Change as needed
 
   public static final double jugglingAngle = Units.degreesToRadians(71.5);
 
