@@ -1,0 +1,50 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "pivotDown"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 1.5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CLR_Entry"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CLR_Intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CLR_StageShoot1"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": false,
+  "folder": "Testing",
+  "choreoAuto": false
+}

@@ -5,10 +5,12 @@
   "pathFolders": [
     "Citrus Auto",
     "Default NZ Auto",
-    "Depot Auto"
+    "Depot Auto",
+    "Testing"
   ],
   "autoFolders": [
-    "Default NZ Auto"
+    "Default NZ Auto",
+    "Testing"
   ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,

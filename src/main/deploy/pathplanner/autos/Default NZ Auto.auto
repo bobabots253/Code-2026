@@ -5,33 +5,15 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "pivotDown"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "CLT_Entry"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "CLT_Pass1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "CLT_Shoot1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "CLT_Pass2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "CLT_Shoot2"
           }
         }
       ]

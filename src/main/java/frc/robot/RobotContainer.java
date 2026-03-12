@@ -14,6 +14,8 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -246,6 +248,13 @@ public class RobotContainer {
         break;
     }
 
+    NamedCommands.registerCommand("pivotDown", pivotSubsystem.deployCommand());
+    NamedCommands.registerCommand("pivotUp", pivotSubsystem.stowCommand());
+    // NamedCommands.registerCommand("rollerIntake", rollerSubsystem.intakeCommand());
+    // NamedCommands.registerCommand("rollerIntake", rollerSubsystem.stowCommand());
+    // NamedCommands.registerCommand("agitatorIntake", agitatorSubsystem.intakeCommand());
+    // NamedCommands.registerCommand("agitatorIntake", agitatorSubsystem.intakeCommand());
+
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -272,6 +281,7 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+    configureAutos();
   }
 
   /**
@@ -366,6 +376,13 @@ public class RobotContainer {
     //                             swerveSubsystem.getPose().getTranslation(), new Rotation2d())),
     //                 swerveSubsystem)
     //             .ignoringDisable(true));
+  }
+
+  private void configureAutos() {
+
+    // ------ Named Commands -------- \\
+
+    autoChooser.addOption("Testing Spartan", new PathPlannerAuto("TestingSpartan"));
   }
 
   /**
