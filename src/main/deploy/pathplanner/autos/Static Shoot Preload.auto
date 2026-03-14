@@ -11,6 +11,12 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "CenterBackout"
+          }
+        },
+        {
           "type": "race",
           "data": {
             "commands": [
@@ -29,13 +35,13 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "hoodDynamic"
+                  "name": "hoodLayup"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "flywheelDynamic"
+                  "name": "flywheelLayup"
                 }
               }
             ]
@@ -48,13 +54,13 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "flywheelDynamic"
+                  "name": "flywheelLayup"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "hoodDynamic"
+                  "name": "hoodLayup"
                 }
               },
               {
