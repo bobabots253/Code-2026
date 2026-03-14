@@ -1,0 +1,70 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.984,
+        "y": 2.699326
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.751779996160314,
+        "y": 2.7543541367030313
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.7515621427731443,
+        "y": 2.818326
+      },
+      "prevControl": {
+        "x": 3.9878293378502105,
+        "y": 2.736608116214286
+      },
+      "nextControl": {
+        "x": 3.5152949476960775,
+        "y": 2.9000438837857136
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.9776914505621317,
+        "y": 3.404326
+      },
+      "prevControl": {
+        "x": 3.344421239771326,
+        "y": 3.1234629252005552
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 4.0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": "Josh Testing",
+  "idealStartingState": {
+    "velocity": 4.0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}
