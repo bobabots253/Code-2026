@@ -54,9 +54,9 @@ public class VisionConstants {
   public static double[] cameraStdDevFactors =
       new double[] {
         1.0, // Camera 0 - Yellow - L
-        2.0, // Camera 1 - Pink - R
-        2.0, // Camera 2 - Orange - R
-        1.0, // Camera 3 - Purple - L
+        1.0, // Camera 1 - Purple - L
+        2.0, // Camera 2 - Pink - R
+        2.0, // Camera 3 - Orange - L
       };
 
   // Multipliers to apply for MegaTag 2 observations

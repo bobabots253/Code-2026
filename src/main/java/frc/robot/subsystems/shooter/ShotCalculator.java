@@ -222,7 +222,6 @@ public class ShotCalculator extends FullSubsystem {
     return fieldToTargetAngle;
   }
 
-  @AutoLogOutput(key = "ShotCalculator/CorrectTargetPose2D")
   public Pose2d getCorrectedTargetPose2d() {
     return new Pose2d(correctedTargetPose3d.getX(), correctedTargetPose3d.getY(), new Rotation2d());
   }
@@ -258,7 +257,6 @@ public class ShotCalculator extends FullSubsystem {
 
   // Return This Util in Constants.java
   // Periodic Command Scheduler Overflow Handling
-  @AutoLogOutput(key = "ShotCalculator/TargetLocation")
   public void updateTargetByAlliance() {
     boolean isRed =
         DriverStation.getAlliance().isPresent()
@@ -286,9 +284,9 @@ public class ShotCalculator extends FullSubsystem {
   public void periodicAfterScheduler() {
     Logger.recordOutput("ShotCalculator/HubTargetLocation", hubTargetLocation);
     Logger.recordOutput("ShotCalculator/PassTargetLocation", passTargetLocation);
-    Logger.recordOutput("ShotCalculator/RawTargetPose3d", rawTargetPose3d);
-    Logger.recordOutput("ShotCalculator/CorrectedTargetPose3d", correctedTargetPose3d);
-    Logger.recordOutput("ShotCalculator/ShooterPose3d", shooterPose3d);
-    Logger.recordOutput("ShotCalculator/DrivetrainSpeeds", drivetrainSpeeds);
+    // Logger.recordOutput("ShotCalculator/RawTargetPose3d", rawTargetPose3d);
+    // Logger.recordOutput("ShotCalculator/CorrectedTargetPose3d", correctedTargetPose3d);
+    // Logger.recordOutput("ShotCalculator/ShooterPose3d", shooterPose3d);
+    // Logger.recordOutput("ShotCalculator/DrivetrainSpeeds", drivetrainSpeeds);
   }
 }

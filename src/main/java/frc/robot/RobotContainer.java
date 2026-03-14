@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
@@ -48,6 +47,7 @@ import frc.robot.subsystems.kicker.KickerIOSim;
 import frc.robot.subsystems.kicker.KickerIOSpark;
 import frc.robot.subsystems.kicker.KickerSubsystem;
 import frc.robot.subsystems.shooter.ShotCalculator;
+import frc.robot.subsystems.shooter.ShotCalculator.PassSide;
 import frc.robot.subsystems.shooter.ShotCalculator.ShotMode;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIO;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
@@ -243,28 +243,27 @@ public class RobotContainer {
     NamedCommands.registerCommand("flywheelLayup", flywheelSubsystem.runLayupCommand());
     NamedCommands.registerCommand(
         "flywheelDynamic",
-        new ParallelCommandGroup(
-            shotCalculator.toggleShotMode(ShotMode.HUB),
-            flywheelSubsystem.dynamicUpdatedShootCommand(
-                () -> shotCalculator.getCorrectTargetVelocity())));
+        flywheelSubsystem.dynamicUpdatedShootCommand(
+            () -> shotCalculator.getCorrectTargetVelocity()));
     NamedCommands.registerCommand("toggleWarm", flywheelSubsystem.toggleWarm());
 
     NamedCommands.registerCommand("hoodLayup", hoodSubsystem.runLayupCommand());
     NamedCommands.registerCommand(
         "hoodDynamic",
-        new ParallelCommandGroup(
-            shotCalculator.toggleShotMode(ShotMode.HUB),
-            hoodSubsystem.dynamicUpdatedShootCommand(
-                () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle()))));
+        hoodSubsystem.dynamicUpdatedShootCommand(
+            () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())));
+
+    NamedCommands.registerCommand("toggleHub", shotCalculator.toggleShotMode(ShotMode.HUB));
 
     // ------- Drive Auto NamedCommands -------- \\
 
     NamedCommands.registerCommand(
         "driveHubLock",
-        new ParallelCommandGroup(
-            shotCalculator.toggleShotMode(ShotMode.HUB),
-            DriveCommands.pointAtHub(
-                swerveSubsystem, () -> shotCalculator.getCorrectTargetRotation())));
+        DriveCommands.joystickDriveAtAngle(
+            swerveSubsystem,
+            () -> -driver.getLeftY(),
+            () -> -driver.getLeftX(),
+            () -> shotCalculator.getCorrectTargetRotation()));
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -321,11 +320,11 @@ public class RobotContainer {
         .leftBumper()
         .whileTrue(indexerSubsystem.runCurrentCommand())
         .whileTrue(kickerSubsystem.indexCommand())
-        .whileTrue(agitatorSubsystem.indexCommand());
+        .whileTrue(agitatorSubsystem.indexCommand())
+        .whileTrue(pivotSubsystem.runSaltAndPepperCommand());
 
     driver
         .rightBumper()
-        .onTrue(shotCalculator.toggleShotMode(ShotMode.HUB))
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 swerveSubsystem,
@@ -343,9 +342,6 @@ public class RobotContainer {
 
     // ------- Operator Controls -------- \\
 
-    operator.povLeft().onTrue(flywheelSubsystem.toggleWarm());
-    // .whileTrue(
-    //   hoodSubsystem.dynamicUpdatedShootCommand(() -> shotCalculator.getCorrectedTargetAngle()));
     operator.leftBumper().onTrue(pivotSubsystem.deployCommand());
     operator.rightBumper().onTrue(pivotSubsystem.stowCommand());
 
@@ -365,10 +361,18 @@ public class RobotContainer {
             flywheelSubsystem.dynamicUpdatedShootCommand(
                 () -> shotCalculator.getCorrectTargetVelocity()));
 
-    operator.povDown().whileTrue(hoodSubsystem.runDebuggingVoltageDownCommand());
-    operator.povUp().whileTrue(hoodSubsystem.runDebuggingVoltageUpCommand());
+    operator.a().onTrue(flywheelSubsystem.toggleWarm()); // Shifted from DPad Left
 
-    operator.povRight().whileTrue(flywheelSubsystem.runDebuggingVelocityCommand());
+    operator
+        .povUp()
+        .onTrue(shotCalculator.toggleShotMode(ShotMode.HUB)); // Operator MUST get this right
+
+    operator
+        .povLeft()
+        .onTrue(shotCalculator.togglePass(PassSide.CLOSE_LEFT)); // Operator MUST get this right
+    operator
+        .povRight()
+        .onTrue(shotCalculator.togglePass(PassSide.CLOSE_RIGHT)); // Operator MUST get this right
 
     // ------ Debugging -------- \\
 

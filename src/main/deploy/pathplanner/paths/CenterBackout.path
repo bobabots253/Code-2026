@@ -3,41 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.899,
-        "y": 5.854
+        "x": 3.5821348314606745,
+        "y": 4.045191011235955
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.923482995107444,
-        "y": 5.590365254058147
+        "x": 2.7478837777473384,
+        "y": 4.054212141611514
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.372553515513488,
-        "y": 5.202171788399093
+        "x": 2.733452844201076,
+        "y": 4.045191011235955
       },
       "prevControl": {
-        "x": 3.7022175290856545,
-        "y": 5.41694509517742
-      },
-      "nextControl": {
-        "x": 3.1427809133507485,
-        "y": 5.052476888313345
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.9250223133651514,
-        "y": 4.635496724084444
-      },
-      "prevControl": {
-        "x": 3.4986430437370712,
-        "y": 5.336724205353633
+        "x": 4.135900136697035,
+        "y": 4.08714473054205
       },
       "nextControl": null,
       "isLocked": false,
@@ -57,14 +41,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 4.0,
-    "rotation": 179.36340642403647
+    "velocity": 0,
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "CLB Citrus Auto",
   "idealStartingState": {
-    "velocity": 5.5,
-    "rotation": 180.0
+    "velocity": 0.0,
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }
