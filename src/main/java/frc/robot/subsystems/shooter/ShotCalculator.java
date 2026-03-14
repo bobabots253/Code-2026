@@ -80,7 +80,9 @@ public class ShotCalculator extends FullSubsystem {
   @Override
   public void periodic() {
     robotPose = swerveSubsystem.getPose(); // Good
-    updateTargetByAlliance(); // Good
+    // updateTargetByAlliance(); // Good
+    updateTargetPose2d();
+    
 
     drivetrainSpeeds = swerveSubsystem.getChassisSpeeds();
     drivetrainAccelerations = swerveSubsystem.getFieldRelativeChassisAccelerations();
@@ -214,6 +216,28 @@ public class ShotCalculator extends FullSubsystem {
       targetLocation = new Pose2d(blueHubTarget, new Rotation2d());
     }
     return targetLocation;
+  }
+
+  public void updateTargetPose2d(){
+    var alliance = DriverStation.getAlliance();
+
+    if((robotPose.getX() > fieldSetup.blueSideNuetralLine) && (robotPose.getX() < fieldSetup.redSideNuetralLine)){
+      if(alliance.get() == DriverStation.Alliance.Blue){
+        if(robotPose.getY() > fieldSetup.horizontalMidLine){
+          targetLocation = new Pose2d(fieldSetup.middleOfSecondQuadrant, new Rotation2d());
+        }else{
+          targetLocation = new Pose2d(fieldSetup.middleOfThirdQuadrant, new Rotation2d());
+        }
+      }else{
+        if(robotPose.getY() > fieldSetup.horizontalMidLine){
+          targetLocation = new Pose2d(fieldSetup.middleOfFirstQuadrant, new Rotation2d());
+        }else {
+          targetLocation = new Pose2d(fieldSetup.middleOfFourthQuadrant, new Rotation2d());
+        }
+      }
+    }else{
+      targetLocation = updateTargetByAlliance();
+    }
   }
 
   @Override

@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import java.util.TreeMap;
@@ -12,6 +13,16 @@ public class fieldSetup {
   public static Rotation3d ninetyRotation = new Rotation3d(0, 0, 90);
   public static Rotation3d twoSeventyRotation = new Rotation3d(0, 0, 270);
   public static Rotation3d zero = new Rotation3d(0, 0, 0);
+
+  public static double blueSideNuetralLine = 5.222494;
+  public static double redSideNuetralLine = 11.318494;
+  public static double horizontalMidLine = 4.034536;
+  public static double verticalMidLine = 8.270494;
+  public static Translation2d middleOfFirstQuadrant = new Translation2d(2.014347, 6.051804);
+  public static Translation2d middleOfSecondQuadrant = new Translation2d(2.014347, 6.051804);
+  public static Translation2d middleOfThirdQuadrant = new Translation2d(2.014347, 2.017268);
+  public static Translation2d middleOfFourthQuadrant = new Translation2d(14.526641, 2.017268);
+  
 
   public static final Translation3d blueHubCenter = new Translation3d(4.626, 4.035, 1.45); // meters
   public static final Translation3d redHubCenter = new Translation3d(11.915, 4.035, 1.45); // meters
