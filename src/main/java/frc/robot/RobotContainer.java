@@ -241,9 +241,21 @@ public class RobotContainer {
     // ------- Shooter Auto NamedCommands -------- \\
 
     NamedCommands.registerCommand("flywheelLayup", flywheelSubsystem.runLayupCommand());
+    NamedCommands.registerCommand(
+        "flywheelDynamic",
+        new ParallelCommandGroup(
+            shotCalculator.toggleShotMode(ShotMode.HUB),
+            flywheelSubsystem.dynamicUpdatedShootCommand(
+                () -> shotCalculator.getCorrectTargetVelocity())));
     NamedCommands.registerCommand("toggleWarm", flywheelSubsystem.toggleWarm());
 
     NamedCommands.registerCommand("hoodLayup", hoodSubsystem.runLayupCommand());
+    NamedCommands.registerCommand(
+        "hoodDynamic",
+        new ParallelCommandGroup(
+            shotCalculator.toggleShotMode(ShotMode.HUB),
+            hoodSubsystem.dynamicUpdatedShootCommand(
+                () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle()))));
 
     // ------- Drive Auto NamedCommands -------- \\
 
