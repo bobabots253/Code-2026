@@ -17,7 +17,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CLB_Entry"
+                  "pathName": "CRB_Entry"
                 }
               },
               {
@@ -54,7 +54,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CLB_Intake"
+                  "pathName": "CRB_Intake"
                 }
               },
               {
@@ -79,7 +79,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CLB_StageShoot1"
+                  "pathName": "CRB_StageShoot1"
                 }
               },
               {
@@ -180,7 +180,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "CLB_Reentry"
+            "pathName": "CRB_Reentry"
           }
         },
         {
@@ -190,7 +190,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CLB_Entry2"
+                  "pathName": "CRB_Entry2"
                 }
               },
               {
@@ -221,7 +221,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CLB_Intake2"
+                  "pathName": "CRB_Intake2"
                 }
               },
               {
@@ -246,7 +246,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CLB_StageShoot2"
+                  "pathName": "CRB_StageShoot2"
                 }
               },
               {

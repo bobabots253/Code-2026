@@ -3,14 +3,15 @@
   "robotLength": 0.8,
   "holonomicMode": true,
   "pathFolders": [
-    "Citrus Auto",
+    "CLB Citrus Auto",
     "Default NZ Auto",
     "Depot Auto",
+    "CRB Citrus Auto",
     "Testing"
   ],
   "autoFolders": [
+    "Citrus Auto",
     "Default NZ Auto",
-    "CitrusAuto",
     "TestingSpartan"
   ],
   "defaultMaxVel": 3.0,

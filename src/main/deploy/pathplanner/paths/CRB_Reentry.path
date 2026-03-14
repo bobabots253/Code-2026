@@ -3,48 +3,37 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.899,
-        "y": 5.854
+        "x": 2.978,
+        "y": 3.404000000000001
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.923482995107444,
-        "y": 5.590365254058147
+        "x": 3.206541902763502,
+        "y": 2.443173733486314
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.372553515513488,
-        "y": 5.202171788399093
+        "x": 3.623,
+        "y": 0.6330000000000009
       },
       "prevControl": {
-        "x": 3.7022175290856545,
-        "y": 5.41694509517742
-      },
-      "nextControl": {
-        "x": 3.1427809133507485,
-        "y": 5.052476888313345
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.9250223133651514,
-        "y": 4.635496724084444
-      },
-      "prevControl": {
-        "x": 3.4986430437370712,
-        "y": 5.336724205353633
+        "x": 2.65979528396225,
+        "y": 0.5237001740666402
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.7941908713692851,
+      "rotationDegrees": -0.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -58,13 +47,13 @@
   },
   "goalEndState": {
     "velocity": 4.0,
-    "rotation": 179.36340642403647
+    "rotation": -0.0
   },
   "reversed": false,
-  "folder": "CLB Citrus Auto",
+  "folder": "CRB Citrus Auto",
   "idealStartingState": {
-    "velocity": 4.0,
-    "rotation": 180.0
+    "velocity": 0.0,
+    "rotation": 20.641688424847928
   },
   "useDefaultConstraints": true
 }

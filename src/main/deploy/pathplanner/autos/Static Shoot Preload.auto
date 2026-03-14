@@ -23,13 +23,68 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.0
+                  "waitTime": 1.5
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": null
+                  "name": "hoodDynamic"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "flywheelDynamic"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "flywheelDynamic"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "hoodDynamic"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "indexerIndex"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 5.0
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "kickerIndex"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "agitatorIndex"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "pivotShake"
                 }
               }
             ]
