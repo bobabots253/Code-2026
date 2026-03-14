@@ -127,11 +127,7 @@ public class PivotSubsystem extends FullSubsystem {
   }
 
   public Command runSaltAndPepperCommand() {
-    return Commands.sequence(
-            deployCommand(),
-            Commands.waitSeconds(0.3),
-            halfDeployCommand(),
-            Commands.waitSeconds(0.3))
+    return Commands.sequence(deployCommand().withTimeout(0.3), halfDeployCommand().withTimeout(0.3))
         .repeatedly();
   }
 

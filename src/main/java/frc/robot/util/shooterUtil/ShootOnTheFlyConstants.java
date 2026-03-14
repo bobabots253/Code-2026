@@ -5,14 +5,31 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.util.Units;
+import frc.robot.fieldSetup;
 
 public class ShootOnTheFlyConstants {
 
   public static final double FLYWHEEL_RADIUS_METERS = Units.inchesToMeters(2.0);
 
   public static final double shooterHeightOffset = 0.5; // Meters, height of shooter from ground
+
+  // ------- Transform Constants -------- \\
   public static final Transform3d SHOOTER_TRANSFORM_CENTER =
       new Transform3d(-0.24, 0, 0.5, Rotation3d.kZero);
+
+  // ------- Hub Shooting Constants -------- \\
+  public static final double HUB_INNER_HEIGHT = fieldSetup.blueHubCenter.getZ(); // Same for RED
+
+  // ------- Passing Constants -------- \\
+  // Add any height above SHOOTER Z OFFSET to avoid math breaking
+  // Relative to DS Perspective aka 6328's callouts
+  public static final Translation3d BLUE_PASS_CR_TARGET = new Translation3d(2.00, 1.500, 0.501);
+
+  public static final Translation3d BLUE_PASS_CL_TARGET = new Translation3d(2.00, 6.500, 0.501);
+
+  public static final Translation3d RED_PASS_CL_TARGET = new Translation3d(14.50, 1.500, 0.501);
+
+  public static final Translation3d RED_PASS_CR_TARGET = new Translation3d(14.50, 6.500, 0.501);
 
   public static final InterpolatingDoubleTreeMap FLYWHEEL_RPM_INTERPOLATOR =
       new InterpolatingDoubleTreeMap();
@@ -47,18 +64,21 @@ public class ShootOnTheFlyConstants {
     // Key: Distance (meters), Value: Shooter Velocity (rad/sec)
     // USE THIS, BUT FIX FIRST
     // Touching Hub
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(2.0, Units.rotationsPerMinuteToRadiansPerSecond(3000));
     FLYWHEEL_VELOCITY_INTERPOLATOR.put(2.5, Units.rotationsPerMinuteToRadiansPerSecond(3300));
     FLYWHEEL_VELOCITY_INTERPOLATOR.put(3.0, Units.rotationsPerMinuteToRadiansPerSecond(3300));
     FLYWHEEL_VELOCITY_INTERPOLATOR.put(3.5, Units.rotationsPerMinuteToRadiansPerSecond(3300));
     FLYWHEEL_VELOCITY_INTERPOLATOR.put(4.0, Units.rotationsPerMinuteToRadiansPerSecond(3300));
-    FLYWHEEL_VELOCITY_INTERPOLATOR.put(4.0, Units.rotationsPerMinuteToRadiansPerSecond(3400));
+    // FLYWHEEL_VELOCITY_INTERPOLATOR.put(4.5, Units.rotationsPerMinuteToRadiansPerSecond(3400)); //
+    // Check
 
     // Key: Distance (meters), Value: Hood Angle (DEGREES)
     // Touching Hub, Using Distance 2d
+    HOOD_DEGREES_INTERPOLATOR.put(2.0, 41.55);
     HOOD_DEGREES_INTERPOLATOR.put(2.5, 44.7);
     HOOD_DEGREES_INTERPOLATOR.put(3.0, 41.17);
     HOOD_DEGREES_INTERPOLATOR.put(3.5, 30.4);
     HOOD_DEGREES_INTERPOLATOR.put(4.0, 25.85);
-    HOOD_DEGREES_INTERPOLATOR.put(4.0, 31.31);
+    // HOOD_DEGREES_INTERPOLATOR.put(4.0, 31.31); // Check
   }
 }

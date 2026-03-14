@@ -53,14 +53,11 @@ public class VisionConstants {
   // Manual Variance Weighting: (Adjust to trust some cameras more than others)
   public static double[] cameraStdDevFactors =
       new double[] {
-        1.0, // Camera 0
-        1.0, // Camera 1
-        1.0, // Camera 2
-        1.0, // Camera 3
+        1.0, // Camera 0 - Yellow - L
+        2.0, // Camera 1 - Pink - R
+        2.0, // Camera 2 - Orange - R
+        1.0, // Camera 3 - Purple - L
       };
-  // Blue Camera - Cannot be trusted
-  // MT2 on LL4 needs filtering for jumping
-  // Add rotation limit
 
   // Multipliers to apply for MegaTag 2 observations
   public static double linearStdDevMegatag2Factor = 0.5; // More stable than full 3D solve
@@ -70,7 +67,7 @@ public class VisionConstants {
   static final double maxLinearSpeed = 2.0; // Meters per second
   static final double maxAngularSpeed =
       DegreesPerSecond.of(270).in(RadiansPerSecond); // Radians per second
-  static final double maxGyroError = 2.0; // Degrees
+  static final double maxGyroError = 1.0; // Degrees
   static final double maxTranslationError = 1.0; // Meters
   static final int LOCK_MODE = 10;
 }

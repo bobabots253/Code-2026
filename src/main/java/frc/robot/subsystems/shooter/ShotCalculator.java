@@ -4,8 +4,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotState;
 import frc.robot.fieldSetup;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
@@ -18,6 +20,16 @@ import org.littletonrobotics.junction.Logger;
 
 public class ShotCalculator extends FullSubsystem {
 
+  public enum ShotMode {
+    HUB,
+    PASS
+  }
+
+  public enum PassSide {
+    CLOSE_LEFT, // high Y — near left bump
+    CLOSE_RIGHT // low  Y — near right bump
+  }
+
   public enum CompensationMode {
     // Aim directly at hub. No robot motion factored in.
     STATIC,
@@ -27,7 +39,10 @@ public class ShotCalculator extends FullSubsystem {
     VELOCITY_AND_ACCELERATION
   }
 
-  private CompensationMode currentCompensationMode = CompensationMode.STATIC;
+  // Internal mode tracking
+  private ShotMode currentShotMode = ShotMode.HUB; // Default Non-Null
+  private PassSide currentPassSide = PassSide.CLOSE_RIGHT; // Default Non-Null
+  private CompensationMode currentCompensationMode = CompensationMode.STATIC; // Keep for Week 2
 
   // Tunable Constants for SOTF Calculations
   private static final double ACCELERATION_COMPENSATION_FACTOR = 0.001;
@@ -35,41 +50,74 @@ public class ShotCalculator extends FullSubsystem {
 
   private final SwerveSubsystem swerveSubsystem;
 
-  private Pose2d targetLocation = Pose2d.kZero;
+  private Pose2d robotPose = Pose2d.kZero;
+  private Pose3d shooterPose3d = Pose3d.kZero;
+  private Pose3d rawTargetPose3d = Pose3d.kZero; // selected target before compensation
+  private Pose3d correctedTargetPose3d = Pose3d.kZero; // selected target after compensation
+
+  private Pose2d hubTargetLocation = Pose2d.kZero;
+  private Translation3d passTargetLocation = ShootOnTheFlyConstants.BLUE_PASS_CL_TARGET;
+
   private Translation2d blueHubTarget = fieldSetup.blueHubCenter.toTranslation2d();
   private Translation2d redHubTarget = fieldSetup.redHubCenter.toTranslation2d();
 
-  @AutoLogOutput(key = "ShotCalculator/CorrectedTargetPose")
-  private Pose3d correctedTargetPose3d = Pose3d.kZero;
-
-  private Pose3d shooterPose3d = Pose3d.kZero;
-
-  private Pose2d robotPose = Pose2d.kZero;
-
-  @AutoLogOutput(key = "ShotCalculator/DrivetrainSpeeds")
   private ChassisSpeeds drivetrainSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
-
-  @AutoLogOutput(key = "ShotCalculator/AngularError")
-  private Rotation2d angularError = Rotation2d.kZero;
-
   ChassisAccelerations drivetrainAccelerations =
       new ChassisAccelerations(0.0, 0.0, 0.0); // Initialize with zero accelerations
 
-  private double distanceToHub2D = 0.0;
-  private double distanceToHub3D = 0.0;
+  private Rotation2d fieldToTargetAngle = Rotation2d.kZero; // Used by both Shot Modes
+  private Rotation2d angularError = Rotation2d.kZero;
 
-  private Rotation2d fieldToHubAngle = Rotation2d.kZero;
+  private double distanceToTarget2D = 0.0;
+  private double distanceToTarget3D = 0.0;
 
-  private double targetSpeedRPM = 0.0;
-  private double targetSpeedMPS = 0.0;
+  private double targetSpeedRadPerSec = 0.0;
   private double targetAngleDeg = 0.0;
 
   public ShotCalculator(SwerveSubsystem swerveSubsystem) {
     this.swerveSubsystem = swerveSubsystem;
   }
 
+  // ------- Setter Methods -------- \\
+
+  public void setShotMode(ShotMode mode) {
+    this.currentShotMode = mode;
+  }
+
+  public Command toggleShotMode(ShotMode toggleRequest) {
+    return runOnce(() -> setShotMode(toggleRequest));
+  }
+
+  /**
+   * Only affects outputs when active mode is ShotMode.PASS.
+   *
+   * @param side - relative to DS perspective
+   */
+  public void setPassSide(PassSide side) {
+    this.currentPassSide = side;
+  }
+
+  public Command togglePassMode(PassSide toggleRequest) {
+    return runOnce(() -> setPassSide(toggleRequest));
+  }
+
+  // Use this in RobotContainer to change to passing in one call
+  public void setPass(PassSide side) {
+    this.currentShotMode = ShotMode.PASS;
+    this.currentPassSide = side;
+  }
+
+  public Command togglePass(PassSide toggleRequest) {
+    return runOnce(() -> setPass(toggleRequest));
+  }
+
   public void setCompensationMode(CompensationMode mode) {
     this.currentCompensationMode = mode;
+  }
+
+  @AutoLogOutput(key = "ShotCalculator/ShotMode")
+  public String getShotMode() {
+    return currentShotMode.name();
   }
 
   @AutoLogOutput(key = "ShotCalculator/CompensationMode")
@@ -79,20 +127,36 @@ public class ShotCalculator extends FullSubsystem {
 
   @Override
   public void periodic() {
-    robotPose = swerveSubsystem.getPose(); // Good
-    updateTargetByAlliance(); // Good
 
+    // Update local odometry variable at the start of the periodic block
+    robotPose = swerveSubsystem.getPose(); // Good
     drivetrainSpeeds = swerveSubsystem.getChassisSpeeds();
     drivetrainAccelerations = swerveSubsystem.getFieldRelativeChassisAccelerations();
 
+    // Update Shooter Pose by transforming robot odometry by offsets
     shooterPose3d = new Pose3d(robotPose).plus(ShootOnTheFlyConstants.SHOOTER_TRANSFORM_CENTER);
 
-    Pose3d rawTargetPose3d =
-        new Pose3d(
-            targetLocation.getX(),
-            targetLocation.getY(),
-            fieldSetup.blueHubCenter.getZ(), // CHECK THIS VALUE, hub inner opening (meters)
-            Pose3d.kZero.getRotation());
+    // Taarget is both ShotMode and Alliance
+    updateTargetByAlliance(); // Good
+    switch (currentShotMode) {
+      case HUB:
+        rawTargetPose3d =
+            new Pose3d(
+                hubTargetLocation.getX(),
+                hubTargetLocation.getY(),
+                ShootOnTheFlyConstants.HUB_INNER_HEIGHT,
+                Pose3d.kZero.getRotation());
+        break;
+
+      case PASS:
+        rawTargetPose3d =
+            new Pose3d(
+                passTargetLocation.getX(),
+                passTargetLocation.getY(),
+                passTargetLocation.getZ(),
+                Pose3d.kZero.getRotation());
+        break;
+    }
 
     switch (currentCompensationMode) {
       case STATIC:
@@ -127,18 +191,18 @@ public class ShotCalculator extends FullSubsystem {
         new Translation2d(correctedTargetPose3d.getX(), correctedTargetPose3d.getY());
     Translation2d shooterXYCoords = shooterPose3d.toPose2d().getTranslation();
 
-    fieldToHubAngle = correctedTargetXYCoords.minus(shooterXYCoords).getAngle();
+    fieldToTargetAngle = correctedTargetXYCoords.minus(shooterXYCoords).getAngle();
     // Functionally equivalent to atan2(dy, dx) but avoids the manual subtraction + easier to read
 
-    distanceToHub2D = shooterXYCoords.getDistance(correctedTargetXYCoords);
-    distanceToHub3D =
+    distanceToTarget2D = shooterXYCoords.getDistance(correctedTargetXYCoords);
+    distanceToTarget3D =
         shooterPose3d.getTranslation().getDistance(correctedTargetPose3d.getTranslation());
 
-    targetSpeedRPM = ShootOnTheFlyConstants.FLYWHEEL_RPM_INTERPOLATOR.get(distanceToHub2D);
-    targetSpeedMPS = ShootOnTheFlyConstants.FLYWHEEL_VELOCITY_INTERPOLATOR.get(distanceToHub2D);
-    targetAngleDeg = ShootOnTheFlyConstants.HOOD_DEGREES_INTERPOLATOR.get(distanceToHub2D);
+    targetSpeedRadPerSec =
+        ShootOnTheFlyConstants.FLYWHEEL_VELOCITY_INTERPOLATOR.get(distanceToTarget2D);
+    targetAngleDeg = ShootOnTheFlyConstants.HOOD_DEGREES_INTERPOLATOR.get(distanceToTarget2D);
 
-    angularError = fieldToHubAngle.minus(robotPose.getRotation());
+    angularError = fieldToTargetAngle.minus(robotPose.getRotation());
 
     // Publish Shot Calculation Data to Robot State
     RobotState.getInstance()
@@ -153,20 +217,24 @@ public class ShotCalculator extends FullSubsystem {
                 getShooterToCorrectTargetPoseDistance3D()));
   }
 
-  /*
-   * Note: the rotation of this Pose2d is meaningless
-   */
+  @AutoLogOutput(key = "ShotCalculator/CorrectTargetRotation")
+  public Rotation2d getCorrectTargetRotation() {
+    return fieldToTargetAngle;
+  }
+
+  @AutoLogOutput(key = "ShotCalculator/CorrectTargetPose2D")
   public Pose2d getCorrectedTargetPose2d() {
     return new Pose2d(correctedTargetPose3d.getX(), correctedTargetPose3d.getY(), new Rotation2d());
   }
 
+  // Placeholder
   public double getCorrectedTargetSpeedRPM() {
-    return targetSpeedRPM;
+    return 0;
   }
 
   @AutoLogOutput(key = "ShotCalculator/CorrectTargetVelocity")
   public double getCorrectTargetVelocity() {
-    return targetSpeedMPS;
+    return targetSpeedRadPerSec;
   }
 
   @AutoLogOutput(key = "ShotCalculator/CorrectedTargetAngle")
@@ -174,50 +242,53 @@ public class ShotCalculator extends FullSubsystem {
     return targetAngleDeg;
   }
 
-  @AutoLogOutput(key = "ShotCalculator/CorrectTargetRotation")
-  /**
-   * The heading the robot needs to face to aim at the target location. Calculated as atan2(targetY
-   * - robotY, targetX - robotX). DO NOT DO THE FLIPPING HERE
-   */
-  public Rotation2d getCorrectTargetRotation() {
-    return (fieldToHubAngle);
-  }
-
-  @AutoLogOutput(key = "ShotCalculator/FieldToHubAngle")
-  public Rotation2d getFieldToHubAngle() {
-    return (fieldToHubAngle);
-  }
-
-  // log this value if you can 12:50
   @AutoLogOutput(key = "ShotCalculator/Distance2D")
   public double getShooterToCorrectTargetPoseDistance() {
-    return distanceToHub2D;
+    return distanceToTarget2D;
   }
 
   public double getShooterToCorrectTargetPoseDistance3D() {
-    return distanceToHub3D;
+    return distanceToTarget3D;
+  }
+
+  @AutoLogOutput(key = "ShotCalculator/AngularError")
+  public Rotation2d getAngularError() {
+    return angularError;
   }
 
   // Return This Util in Constants.java
   // Periodic Command Scheduler Overflow Handling
   @AutoLogOutput(key = "ShotCalculator/TargetLocation")
-  public Pose2d updateTargetByAlliance() {
-    var alliance = DriverStation.getAlliance();
+  public void updateTargetByAlliance() {
+    boolean isRed =
+        DriverStation.getAlliance().isPresent()
+            && DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
 
-    if (alliance.isPresent()) {
-      if (alliance.get() == DriverStation.Alliance.Red) {
-        targetLocation = new Pose2d(redHubTarget, new Rotation2d());
-      } else {
-        targetLocation = new Pose2d(blueHubTarget, new Rotation2d());
-      }
+    if (isRed) {
+      hubTargetLocation = new Pose2d(redHubTarget, new Rotation2d());
+      passTargetLocation =
+          (currentPassSide == PassSide.CLOSE_LEFT)
+              ? ShootOnTheFlyConstants.RED_PASS_CL_TARGET
+              : ShootOnTheFlyConstants.RED_PASS_CR_TARGET;
     } else {
-      targetLocation = new Pose2d(blueHubTarget, new Rotation2d());
+      hubTargetLocation = new Pose2d(blueHubTarget, new Rotation2d());
+      passTargetLocation =
+          (currentPassSide == PassSide.CLOSE_LEFT)
+              ? ShootOnTheFlyConstants.BLUE_PASS_CL_TARGET
+              : ShootOnTheFlyConstants.BLUE_PASS_CR_TARGET;
     }
-    return targetLocation;
   }
+
+  //     Alliance alliance = DriverStation.getAlliance().get();
+  //     boolean isRed = alliance == Alliance.Red;
 
   @Override
   public void periodicAfterScheduler() {
-    Logger.recordOutput("ShotCalculator/TargetLocation", targetLocation);
+    Logger.recordOutput("ShotCalculator/HubTargetLocation", hubTargetLocation);
+    Logger.recordOutput("ShotCalculator/PassTargetLocation", passTargetLocation);
+    Logger.recordOutput("ShotCalculator/RawTargetPose3d", rawTargetPose3d);
+    Logger.recordOutput("ShotCalculator/CorrectedTargetPose3d", correctedTargetPose3d);
+    Logger.recordOutput("ShotCalculator/ShooterPose3d", shooterPose3d);
+    Logger.recordOutput("ShotCalculator/DrivetrainSpeeds", drivetrainSpeeds);
   }
 }

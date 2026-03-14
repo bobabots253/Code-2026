@@ -15,7 +15,6 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -24,6 +23,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
@@ -48,6 +48,7 @@ import frc.robot.subsystems.kicker.KickerIOSim;
 import frc.robot.subsystems.kicker.KickerIOSpark;
 import frc.robot.subsystems.kicker.KickerSubsystem;
 import frc.robot.subsystems.shooter.ShotCalculator;
+import frc.robot.subsystems.shooter.ShotCalculator.ShotMode;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIO;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSpark;
@@ -248,7 +249,10 @@ public class RobotContainer {
 
     NamedCommands.registerCommand(
         "driveHubLock",
-        DriveCommands.pointAtHub(swerveSubsystem, () -> shotCalculator.getFieldToHubAngle()));
+        new ParallelCommandGroup(
+            shotCalculator.toggleShotMode(ShotMode.HUB),
+            DriveCommands.pointAtHub(
+                swerveSubsystem, () -> shotCalculator.getCorrectTargetRotation())));
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -309,12 +313,13 @@ public class RobotContainer {
 
     driver
         .rightBumper()
+        .onTrue(shotCalculator.toggleShotMode(ShotMode.HUB))
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 swerveSubsystem,
                 () -> -driver.getLeftY(),
                 () -> -driver.getLeftX(),
-                () -> shotCalculator.getFieldToHubAngle()));
+                () -> shotCalculator.getCorrectTargetRotation()));
 
     driver
         .b()
@@ -379,8 +384,7 @@ public class RobotContainer {
   private void configureAutos() {
 
     // ------ Named Commands -------- \\
-
-    autoChooser.addOption("Testing Spartan", new PathPlannerAuto("TestingSpartan"));
+    // Autos created in PathPlanner UI are automatically pushed to AutoChooser
   }
 
   /**
@@ -391,69 +395,6 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return autoChooser.get();
   }
-  //   public Command preLoadAutoCommand(){
-  //     // Pose2d firstTargetPose2d = (DriverStation.getAlliance().get() == Alliance.Red) ? new
-  // Pose2d(15.205, 2.127, new Rotation2d()) : new Pose2d(1.154, 5.391, new Rotation2d(Math.PI));
-  //     return Commands.sequence(
-  //       // Commands.runOnce(
-  //       //   () -> {
-  //       //     new HolonomicAutoAlign(swerveSubsystem, new Pose2d(0,0, new Rotation2d()));
-  //       //   }),
-
-  //       Commands.parallel(flywheelSubsystem.runStaticVelocitCommand(),
-  // hoodSubsystem.runStaticAngleCommand()),
-  //       new WaitCommand(4),
-  //       Commands.parallel(
-  //         DriveCommands.joystickDriveAtAngle(
-  //                 swerveSubsystem,
-  //                 () -> -driver.getLeftY(),
-  //                 () -> -driver.getLeftX(),
-  //                 () -> shotCalculator.getFieldToHubAngle()),
-  //         indexerSubsystem.runCurrentCommand(),
-  //         agitatorSubsystem.indexCommand(),
-  //         kickerSubsystem.indexCommand()
-  //         )
-  //         );
-
-  //     // return Commands.runOnce(() -> {flywheelSubsystem.shootCommand();});
-
-  //   }
-
-  //   public Command depotAutoCommand(){
-  //    Pose2d firstTargetPose2d = (DriverStation.getAlliance().get() == Alliance.Red) ? new
-  // Pose2d(15.205, 2.127, new Rotation2d()) : new Pose2d(1.154, 5.391, new Rotation2d(Math.PI));
-  //    Pose2d secondTargetPose2d = (DriverStation.getAlliance().get() == Alliance.Red) ? new
-  // Pose2d(15.813, 2.088, new Rotation2d()) : new Pose2d(0.571, 5.918, new Rotation2d(Math.PI));
-  //   return Commands.sequence(
-  //     Commands.runOnce(
-  //       () -> {
-  //         new HolonomicAutoAlign(swerveSubsystem, firstTargetPose2d);
-  //       }),
-  //     Commands.sequence(
-  //       pivotSubsystem.deployCommand(),
-  //       rollerSubsystem.intakeCommand()
-  //     ),
-  //     Commands.runOnce(
-  //       () -> {
-  //         new HolonomicAutoAlign(swerveSubsystem, secondTargetPose2d);
-  //     }),
-
-  //     Commands.parallel(flywheelSubsystem.shootCommand(), hoodSubsystem.shootCommand()),
-  //     Commands.parallel(
-  //       DriveCommands.joystickDriveAtAngle(
-  //               swerveSubsystem,
-  //               () -> -controller.getLeftY(),
-  //               () -> -controller.getLeftX(),
-  //               () -> shotCalculator.getFieldToHubAngle()),
-  //       indexerSubsystem.runCurrentCommand(),
-  //       agitatorSubsystem.indexCommand(),
-  //       kickerSubsystem.indexCommand()
-  //       )
-  //       );
-
-  //   // return Commands.runOnce(() -> {flywheelSubsystem.shootCommand();});
-
-  // }
 
   /*
    * Applies the alliance-relative pose offset to the swerve pose estimator.
