@@ -21,27 +21,21 @@
           "data": {
             "commands": [
               {
-                "type": "named",
-                "data": {
-                  "name": "driveHubLock"
-                }
-              },
-              {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.5
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "hoodLayup"
+                  "waitTime": 0.5
                 }
               },
               {
                 "type": "named",
                 "data": {
                   "name": "flywheelLayup"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "hoodLayup"
                 }
               }
             ]

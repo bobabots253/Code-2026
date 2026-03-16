@@ -102,27 +102,9 @@
           "data": {
             "commands": [
               {
-                "type": "named",
-                "data": {
-                  "name": "driveHubLock"
-                }
-              },
-              {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.0
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "hoodLayup"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "flywheelLayup"
+                  "waitTime": 0.001
                 }
               }
             ]
@@ -275,27 +257,9 @@
           "data": {
             "commands": [
               {
-                "type": "named",
-                "data": {
-                  "name": "driveHubLock"
-                }
-              },
-              {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.0
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "hoodLayup"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "flywheelLayup"
+                  "waitTime": 0.001
                 }
               }
             ]

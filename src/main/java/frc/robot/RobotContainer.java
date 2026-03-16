@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
@@ -125,9 +126,9 @@ public class RobotContainer {
                 swerveSubsystem::getRotation,
                 swerveSubsystem::getChassisSpeeds,
                 new VisionIOLimelight(VisionConstants.cameraYellow, swerveSubsystem::getRotation),
-                new VisionIOLimelight(VisionConstants.cameraPurple, swerveSubsystem::getRotation),
-                new VisionIOLimelight(VisionConstants.cameraPink, swerveSubsystem::getRotation),
-                new VisionIOLimelight(VisionConstants.cameraOrange, swerveSubsystem::getRotation));
+                new VisionIOLimelight(VisionConstants.cameraPurple, swerveSubsystem::getRotation));
+        // new VisionIOLimelight(VisionConstants.cameraPink, swerveSubsystem::getRotation));
+        // new VisionIOLimelight(VisionConstants.cameraOrange, swerveSubsystem::getRotation));
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
 
@@ -337,6 +338,19 @@ public class RobotContainer {
         .whileTrue(flywheelSubsystem.juggleCommand())
         .whileTrue(hoodSubsystem.juggleCommand());
 
+    // Reset gyro to 0° when B button is pressed
+    driver
+        .a()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        swerveSubsystem.setPose(
+                            new Pose2d(
+                                swerveSubsystem.getPose().getTranslation(),
+                                returnGlobalSwerveOffset())),
+                    swerveSubsystem)
+                .ignoringDisable(true));
+
     driver.povUp().onTrue(hoodSubsystem.runDebuggingUpCommand());
     driver.povDown().onTrue(hoodSubsystem.runDebuggingDownCommand());
 
@@ -410,6 +424,19 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  // Only use for Driver Reset Button Binding
+  public Rotation2d returnGlobalSwerveOffset() {
+    if (!DriverStation.getAlliance().isPresent()) {
+      return new Rotation2d();
+    } else {
+      Alliance alliance = DriverStation.getAlliance().get();
+      boolean isRed = alliance == Alliance.Red;
+      Rotation2d allianceOffset =
+          isRed ? Rotation2d.fromDegrees(180.0) : Rotation2d.fromDegrees(0.0);
+      return allianceOffset;
+    }
   }
 
   /*

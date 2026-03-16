@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.978,
-        "y": 3.404000000000001
+        "x": 3.001,
+        "y": 2.699
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.206541902763502,
-        "y": 2.443173733486314
+        "x": 3.2295419027635015,
+        "y": 1.7381737334863132
       },
       "isLocked": false,
       "linkedName": null
@@ -53,7 +53,7 @@
   "folder": "CRB Citrus Auto",
   "idealStartingState": {
     "velocity": 0.0,
-    "rotation": 20.641688424847928
+    "rotation": 39.465
   },
   "useDefaultConstraints": true
 }

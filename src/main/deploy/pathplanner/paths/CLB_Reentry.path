@@ -53,7 +53,7 @@
   "folder": "CLB Citrus Auto",
   "idealStartingState": {
     "velocity": 0.0,
-    "rotation": -20.641688424847928
+    "rotation": -20.642
   },
   "useDefaultConstraints": true
 }
