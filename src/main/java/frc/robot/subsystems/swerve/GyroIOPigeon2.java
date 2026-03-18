@@ -18,24 +18,28 @@ import static frc.robot.subsystems.swerve.SwerveConstants.*;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.GyroTrimConfigs;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import java.util.Queue;
+import frc.robot.util.swerveUtil.PrimitiveDoubleQueue;
 
 /** IO implementation for Pigeon 2. */
 public class GyroIOPigeon2 implements GyroIO {
   private final Pigeon2 pigeon = new Pigeon2(pigeonCanId);
   private final StatusSignal<Angle> yaw = pigeon.getYaw();
-  private final Queue<Double> yawPositionQueue;
-  private final Queue<Double> yawTimestampQueue;
+  private final PrimitiveDoubleQueue yawPositionQueue;
+  private final PrimitiveDoubleQueue yawTimestampQueue;
   private final StatusSignal<AngularVelocity> yawVelocity = pigeon.getAngularVelocityZWorld();
+  private final GyroTrimConfigs gyroTrimConfigs = new GyroTrimConfigs().withGyroScalarZ(-2.04);
 
   public GyroIOPigeon2() {
+
     pigeon.getConfigurator().apply(new Pigeon2Configuration());
+    pigeon.getConfigurator().apply(gyroTrimConfigs);
     pigeon.getConfigurator().setYaw(0.0);
     yaw.setUpdateFrequency(odometryFrequency);
     yawVelocity.setUpdateFrequency(50.0);
@@ -54,12 +58,15 @@ public class GyroIOPigeon2 implements GyroIO {
     inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
     inputs.yawVelocityRadPerSec = Units.degreesToRadians(yawVelocity.getValueAsDouble());
 
-    inputs.odometryYawTimestamps =
-        yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-    inputs.odometryYawPositions =
-        yawPositionQueue.stream()
-            .map((Double value) -> Rotation2d.fromDegrees(value))
-            .toArray(Rotation2d[]::new);
+    inputs.odometryYawTimestamps = yawTimestampQueue.toArray();
+
+    double[] rawYaw = yawPositionQueue.toArray();
+    Rotation2d[] yawRot = new Rotation2d[rawYaw.length];
+    for (int i = 0; i < rawYaw.length; i++) {
+      yawRot[i] = Rotation2d.fromDegrees(rawYaw[i]);
+    }
+    inputs.odometryYawPositions = yawRot;
+
     yawTimestampQueue.clear();
     yawPositionQueue.clear();
   }

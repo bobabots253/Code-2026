@@ -37,7 +37,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
-import java.util.Queue;
+import frc.robot.util.swerveUtil.PrimitiveDoubleQueue;
 import java.util.function.DoubleSupplier;
 
 /**
@@ -58,9 +58,9 @@ public class ModuleIOSpark implements ModuleIO {
   private final SparkClosedLoopController turnController;
 
   // Queue inputs from odometry thread
-  private final Queue<Double> timestampQueue;
-  private final Queue<Double> drivePositionQueue;
-  private final Queue<Double> turnPositionQueue;
+  private final PrimitiveDoubleQueue timestampQueue;
+  private final PrimitiveDoubleQueue drivePositionQueue;
+  private final PrimitiveDoubleQueue turnPositionQueue;
 
   // Connection debouncers
   private final Debouncer driveConnectedDebounce =
@@ -206,14 +206,16 @@ public class ModuleIOSpark implements ModuleIO {
     inputs.turnConnected = turnConnectedDebounce.calculate(!sparkStickyFault);
 
     // Update odometry inputs
-    inputs.odometryTimestamps =
-        timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-    inputs.odometryDrivePositionsRad =
-        drivePositionQueue.stream().mapToDouble((Double value) -> value).toArray();
-    inputs.odometryTurnPositions =
-        turnPositionQueue.stream()
-            .map((Double value) -> new Rotation2d(value).minus(zeroRotation))
-            .toArray(Rotation2d[]::new);
+    inputs.odometryTimestamps = timestampQueue.toArray();
+    inputs.odometryDrivePositionsRad = drivePositionQueue.toArray();
+
+    double[] rawTurnPosition = turnPositionQueue.toArray();
+    Rotation2d[] turnPosRot = new Rotation2d[rawTurnPosition.length];
+    for (int i = 0; i < rawTurnPosition.length; i++) {
+      turnPosRot[i] = new Rotation2d(rawTurnPosition[i]).minus(zeroRotation);
+    }
+    inputs.odometryTurnPositions = turnPosRot;
+
     timestampQueue.clear();
     drivePositionQueue.clear();
     turnPositionQueue.clear();

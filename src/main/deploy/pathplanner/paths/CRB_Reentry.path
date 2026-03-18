@@ -1,0 +1,59 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.001,
+        "y": 2.699
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.2295419027635015,
+        "y": 1.7381737334863132
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.623,
+        "y": 0.6330000000000009
+      },
+      "prevControl": {
+        "x": 2.65979528396225,
+        "y": 0.5237001740666402
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.7941908713692851,
+      "rotationDegrees": -0.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 4.0,
+    "rotation": -0.0
+  },
+  "reversed": false,
+  "folder": "CRB Citrus Auto",
+  "idealStartingState": {
+    "velocity": 0.0,
+    "rotation": 39.465
+  },
+  "useDefaultConstraints": true
+}

@@ -133,7 +133,7 @@ public class DriveCommands {
       Supplier<Rotation2d> rotationSupplier) {
 
     // Create PID controller
-    PIDController angleController = new PIDController(2, 0.0, 0.0); // Broken atm
+    PIDController angleController = new PIDController(10, 0.0, 0.2); // Broken atm
     angleController.enableContinuousInput(-Math.PI, Math.PI);
 
     // Construct command
@@ -172,63 +172,32 @@ public class DriveCommands {
         .beforeStarting(() -> angleController.reset()); // (drive.getRotation().getRadians()
   }
 
-  //   /**
-  //    * Field relative drive command using joystick for linear control and PID for angular
-  // control.
-  //    * Used to snap and lock rotation to face the hub.
-  //    */
-  //   public static Command joystickDriveAndShootHub(
-  //       SwerveSubsystem drive,
-  //       DoubleSupplier xSupplier,
-  //       DoubleSupplier ySupplier,
-  //       Pose2d targetPose,
-  //       double driveScalar) {
+  public static Command pointAtHub(SwerveSubsystem drive, Supplier<Rotation2d> rotationSupplier) {
 
-  //     // Create PID controller
-  //     ProfiledPIDController angleController =
-  //         new ProfiledPIDController(
-  //             DRIVE_AND_SHOOT_ANGLE_P,
-  //             0.0,
-  //             DRIVE_AND_SHOOT_ANGLE_D,
-  //             new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-  //     angleController.enableContinuousInput(-Math.PI, Math.PI);
+    // Create PID controller
+    PIDController angleController = new PIDController(10, 0.0, 0.2); // Broken atm
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
 
-  //     // Construct command
-  //     return Commands.run(
-  //             () -> {
-  //               // Get linear velocity
-  //               Translation2d linearVelocity =
-  //                   getLinearVelocityFromJoysticks(xSupplier.getAsDouble(),
-  // ySupplier.getAsDouble());
+    // Construct command
+    return Commands.run(
+            () -> {
 
-  //               // Calculate angular speed
-  //               double omega =
-  //                   angleController.calculate(
-  //                       drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
+              // Calculate angular speed
+              double omega =
+                  angleController.calculate(
+                      drive.getRotation().getRadians(),
+                      rotationSupplier.get().getRadians()); // atan2 blue-origin setpoint
 
-  //               // Convert to field relative speeds & send command
-  //               ChassisSpeeds speeds =
-  //                   new ChassisSpeeds(
-  //                       linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec() *
-  // driveScalar,
-  //                       linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec() *
-  // driveScalar,
-  //                       omega);
-  //               boolean isFlipped =
-  //                   DriverStation.getAlliance().isPresent()
-  //                       && DriverStation.getAlliance().get() == Alliance.Red;
-  //               drive.runVelocity(
-  //                   ChassisSpeeds.fromFieldRelativeSpeeds(
-  //                       speeds,
-  //                       isFlipped
-  //                           ? drive.getRotation().plus(new Rotation2d(Math.PI))
-  //                           : drive.getRotation()));
-  //             },
-  //             drive)
+              // Convert to field relative speeds & send command
+              ChassisSpeeds speeds = new ChassisSpeeds(0, 0, omega);
 
-  //         // Reset PID controller when command starts
-  //         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
-  //   }
+              drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
+            },
+            drive)
+
+        // Reset PID controller when command starts
+        .beforeStarting(() -> angleController.reset());
+  }
 
   public static Command joystickDriveAndShootHub(
       SwerveSubsystem drive,

@@ -1,0 +1,135 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 6.256,
+        "y": 0.9980000000000011
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.1187097091575655,
+        "y": 1.4553039484191643
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.723236432024143,
+        "y": 2.2154431569147643
+      },
+      "prevControl": {
+        "x": 5.904884664965179,
+        "y": 1.591984992995238
+      },
+      "nextControl": {
+        "x": 5.653305170691702,
+        "y": 2.4554631950125323
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.899117179467192,
+        "y": 3.4627252588807442
+      },
+      "prevControl": {
+        "x": 5.4836842683507845,
+        "y": 2.8812610854548133
+      },
+      "nextControl": {
+        "x": 6.402536316547704,
+        "y": 4.167340094625652
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.030463785167743,
+        "y": 3.4627252588807442
+      },
+      "prevControl": {
+        "x": 7.739421794737126,
+        "y": 4.032411042450537
+      },
+      "nextControl": {
+        "x": 8.374418992904491,
+        "y": 2.7894671089398955
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.682070590005152,
+        "y": 2.2154431569147643
+      },
+      "prevControl": {
+        "x": 8.1206352063576,
+        "y": 2.373754365256402
+      },
+      "nextControl": {
+        "x": 7.149314849951772,
+        "y": 2.023131233394209
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.899,
+        "y": 2.2150000000000007
+      },
+      "prevControl": {
+        "x": 6.220141557643975,
+        "y": 2.290398684601362
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.5145228215767665,
+      "rotationDegrees": 82.87163880343643
+    },
+    {
+      "waypointRelativePos": 2.460580912863066,
+      "rotationDegrees": -1.7923176899283675
+    },
+    {
+      "waypointRelativePos": 3.165975103734387,
+      "rotationDegrees": -78.29208288813534
+    },
+    {
+      "waypointRelativePos": 3.912863070539367,
+      "rotationDegrees": -154.46296016946835
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": true
+  },
+  "goalEndState": {
+    "velocity": 5.5,
+    "rotation": -180.0
+  },
+  "reversed": false,
+  "folder": "CRB Citrus Auto",
+  "idealStartingState": {
+    "velocity": 4.0,
+    "rotation": 90.0
+  },
+  "useDefaultConstraints": true
+}

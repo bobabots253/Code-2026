@@ -16,9 +16,10 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 
 public class VisionConstants {
-  // AprilTag layout
+  // AprilTag layout - Test FieldConstants from 6328
   public static AprilTagFieldLayout aprilTagLayout =
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField); // Fix to 2026 Layout
+  //   FieldConstants();
 
   // Camera names, must match names configured on coprocessor
   public static String cameraPurple = "limelight-purple"; // BL
@@ -52,24 +53,21 @@ public class VisionConstants {
   // Manual Variance Weighting: (Adjust to trust some cameras more than others)
   public static double[] cameraStdDevFactors =
       new double[] {
-        1.0, // Camera 0
-        1.0, // Camera 1
-        1.0, // Camera 2
-        1.0, // Camera 3
+        1.0, // Camera 0 - Yellow - L
+        1.0, // Camera 1 - Purple - L
+        2.0, // Camera 2 - Pink - R
+        2.0, // Camera 3 - Orange - L
       };
-  // Blue Camera - Cannot be trusted
-  // MT2 on LL4 needs filtering for jumping
-  // Add rotation limit
 
   // Multipliers to apply for MegaTag 2 observations
   public static double linearStdDevMegatag2Factor = 0.5; // More stable than full 3D solve
   public static double angularStdDevMegatag2Factor = Double.POSITIVE_INFINITY; // Never Trust
 
   // Clamping ranges for vision estimates (see units)
-  static final double maxLinearSpeed = 3.0; // Meters per second
+  static final double maxLinearSpeed = 2.0; // Meters per second
   static final double maxAngularSpeed =
-      DegreesPerSecond.of(360).in(RadiansPerSecond); // Radians per second
-  static final double maxGyroError = 5.0; // Degrees
+      DegreesPerSecond.of(270).in(RadiansPerSecond); // Radians per second
+  static final double maxGyroError = 1.0; // Degrees
   static final double maxTranslationError = 1.0; // Meters
   static final int LOCK_MODE = 10;
 }

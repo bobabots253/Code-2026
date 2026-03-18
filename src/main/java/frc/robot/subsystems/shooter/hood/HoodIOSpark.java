@@ -43,7 +43,7 @@ public class HoodIOSpark implements HoodIO {
     masterNEOConfig
         .idleMode(IdleMode.kBrake)
         .inverted(false)
-        .smartCurrentLimit(35); // Current Limit reduced for safety
+        .smartCurrentLimit(50); // Current Limit reduced for safety
     masterNEOConfig
         .encoder
         .positionConversionFactor(masterPositionConversionFactor) // THE USER MUST GET THIS RIGHT
@@ -55,12 +55,6 @@ public class HoodIOSpark implements HoodIO {
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .pid(sparkMasterHoodkP, sparkMasterHoodkI, sparkMasterHoodkD);
-    // masterNEOConfig
-    // .softLimit
-    // .reverseSoftLimitEnabled(true)
-    // .reverseSoftLimit(minAngleRad)
-    // .forwardSoftLimitEnabled(true)
-    // .forwardSoftLimit(maxAngleRad);
     masterNEOConfig
         .signals
         .primaryEncoderPositionAlwaysOn(true)
@@ -104,7 +98,7 @@ public class HoodIOSpark implements HoodIO {
   public void applyOutputs(HoodIOOutputs outputs) {
 
     // Safety check to prevent over/under extension
-    // May need additional acceleration limits if the rack teeth start shearing
+    // THE USER MUST GET THIS RIGHT
     double safeSetpoint = Math.max(minAngleRad, Math.min(maxAngleRad, outputs.positionRad));
 
     switch (outputs.mode) {

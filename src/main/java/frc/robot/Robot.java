@@ -41,11 +41,17 @@ public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
 
+  private Timer m_gcTimer = new Timer();
+
   // Flag to ensure we only apply the alliance offset once per DS connection
   @AutoLogOutput(key = "Robot/HasInitializedAlliancePose")
   private boolean hasInitializedAlliancePose = false;
 
   public Robot() {
+
+    // Start GC timer
+    m_gcTimer.start();
+
     // Record metadata
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
     Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -112,7 +118,9 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
     FullSubsystem.runAllPeriodicAfterScheduler();
 
-    // System.gc();
+    if (m_gcTimer.advanceIfElapsed(5)) {
+      System.gc();
+    }
     // Optionally call the garbage collector which manually suggest GC reduce memory usage
     // However, Java Garbage Collection should already be optimized to not have to call this
     // function manually.

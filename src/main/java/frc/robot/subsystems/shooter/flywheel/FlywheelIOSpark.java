@@ -2,10 +2,14 @@ package frc.robot.subsystems.shooter.flywheel;
 
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.followerFlywheelEncoderPositionFactor;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.followerFlywheelEncoderVelocityFactor;
+import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.kA;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.kAntilag;
+import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.kS;
+import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.kV;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.masterFlywheelEncoderPositionFactor;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.masterFlywheelEncoderVelocityFactor;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkFollowerFlywheelCanId;
+import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkMasterFlyWheelkP;
 import static frc.robot.subsystems.shooter.flywheel.FlywheelConstants.sparkMasterFlywheelCanId;
 import static frc.robot.util.SparkUtil.ifOk;
 import static frc.robot.util.SparkUtil.sparkStickyFault;
@@ -23,7 +27,9 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.util.Units;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -43,6 +49,9 @@ public class FlywheelIOSpark implements FlywheelIO {
 
   // Declare motor controllers
   private final SparkClosedLoopController masterVortexController;
+
+  //
+  private final SimpleMotorFeedforward ffcalculator = new SimpleMotorFeedforward(kS, kV, kA);
 
   // Declare WPILib Debouncer for Motor Disconnection Alerts here
   private final Debouncer masterVortexDebouncer =
@@ -84,6 +93,13 @@ public class FlywheelIOSpark implements FlywheelIO {
             10) // Measurement = Postion / deltaTime, this edits deltaTime to parameter
         .uvwAverageDepth(2); // Does not affect positional control
     masterVortexConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pid(1.0, 0, 0);
+    masterVortexConfig
+        .closedLoop
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        .pid(sparkMasterFlyWheelkP, 0.0, 0.0, ClosedLoopSlot.kSlot1)
+        .allowedClosedLoopError(
+            Units.rotationsPerMinuteToRadiansPerSecond(50), ClosedLoopSlot.kSlot1);
+    // masterVortexConfig.closedLoop.feedForward.sva(kS, kV, kA, ClosedLoopSlot.kSlot1);
     // Since Current Control (CC) uses internal motor measurements,
     // does this even affect
     // .p(sparkMasterFlyWheelkP, ClosedLoopSlot.kSlot0);
@@ -199,6 +215,7 @@ public class FlywheelIOSpark implements FlywheelIO {
 
   @Override
   public void applyOutputs(FlywheelIOOutputs outputs) {
+    double setpoint = outputs.velocityRadsPerSec;
     // Better Implementation of Bang-Bang and TorqueCurrentFOC cuz REV API ;(
     // Strucutre:
     // https://www.chiefdelphi.com/t/frc-6328-mechanical-advantage-2026-build-thread/509595/272
@@ -210,11 +227,15 @@ public class FlywheelIOSpark implements FlywheelIO {
         break;
       case CURRENT: // DO NOT USE, BROKEN
         masterVortexController.setSetpoint(
-            FlywheelConstants.kDebuggingCurrent, ControlType.kCurrent, ClosedLoopSlot.kSlot0);
+            FlywheelConstants.debuggingCurrent, ControlType.kCurrent, ClosedLoopSlot.kSlot0);
         break;
-      case VELOCITY_SETPOINT:
+      case VELOCITY_PID:
+        double arrfeedForward = ffcalculator.calculate(setpoint);
+        masterVortexController.setSetpoint(
+            setpoint, ControlType.kVelocity, ClosedLoopSlot.kSlot1, arrfeedForward);
+        break;
+      case VELOCITY_BANG_BANG_TORQUE:
         double measuredVelocity = outputs.measuredVelocityRadPerSec;
-        double setpoint = outputs.velocityRadsPerSec;
 
         double error = setpoint - measuredVelocity;
         Logger.recordOutput("Flywheel/Error", error);

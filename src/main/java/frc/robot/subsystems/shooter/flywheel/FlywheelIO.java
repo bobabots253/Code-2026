@@ -24,9 +24,10 @@ public interface FlywheelIO {
 
   public static enum FlywheelIOOutputMode {
     COAST,
-    VELOCITY_SETPOINT,
+    VELOCITY_BANG_BANG_TORQUE,
     VOLTAGE,
-    CURRENT
+    CURRENT,
+    VELOCITY_PID
   }
 
   public static class FlywheelIOOutputs {

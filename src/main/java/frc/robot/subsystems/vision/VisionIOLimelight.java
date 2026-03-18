@@ -51,6 +51,7 @@ public class VisionIOLimelight implements VisionIO {
     // Translation (X,Y,Z) in meters Rotation(Roll,Pitch,Yaw) in degrees, total latency (cl+tl),
     // tag count, tag span, average tag distance from camera, average tag area ()
     // Should be "botpose_wpiblue", but don't fix what isn't broken
+    // double[] megatag2Cache = new double[] {};
     megatag2Subscriber =
         table.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
   }

@@ -1,0 +1,75 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.899,
+        "y": 5.854
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.801867238550603,
+        "y": 5.795152414621964
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.2667387097272735,
+        "y": 5.751787201943338
+      },
+      "prevControl": {
+        "x": 3.7524290917278753,
+        "y": 5.881882839979214
+      },
+      "nextControl": {
+        "x": 3.0018433959886304,
+        "y": 5.680833100049058
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.978,
+        "y": 4.665
+      },
+      "prevControl": {
+        "x": 3.0248329501474704,
+        "y": 5.503753116715694
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.5253112033195029,
+      "rotationDegrees": 180.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": true
+  },
+  "goalEndState": {
+    "velocity": 5.5,
+    "rotation": -20.642
+  },
+  "reversed": false,
+  "folder": "CLB Citrus Auto",
+  "idealStartingState": {
+    "velocity": 5.5,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}

@@ -5,6 +5,7 @@ import static frc.robot.subsystems.intake.pivot.PivotConstants.highCurrentAmps;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.intake.pivot.PivotIO.PivotIOOutputMode;
 import frc.robot.subsystems.intake.pivot.PivotIO.PivotIOOutputs;
 import frc.robot.subsystems.shooter.hood.HoodConstants;
@@ -25,9 +26,9 @@ public class PivotSubsystem extends FullSubsystem {
   public enum Goal {
     IDLE(() -> 0.0),
     DEPLOYED(() -> PivotConstants.deployedAngle),
+    HALF_DEPLOYED(() -> PivotConstants.halfDeployedAngle),
     STOW(() -> PivotConstants.stowAngle), // Change if Necessary
-    JUGGLE(() -> HoodConstants.jugglingAngle),
-    DEBUGGING(() -> HoodConstants.debuggingAngle);
+    JUGGLE(() -> HoodConstants.jugglingAngle);
 
     // Required Arguement for each enum state
     private final DoubleSupplier angleRads;
@@ -116,17 +117,22 @@ public class PivotSubsystem extends FullSubsystem {
         .withName("Pivot Deploy");
   }
 
+  public Command halfDeployCommand() {
+    return startEnd(() -> setGoal(Goal.HALF_DEPLOYED), () -> setGoal(Goal.IDLE))
+        .withName("Pivot Half Deploy");
+  }
+
   public Command stowCommand() {
     return startEnd(() -> setGoal(Goal.STOW), () -> setGoal(Goal.IDLE)).withName("Pivot Stow");
   }
 
-  public Command juggleCommand() {
-    return startEnd(() -> setGoal(Goal.JUGGLE), () -> setGoal(Goal.IDLE)).withName("Pivot Juggle");
+  public Command runSaltAndPepperCommand() {
+    return Commands.sequence(deployCommand().withTimeout(0.3), halfDeployCommand().withTimeout(0.3))
+        .repeatedly();
   }
 
-  public Command runDebuggingCommand() {
-    return startEnd(() -> setGoal(Goal.DEBUGGING), () -> setGoal(Goal.IDLE))
-        .withName("Pivot Debug");
+  public Command juggleCommand() {
+    return startEnd(() -> setGoal(Goal.JUGGLE), () -> setGoal(Goal.IDLE)).withName("Pivot Juggle");
   }
 
   public Command stopCommand() {

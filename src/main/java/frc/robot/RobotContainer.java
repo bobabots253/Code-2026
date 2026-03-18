@@ -14,8 +14,10 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -45,6 +47,8 @@ import frc.robot.subsystems.kicker.KickerIOSim;
 import frc.robot.subsystems.kicker.KickerIOSpark;
 import frc.robot.subsystems.kicker.KickerSubsystem;
 import frc.robot.subsystems.shooter.ShotCalculator;
+import frc.robot.subsystems.shooter.ShotCalculator.PassSide;
+import frc.robot.subsystems.shooter.ShotCalculator.ShotMode;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIO;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSpark;
@@ -104,12 +108,6 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    // clampVisionChooser.addDefaultOption("Locked", 10);
-    // clampVisionChooser.addOption("Unlocked | Purple", 0);
-    // clampVisionChooser.addOption("Unlocked | Orange", 1);
-    // clampVisionChooser.addOption("Unlocked | Green", 2);
-    // clampVisionChooser.addOption("Unlocked | Blue", 3);
-
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -126,25 +124,13 @@ public class RobotContainer {
                 swerveSubsystem::addVisionMeasurement,
                 swerveSubsystem::getRotation,
                 swerveSubsystem::getChassisSpeeds,
-                // new VisionIOLimelight(VisionConstants.cameraPurple,
-                // swerveSubsystem::getRotation),
-                // new VisionIOLimelight(VisionConstants.cameraOrange,
-                // swerveSubsystem::getRotation),
                 new VisionIOLimelight(VisionConstants.cameraYellow, swerveSubsystem::getRotation),
-                new VisionIOLimelight(VisionConstants.cameraPink, swerveSubsystem::getRotation));
+                new VisionIOLimelight(VisionConstants.cameraPurple, swerveSubsystem::getRotation));
+        // new VisionIOLimelight(VisionConstants.cameraPink, swerveSubsystem::getRotation));
+        // new VisionIOLimelight(VisionConstants.cameraOrange, swerveSubsystem::getRotation));
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
 
-        // hoodSubsystem = new HoodSubsystem(new frc.robot.subsystems.shooter.hood.HoodIOSpark());
-        // flywheelSubsystem =
-        //     new FlywheelSubsystem(new frc.robot.subsystems.shooter.flywheel.FlywheelIOSpark());
-        // shooterSubsystem =
-        //     new ShooterSubsystem(
-        //         flywheelSubsystem,
-        //         hoodSubsystem,
-        //         shotCalculator,
-        //         swerveSubsystem::getPose,
-        //         swerveSubsystem::getChassisSpeeds);
         pivotSubsystem = new PivotSubsystem(new PivotIOSpark());
         rollerSubsystem = new RollerSubsystem(new RollerIOSpark());
         agitatorSubsystem = new AgitatorSubsystem(new AgitatorIOSpark());
@@ -188,15 +174,7 @@ public class RobotContainer {
                     swerveSubsystem::getPose));
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
-        // hoodSubsystem = new HoodSubsystem(new HoodIOSim());
-        // flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
-        // shooterSubsystem =
-        //     new ShooterSubsystem(
-        //         flywheelSubsystem,
-        //         hoodSubsystem,
-        //         shotCalculator,
-        //         swerveSubsystem::getPose,
-        //         swerveSubsystem::getChassisSpeeds);
+
         pivotSubsystem = new PivotSubsystem(new PivotIOSim());
         rollerSubsystem = new RollerSubsystem(new RollerIOSim());
         agitatorSubsystem = new AgitatorSubsystem(new AgitatorIOSim());
@@ -227,15 +205,7 @@ public class RobotContainer {
                 new VisionIO() {});
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
-        // hoodSubsystem = new HoodSubsystem(new HoodIOSim());
-        // flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
-        // shooterSubsystem =
-        //     new ShooterSubsystem(
-        //         new FlywheelSubsystem(new FlywheelIO() {}),
-        //         new HoodSubsystem(new HoodIO() {}),
-        //         new ShotCalculator(swerveSubsystem),
-        //         swerveSubsystem::getPose,
-        //         swerveSubsystem::getChassisSpeeds);
+
         pivotSubsystem = new PivotSubsystem(new PivotIO() {});
         rollerSubsystem = new RollerSubsystem(new RollerIO() {});
         agitatorSubsystem = new AgitatorSubsystem(new AgitatorIO() {});
@@ -246,6 +216,54 @@ public class RobotContainer {
 
         break;
     }
+
+    // ------- Intake Auto NamedCommands -------- \\
+
+    NamedCommands.registerCommand("pivotDown", pivotSubsystem.deployCommand());
+    NamedCommands.registerCommand("pivotUp", pivotSubsystem.stowCommand());
+    NamedCommands.registerCommand("pivotShake", pivotSubsystem.runSaltAndPepperCommand());
+
+    NamedCommands.registerCommand("rollerIntake", rollerSubsystem.intakeCommand());
+
+    // ------- Agitator Auto NamedCommands -------- \\
+
+    NamedCommands.registerCommand("agitatorIntake", agitatorSubsystem.intakeCommand());
+    NamedCommands.registerCommand("agitatorIndex", agitatorSubsystem.indexCommand());
+
+    // ------- Indexer Auto NamedCommands -------- \\
+
+    NamedCommands.registerCommand("indexerIndex", indexerSubsystem.runCurrentCommand());
+
+    // ------- Kicker Auto NamedCommands -------- \\
+
+    NamedCommands.registerCommand("kickerIndex", kickerSubsystem.indexCommand());
+
+    // ------- Shooter Auto NamedCommands -------- \\
+
+    NamedCommands.registerCommand("flywheelLayup", flywheelSubsystem.runLayupCommand());
+    NamedCommands.registerCommand(
+        "flywheelDynamic",
+        flywheelSubsystem.dynamicUpdatedShootCommand(
+            () -> shotCalculator.getCorrectTargetVelocity()));
+    NamedCommands.registerCommand("toggleWarm", flywheelSubsystem.toggleWarm());
+
+    NamedCommands.registerCommand("hoodLayup", hoodSubsystem.runLayupCommand());
+    NamedCommands.registerCommand(
+        "hoodDynamic",
+        hoodSubsystem.dynamicUpdatedShootCommand(
+            () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())));
+
+    NamedCommands.registerCommand("toggleHub", shotCalculator.toggleShotMode(ShotMode.HUB));
+
+    // ------- Drive Auto NamedCommands -------- \\
+
+    NamedCommands.registerCommand(
+        "driveHubLock",
+        DriveCommands.joystickDriveAtAngle(
+            swerveSubsystem,
+            () -> -driver.getLeftY(),
+            () -> -driver.getLeftX(),
+            () -> shotCalculator.getCorrectTargetRotation()));
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -273,6 +291,7 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+    configureAutos();
   }
 
   /**
@@ -288,7 +307,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
 
-    // ------- DT
+    // ------- Driver Controls -------- \\
 
     swerveSubsystem.setDefaultCommand(
         DriveCommands.joystickDrive(
@@ -301,7 +320,8 @@ public class RobotContainer {
         .leftBumper()
         .whileTrue(indexerSubsystem.runCurrentCommand())
         .whileTrue(kickerSubsystem.indexCommand())
-        .whileTrue(agitatorSubsystem.indexCommand());
+        .whileTrue(agitatorSubsystem.indexCommand())
+        .whileTrue(pivotSubsystem.runSaltAndPepperCommand());
 
     driver
         .rightBumper()
@@ -310,11 +330,31 @@ public class RobotContainer {
                 swerveSubsystem,
                 () -> -driver.getLeftY(),
                 () -> -driver.getLeftX(),
-                () -> shotCalculator.getFieldToHubAngle()));
+                () -> shotCalculator.getCorrectTargetRotation()));
 
-    operator.povLeft().onTrue(flywheelSubsystem.toggleWarm());
-    // .whileTrue(
-    //   hoodSubsystem.dynamicUpdatedShootCommand(() -> shotCalculator.getCorrectedTargetAngle()));
+    driver
+        .b()
+        .whileTrue(flywheelSubsystem.juggleCommand())
+        .whileTrue(hoodSubsystem.juggleCommand());
+
+    // Reset gyro to 0° when B button is pressed
+    driver
+        .a()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        swerveSubsystem.setPose(
+                            new Pose2d(
+                                swerveSubsystem.getPose().getTranslation(),
+                                returnGlobalSwerveOffset())),
+                    swerveSubsystem)
+                .ignoringDisable(true));
+
+    driver.povUp().onTrue(hoodSubsystem.runDebuggingUpCommand());
+    driver.povDown().onTrue(hoodSubsystem.runDebuggingDownCommand());
+
+    // ------- Operator Controls -------- \\
+
     operator.leftBumper().onTrue(pivotSubsystem.deployCommand());
     operator.rightBumper().onTrue(pivotSubsystem.stowCommand());
 
@@ -327,15 +367,27 @@ public class RobotContainer {
 
     operator
         .y()
-        .whileTrue(flywheelSubsystem.runStaticVelocitCommand())
-        .whileTrue(hoodSubsystem.runStaticAngleCommand());
+        .whileTrue(
+            hoodSubsystem.dynamicUpdatedShootCommand(
+                () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())))
+        .whileTrue(
+            flywheelSubsystem.dynamicUpdatedShootCommand(
+                () -> shotCalculator.getCorrectTargetVelocity()));
 
-    operator.povDown().whileTrue(hoodSubsystem.runDebuggingVoltageDownCommand());
-    operator.povUp().whileTrue(hoodSubsystem.runDebuggingVoltageUpCommand());
+    operator.a().onTrue(flywheelSubsystem.toggleWarm()); // Shifted from DPad Left
 
-    operator.povRight().whileTrue(flywheelSubsystem.runDebuggingVelocityCommand());
+    operator
+        .povUp()
+        .onTrue(shotCalculator.toggleShotMode(ShotMode.HUB)); // Operator MUST get this right
 
-    // ------ Debugging
+    operator
+        .povLeft()
+        .onTrue(shotCalculator.togglePass(PassSide.CLOSE_LEFT)); // Operator MUST get this right
+    operator
+        .povRight()
+        .onTrue(shotCalculator.togglePass(PassSide.CLOSE_RIGHT)); // Operator MUST get this right
+
+    // ------ Debugging -------- \\
 
     // Default command, normal field-relative drive
     // swerveSubsystem.setDefaultCommand(
@@ -344,63 +396,6 @@ public class RobotContainer {
     //         () -> -controller.getLeftY(),
     //         () -> -controller.getLeftX(),
     //         () -> -controller.getRightX()));
-
-    // controller.a().onTrue(pivotSubsystem.deployCommand());
-
-    // controller
-    //     .b()
-    //     .whileTrue(flywheelSubsystem.runDebuggingVelocityCommand())
-    //     .whileTrue(hoodSubsystem.runDebuggingCommand());
-
-    // controller.y().onTrue(pivotSubsystem.stowCommand());
-
-    // controller
-    //     .x()
-    //     .whileTrue(
-    //         DriveCommands.joystickDriveAtAngle(
-    //             swerveSubsystem,
-    //             () -> -controller.getLeftY(),
-    //             () -> -controller.getLeftX(),
-    //             () -> shotCalculator.getFieldToHubAngle()));
-
-    // controller
-    //     .leftBumper()
-    //     .whileTrue(rollerSubsystem.intakeCommand())
-    //     .whileTrue(agitatorSubsystem.intakeCommand());
-
-    // controller
-    //     .rightBumper()
-    //     .whileTrue(indexerSubsystem.runCurrentCommand())
-    //     .whileTrue(kickerSubsystem.indexCommand())
-    //     .whileTrue(agitatorSubsystem.indexCommand());
-
-    // controller.povDown().whileTrue(hoodSubsystem.runDebuggingVoltageDownCommand());
-    // controller.povUp().whileTrue(hoodSubsystem.runDebuggingVoltageUpCommand());
-
-    // controller.rightTrigger().whileTrue(rollerSubsystem.runUnjamCommand());
-
-    // controller.povRight().whileTrue(flywheelSubsystem.runDebuggingVelocityCommand());
-
-    // // Bug, Only Updated Hood Angle Once
-    // controller
-    //     .povLeft()
-    //     .whileTrue(flywheelSubsystem.shootCommand())
-    //     .whileTrue(hoodSubsystem.shootCommand());
-
-    // Shoot on the fly when X button is pressed
-    // controller.x().whileTrue(shooterSubsystem.simShootOnTheFlyCommand());
-
-    // Shoot on the fly while Y button is held, With drive control
-    // controller
-    //     .y()
-    //     .whileTrue(
-    //         Commands.parallel(
-    //             DriveCommands.joystickDriveAtAngle(
-    //                 swerveSubsystem,
-    //                 () -> -controller.getLeftY(),
-    //                 () -> -controller.getLeftX(),
-    //                 () -> shotCalculator.getCorrectTargetRotation()),
-    //             shooterSubsystem.simShootOnTheFlyCommand()));
 
     // Reset gyro to 0° when B button is pressed
     // controller
@@ -415,31 +410,11 @@ public class RobotContainer {
     //             .ignoringDisable(true));
   }
 
-  //   public void configureFuelSim() {
-  //     FuelSim instance = FuelSim.getInstance();
-  //     instance.spawnStartingFuel();
-  //     instance.registerRobot(
-  //         SwerveConstants.ROBOT_LENGTH.in(Meters),
-  //         SwerveConstants.ROBOT_WIDTH.in(Meters),
-  //         SwerveConstants.BUMPER_HEIGHT.in(Meters),
-  //         swerveSubsystem::getPose,
-  //         swerveSubsystem::getChassisSpeeds);
-  //     instance.registerIntake(
-  //         SwerveConstants.ROBOT_LENGTH.div(2).in(Meters),
-  //         SwerveConstants.ROBOT_LENGTH.div(2).plus(Inches.of(5)).in(Meters),
-  //         SwerveConstants.ROBOT_WIDTH.div(2).unaryMinus().in(Meters),
-  //         SwerveConstants.ROBOT_WIDTH.div(2).in(Meters),
-  //         () -> true && shooterSubsystem.simAbleToIntake(),
-  //         shooterSubsystem::simIntake);
+  private void configureAutos() {
 
-  //     instance.start();
-  //     Commands.runOnce(
-  //             () -> {
-  //               FuelSim.getInstance().clearFuel();
-  //               FuelSim.getInstance().spawnStartingFuel();
-  //             })
-  //         .schedule();
-  //   }
+    // ------ Named Commands -------- \\
+    // Autos created in PathPlanner UI are automatically pushed to AutoChooser
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -449,69 +424,19 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return autoChooser.get();
   }
-  //   public Command preLoadAutoCommand(){
-  //     // Pose2d firstTargetPose2d = (DriverStation.getAlliance().get() == Alliance.Red) ? new
-  // Pose2d(15.205, 2.127, new Rotation2d()) : new Pose2d(1.154, 5.391, new Rotation2d(Math.PI));
-  //     return Commands.sequence(
-  //       // Commands.runOnce(
-  //       //   () -> {
-  //       //     new HolonomicAutoAlign(swerveSubsystem, new Pose2d(0,0, new Rotation2d()));
-  //       //   }),
 
-  //       Commands.parallel(flywheelSubsystem.runStaticVelocitCommand(),
-  // hoodSubsystem.runStaticAngleCommand()),
-  //       new WaitCommand(4),
-  //       Commands.parallel(
-  //         DriveCommands.joystickDriveAtAngle(
-  //                 swerveSubsystem,
-  //                 () -> -driver.getLeftY(),
-  //                 () -> -driver.getLeftX(),
-  //                 () -> shotCalculator.getFieldToHubAngle()),
-  //         indexerSubsystem.runCurrentCommand(),
-  //         agitatorSubsystem.indexCommand(),
-  //         kickerSubsystem.indexCommand()
-  //         )
-  //         );
-
-  //     // return Commands.runOnce(() -> {flywheelSubsystem.shootCommand();});
-
-  //   }
-
-  //   public Command depotAutoCommand(){
-  //    Pose2d firstTargetPose2d = (DriverStation.getAlliance().get() == Alliance.Red) ? new
-  // Pose2d(15.205, 2.127, new Rotation2d()) : new Pose2d(1.154, 5.391, new Rotation2d(Math.PI));
-  //    Pose2d secondTargetPose2d = (DriverStation.getAlliance().get() == Alliance.Red) ? new
-  // Pose2d(15.813, 2.088, new Rotation2d()) : new Pose2d(0.571, 5.918, new Rotation2d(Math.PI));
-  //   return Commands.sequence(
-  //     Commands.runOnce(
-  //       () -> {
-  //         new HolonomicAutoAlign(swerveSubsystem, firstTargetPose2d);
-  //       }),
-  //     Commands.sequence(
-  //       pivotSubsystem.deployCommand(),
-  //       rollerSubsystem.intakeCommand()
-  //     ),
-  //     Commands.runOnce(
-  //       () -> {
-  //         new HolonomicAutoAlign(swerveSubsystem, secondTargetPose2d);
-  //     }),
-
-  //     Commands.parallel(flywheelSubsystem.shootCommand(), hoodSubsystem.shootCommand()),
-  //     Commands.parallel(
-  //       DriveCommands.joystickDriveAtAngle(
-  //               swerveSubsystem,
-  //               () -> -controller.getLeftY(),
-  //               () -> -controller.getLeftX(),
-  //               () -> shotCalculator.getFieldToHubAngle()),
-  //       indexerSubsystem.runCurrentCommand(),
-  //       agitatorSubsystem.indexCommand(),
-  //       kickerSubsystem.indexCommand()
-  //       )
-  //       );
-
-  //   // return Commands.runOnce(() -> {flywheelSubsystem.shootCommand();});
-
-  // }
+  // Only use for Driver Reset Button Binding
+  public Rotation2d returnGlobalSwerveOffset() {
+    if (!DriverStation.getAlliance().isPresent()) {
+      return new Rotation2d();
+    } else {
+      Alliance alliance = DriverStation.getAlliance().get();
+      boolean isRed = alliance == Alliance.Red;
+      Rotation2d allianceOffset =
+          isRed ? Rotation2d.fromDegrees(180.0) : Rotation2d.fromDegrees(0.0);
+      return allianceOffset;
+    }
+  }
 
   /*
    * Applies the alliance-relative pose offset to the swerve pose estimator.

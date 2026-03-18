@@ -1,0 +1,99 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "toggleWarm"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CenterBackout"
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.5
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "flywheelLayup"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "hoodLayup"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "flywheelLayup"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "hoodLayup"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "indexerIndex"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 5.0
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "kickerIndex"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "agitatorIndex"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "pivotShake"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": false,
+  "folder": "Default NZ Auto",
+  "choreoAuto": false
+}

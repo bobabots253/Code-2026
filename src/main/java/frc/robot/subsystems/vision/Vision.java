@@ -40,10 +40,10 @@ public class Vision extends FullSubsystem {
   private final Alert[] disconnectedAlerts;
 
   // Initialize logging values
-  List<Pose3d> allTagPoses = new LinkedList<>();
+  // List<Pose3d> allTagPoses = new LinkedList<>();
   List<Pose3d> allRobotPoses = new LinkedList<>();
   List<Pose3d> allRobotPosesAccepted = new LinkedList<>();
-  List<Pose3d> allRobotPosesRejected = new LinkedList<>();
+  // List<Pose3d> allRobotPosesRejected = new LinkedList<>();
 
   public Vision(
       VisionConsumer consumer,
@@ -75,10 +75,10 @@ public class Vision extends FullSubsystem {
 
     // Instead of creating new lists each loop, clear allocated lists to reuse memory and reduce GC
     // overhead
-    allTagPoses.clear();
+    // allTagPoses.clear();
     allRobotPoses.clear();
     allRobotPosesAccepted.clear();
-    allRobotPosesRejected.clear();
+    // allRobotPosesRejected.clear();
 
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
@@ -100,18 +100,18 @@ public class Vision extends FullSubsystem {
       disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
 
       // Initialize logging values
-      List<Pose3d> tagPoses = new LinkedList<>();
+      // List<Pose3d> tagPoses = new LinkedList<>();
       List<Pose3d> robotPoses = new LinkedList<>();
       List<Pose3d> robotPosesAccepted = new LinkedList<>();
-      List<Pose3d> robotPosesRejected = new LinkedList<>();
+      // List<Pose3d> robotPosesRejected = new LinkedList<>();
 
       // Add tag poses
-      for (int tagId : inputs[cameraIndex].tagIds) {
-        var tagPose = aprilTagLayout.getTagPose(tagId);
-        if (tagPose.isPresent()) {
-          tagPoses.add(tagPose.get());
-        }
-      }
+      // for (int tagId : inputs[cameraIndex].tagIds) {
+      //   var tagPose = aprilTagLayout.getTagPose(tagId);
+      //   if (tagPose.isPresent()) {
+      //     tagPoses.add(tagPose.get());
+      //   }
+      // }
 
       // Loop over pose observations
       for (var observation : inputs[cameraIndex].poseObservations) {
@@ -146,7 +146,7 @@ public class Vision extends FullSubsystem {
         // Add pose to log
         robotPoses.add(observation.pose());
         if (rejectPose) {
-          robotPosesRejected.add(observation.pose());
+          // robotPosesRejected.add(observation.pose());
         } else {
           robotPosesAccepted.add(observation.pose());
         }
@@ -178,7 +178,7 @@ public class Vision extends FullSubsystem {
         consumer.accept(
             observation.pose().toPose2d(),
             observation.timestamp(),
-            VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+            VecBuilder.fill(linearStdDev, linearStdDev, 9999999999999999999.0));
       }
 
       // Log camera data (Disable in Match to save Bandwidth)
@@ -186,13 +186,10 @@ public class Vision extends FullSubsystem {
       Logger.recordOutput(
           "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesAccepted",
           robotPosesAccepted.toArray(new Pose3d[0]));
-      Logger.recordOutput(
-          "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesRejected",
-          robotPosesRejected.toArray(new Pose3d[0]));
-      allTagPoses.addAll(tagPoses);
+      // allTagPoses.addAll(tagPoses);
       allRobotPoses.addAll(robotPoses);
       allRobotPosesAccepted.addAll(robotPosesAccepted);
-      allRobotPosesRejected.addAll(robotPosesRejected);
+      // allRobotPosesRejected.addAll(robotPosesRejected);
     }
   }
 
@@ -207,11 +204,11 @@ public class Vision extends FullSubsystem {
   @Override
   public void periodicAfterScheduler() {
     // Log summary data
-    Logger.recordOutput("Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[0]));
+    // Logger.recordOutput("Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[0]));
     Logger.recordOutput("Vision/Summary/RobotPoses", allRobotPoses.toArray(new Pose3d[0]));
     Logger.recordOutput(
         "Vision/Summary/RobotPosesAccepted", allRobotPosesAccepted.toArray(new Pose3d[0]));
-    Logger.recordOutput(
-        "Vision/Summary/RobotPosesRejected", allRobotPosesRejected.toArray(new Pose3d[0]));
+    // Logger.recordOutput(
+    //     "Vision/Summary/RobotPosesRejected", allRobotPosesRejected.toArray(new Pose3d[0]));
   }
 }

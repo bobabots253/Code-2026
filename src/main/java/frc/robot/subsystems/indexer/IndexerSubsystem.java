@@ -1,11 +1,12 @@
 package frc.robot.subsystems.indexer;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.RobotState;
-import frc.robot.RobotState.ShotCoordinator;
+import frc.robot.RobotState.ShooterSubsystemParameters;
 import frc.robot.subsystems.indexer.IndexerIO.IndexerIOOutputMode;
 import frc.robot.subsystems.indexer.IndexerIO.IndexerIOOutputs;
 import frc.robot.util.FullSubsystem;
@@ -134,10 +135,16 @@ public class IndexerSubsystem extends FullSubsystem {
 
     return startEnd(
             () -> {
-              ShotCoordinator coordinator = RobotState.getInstance().getShotCoordinatorData();
+              ShooterSubsystemParameters coordinator =
+                  RobotState.getInstance().getShotCoordinatorData();
               double error =
-                  Math.abs(coordinator.flywheelRadPerSec() - coordinator.flywheelGoalRadPerSec());
-              if (error <= coordinator.shotTolerance()) {}
+                  Math.abs(
+                      coordinator.flywheelVelocityRadPerSec()
+                          - coordinator.flywheelVelocityGoalRadPerSec());
+              if (coordinator.flywheelVelocityRadPerSec()
+                  > Units.rotationsPerMinuteToRadiansPerSecond(1000)) {
+                setGoal(Goal.CURRENT);
+              }
             },
             () -> setGoal(Goal.IDLE))
         .withName("Indexer Current");
