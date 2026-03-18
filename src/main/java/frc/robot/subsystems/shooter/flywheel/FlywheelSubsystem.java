@@ -15,6 +15,7 @@ import frc.robot.subsystems.shooter.flywheel.FlywheelIO.FlywheelIOOutputMode;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIO.FlywheelIOOutputs;
 import frc.robot.util.FullSubsystem;
 import java.util.function.DoubleSupplier;
+import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -261,4 +262,43 @@ public class FlywheelSubsystem extends FullSubsystem {
     outputs.mode = FlywheelIOOutputMode.COAST;
     outputs.velocityRadsPerSec = 0.0;
   }
+
+  /*
+   * Sets the IO mode to coast and resets velocity setpoint.
+   */
+  public Command stopCommand() {
+    return runOnce(this::stop);
+  }
+
+  @SuppressWarnings("unused")
+  private boolean isDrawingHighCurrent() {
+    return Math.abs(inputs.masterSupplyCurrentAmps) > highCurrentAmps
+        || Math.abs(inputs.followerSupplyCurrentAmps) > highCurrentAmps;
+  }
+
+  @AutoLogOutput(key = "Flywheel/MeasuredVelocity")
+  public double getVelocity() {
+    return inputs.masterVelocityRads;
+  }
+
+  @AutoLogOutput(key = "Flywheel/CalculatedAcceleration")
+  public double getAcceleration() {
+    return acceleration;
+  }
+
+  private void stop() {
+    outputs.mode = FlywheelIOOutputMode.COAST;
+    outputs.velocityRadsPerSec = 0.0;
+  }
+
+  /*
+   * Set isWarm to True
+   */
+  // public void toggleWarmup() {
+  //   if (isWarm) {
+  //     isWarm = false;
+  //   } else {
+  //     isWarm = true;
+  //   }
+  // }
 }

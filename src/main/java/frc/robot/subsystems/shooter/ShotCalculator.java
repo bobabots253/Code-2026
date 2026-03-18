@@ -12,7 +12,6 @@ import frc.robot.RobotState;
 import frc.robot.fieldSetup;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.util.FullSubsystem;
-import frc.robot.util.shooterUtil.ShootOnTheFlyCalculator;
 import frc.robot.util.shooterUtil.ShootOnTheFlyConstants;
 import frc.robot.util.swerveUtil.ChassisAccelerations;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -222,6 +221,9 @@ public class ShotCalculator extends FullSubsystem {
     return fieldToTargetAngle;
   }
 
+  /*
+   * Note: the rotation of this Pose2d is meaningless
+   */
   public Pose2d getCorrectedTargetPose2d() {
     return new Pose2d(correctedTargetPose3d.getX(), correctedTargetPose3d.getY(), new Rotation2d());
   }
@@ -275,6 +277,7 @@ public class ShotCalculator extends FullSubsystem {
               ? ShootOnTheFlyConstants.BLUE_PASS_CL_TARGET
               : ShootOnTheFlyConstants.BLUE_PASS_CR_TARGET;
     }
+    return targetLocation;
   }
 
   //     Alliance alliance = DriverStation.getAlliance().get();
