@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import frc.robot.util.FullSubsystem;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -44,6 +45,7 @@ public class Vision extends FullSubsystem {
    *  16 - Per-LL Oberservation x Cameras (4 poseObs  x 4 LL)
    *  Don't overcommit memory.
    */
+
   private final VisionConsumer consumer;
   private final Supplier<Rotation2d> gyroRotationSupplier;
   private final Supplier<ChassisSpeeds> robotSpeedsSupplier;
@@ -69,7 +71,7 @@ public class Vision extends FullSubsystem {
   private volatile int exclusiveTagId = VisionConstants.NO_EXCLUSIVE_TAG;
 
   // Per-LL accepted and all pose lists. Cleared and reused each loop.
-  // JVM has type-erasure for casted ArrayLists
+  // JVM has type-erasure for generic casting on ArrayLists
   // Bad programming habits, fix later.
   @SuppressWarnings("unchecked")
   private final ArrayList<Pose3d>[] perCameraRobotPoses;
@@ -102,6 +104,7 @@ public class Vision extends FullSubsystem {
   private record PendingObservation(double timestamp, Pose2d pose, Matrix<N3, N1> stdDevs) {}
 
   // GG
+  @SuppressWarnings("unchecked")
   public Vision(
       VisionConsumer consumer,
       Supplier<Rotation2d> gyroRotationSupplier,
@@ -123,11 +126,8 @@ public class Vision extends FullSubsystem {
     perCameraRobotPosesAccepted = new ArrayList[io.length];
 
     for (int i = 0; i < inputs.length; i++) {
-      inputs[i] = new VisionIOInputsAutoLogged();
 
-      disconnectedAlerts[i] =
-          new Alert(
-              "Vision camera " + Integer.toString(i) + " is disconnected.", AlertType.kWarning);
+      inputs[i] = new VisionIOInputsAutoLogged();
       cameraInputKeys[i] = "Vision/Camera" + i;
       cameraPosesAcceptedKeys[i] = "Vision/Camera" + i + "/RobotPosesAccepted";
       cameraLogPrefixes[i] = "Vision/Camera" + i;
@@ -151,6 +151,7 @@ public class Vision extends FullSubsystem {
   }
 
   // ------- TAG EXCLUSION UTIL  -------- \\
+  // Based on 254's sorting
 
   public void setExclusiveTag(int tagId) {
     this.exclusiveTagId = tagId;
@@ -165,7 +166,7 @@ public class Vision extends FullSubsystem {
   }
 
   // ------- THROTTLING UTIL  -------- \\
-  // Stolen from 2910
+  // Based on 2910's sorting
 
   public void setThrottleValue(int throttleValue) {
     for (VisionIO camera : io) {
@@ -269,7 +270,7 @@ public class Vision extends FullSubsystem {
 
         if (!reject) reject = (Math.abs(observation.pose().getZ()) > VisionConstants.maxZError);
 
-        // Margin added recommended by 6328
+        // Margin added, recommended by 6328
         if (!reject) {
           double x = observation.pose().getX();
           double y = observation.pose().getY();
@@ -358,6 +359,18 @@ public class Vision extends FullSubsystem {
         Logger.recordOutput(
             cameraLogPrefixes[cameraIndex] + "/TagCount", inputs[cameraIndex].tagIds.length);
         Logger.recordOutput(cameraLogPrefixes[cameraIndex] + "/Connected", !disconnected);
+
+        allRobotPoses.addAll(robotPoses);
+        allRobotPosesAccepted.addAll(robotPosesAccepted);
+      }
+
+      // Sort accumalated tag poses by timestamp
+      // Taken from 6328
+      pendingObservations.sort(Comparator.comparingDouble(PendingObservation::timestamp));
+
+      // Submit ordered accpeted pose estimations to vision consumer
+      for (var observation : pendingObservations) {
+        consumer.accept(observation.pose(), observation.timestamp(), observation.stdDevs());
       }
     }
   }
@@ -412,12 +425,36 @@ public class Vision extends FullSubsystem {
   @Override
   public void periodicAfterScheduler() {
     // Log summary data
-    // Logger.recordOutput("Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[0]));
-    Logger.recordOutput("Vision/Summary/RobotPoses", allRobotPoses.toArray(new Pose3d[0]));
+    int allSize = allRobotPoses.size();
+    int allAcceptedSize = allRobotPosesAccepted.size();
+
+    // Resizing if needed
+    if (allRobotPosesBuffer.length < allSize) {
+      allRobotPosesBuffer = new Pose3d[allSize * 2];
+    }
+    if (allRobotPosesAcceptedBuffer.length < allAcceptedSize) {
+      allRobotPosesAcceptedBuffer = new Pose3d[allAcceptedSize * 2];
+    }
+
     Logger.recordOutput(
-        "Vision/Summary/RobotPosesAccepted", allRobotPosesAccepted.toArray(new Pose3d[0]));
-    // Logger.recordOutput(
-    //     "Vision/Summary/RobotPosesRejected", allRobotPosesRejected.toArray(new Pose3d[0]));
+        "Vision/Summary/RobotPoses",
+        allSize == 0 ? EMPTY_POSE3D : allRobotPoses.toArray(allRobotPosesBuffer));
+    Logger.recordOutput(
+        "Vision/Summary/RobotPosesAccepted",
+        allAcceptedSize == 0
+            ? EMPTY_POSE3D
+            : allRobotPosesAccepted.toArray(allRobotPosesAcceptedBuffer));
+
+    // Taken from 6328
+    ArrayList<Pose3d> recentTagPoses = new ArrayList<>();
+    double timestampNow = Timer.getTimestamp();
+    for (var entry : lastTagDetectionTimes.entrySet()) {
+      if (timestampNow - entry.getValue() < VisionConstants.tagLogPersistenceSeconds) {
+        VisionConstants.aprilTagLayout.getTagPose(entry.getKey()).ifPresent(recentTagPoses::add);
+      }
+    }
+    // Log persistent tags
+    Logger.recordOutput("Vision/Summary/RecentTagPoses", recentTagPoses.toArray(EMPTY_POSE3D));
   }
 
   // ------- UTIL  -------- \\
