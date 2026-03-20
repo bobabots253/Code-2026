@@ -1,9 +1,6 @@
-// Copyright (c) 2021-2025 Littleton Robotics
-// http://github.com/Mechanical-Advantage
-//
-// Use of this source code is governed by a BSD
-// license that can be found in the LICENSE file
-// at the root directory of this project.
+/*
+ * Unifying the best parts from FRC 1678 (2024), FRC 254 (FRC 2025), FRC 2910 (FRC 2025), FRC 6328 (FRC 2026), etc.
+ */
 
 package frc.robot.subsystems.vision;
 
@@ -12,6 +9,15 @@ import static frc.robot.subsystems.vision.VisionConstants.aprilTagLayout;
 import static frc.robot.subsystems.vision.VisionConstants.cameraStdDevFactors;
 import static frc.robot.subsystems.vision.VisionConstants.linearStdDevBaseline;
 import static frc.robot.subsystems.vision.VisionConstants.maxZError;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -24,26 +30,72 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import frc.robot.util.FullSubsystem;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 
 public class Vision extends FullSubsystem {
+  /*
+   * Pipeline:
+   *  1. Read all cameras. Send single NT flush after all cameras.
+   *  2. For each observation from each camera, run the rejection checks.
+   *  3. For single-tag observations that pass intial, run quality gate check.
+   *  4. For multi-tag observations, run the std. dev. euqation
+   * 
+   *  Then, accumulate accepted observations into a list.
+   *  Sort by timestamps.
+   *  Submit all sorted observations to the pose estimator consumer.
+   */
   private final VisionConsumer consumer;
   private final Supplier<Rotation2d> gyroRotationSupplier;
   private final Supplier<ChassisSpeeds> robotSpeedsSupplier;
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
+
+  // NT check: latencySubscriber not updated (handled in VisionIOLimelight).
+  // Frame-based check: no frames received for frameDisconnectedTimeoutSec.
+  private final Timer[] frameDisconnectTimers;
   private final Alert[] disconnectedAlerts;
 
-  // Initialize logging values
-  // List<Pose3d> allTagPoses = new LinkedList<>();
-  List<Pose3d> allRobotPoses = new LinkedList<>();
-  List<Pose3d> allRobotPosesAccepted = new LinkedList<>();
-  // List<Pose3d> allRobotPosesRejected = new LinkedList<>();
+  // Logging key strings
+  private final String[] cameraInputKeys;
+  private final String[] cameraPosesAcceptedKeys;
+  private final String[] cameraLogPrefixes;
+
+  // There ought to be a better way to do this, bruh
+  // Tag Detection time persistence for AdvantageKit/Scope visualisation
+  private final Map<Integer, Double> lastTagDetectionTimes = new HashMap<>();
+
+  // Note: When exclusiveTagId != NO_EXCLUSIVE_TAG, only observations containing that
+  // tag ID are accepted. Volatile bc I might need in command thread.
+  private volatile int exclusiveTagId = VisionConstants.NO_EXCLUSIVE_TAG;
+
+  // Per-LL accepted and all pose lists. Cleared and reused each loop.
+  private final ArrayList<Pose3d>[] perCameraRobotPoses;
+  private final ArrayList<Pose3d>[] perCameraRobotPosesAccepted;
+
+  // Global summary lists. Cleared and reused each loop.
+  private final ArrayList<Pose3d> allRobotPoses;
+  private final ArrayList<Pose3d> allRobotPosesAccepted;
+
+  // Output buffers
+  private Pose3d[] allRobotPosesBuffer         = new Pose3d[0];
+  private Pose3d[] allRobotPosesAcceptedBuffer = new Pose3d[0];
+  private Pose3d[] perCameraBuffer             = new Pose3d[8];
+  private static final Pose3d[] EMPTY_POSE3D   = new Pose3d[0];
+
+  private final ArrayList<PendingObservation> pendingObservations = new ArrayList<>(16);
+
+  private Rotation3d cachedGyroRotation3d = new Rotation3d();
+  private double lastGyroRadians = Double.NaN; // DO NOT USE 0.0
+
+  /*
+   * One fully-processed observation, send this boy
+   */
+  private record PendingObservation(
+      double timestamp,
+      Pose2d pose,
+      Matrix<N3, N1> stdDevs) {}
 
   public Vision(
       VisionConsumer consumer,

@@ -13,9 +13,12 @@ import org.littletonrobotics.junction.AutoLog;
 public interface VisionIO {
   @AutoLog
   public static class VisionIOInputs {
+
     public boolean connected = false;
+    public double lastFrameTimestampSec = 0.0;
     public PoseObservation[] poseObservations = new PoseObservation[0];
     public int[] tagIds = new int[0];
+    public double[] limelightStdDevs = new double[0];
   }
 
   /** Represents a robot pose sample used for pose estimation. */
@@ -25,6 +28,7 @@ public interface VisionIO {
       double ambiguity,
       int tagCount,
       double averageTagDistance,
+      double averageTagArea,
       PoseObservationType type) {}
 
   public static enum PoseObservationType {
@@ -32,5 +36,7 @@ public interface VisionIO {
     PHOTONVISION
   }
 
-  public default void updateInputs(VisionIOInputs inputs) {}
+  default void updateInputs(VisionIOInputs inputs) {}
+
+  default void setThrottleValue(int throttleValue) {}
 }
