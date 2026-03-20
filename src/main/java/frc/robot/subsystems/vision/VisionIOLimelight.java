@@ -7,13 +7,6 @@
 
 package frc.robot.subsystems.vision;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Supplier;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -23,20 +16,22 @@ import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotController;
+import java.util.ArrayList;
+import java.util.function.Supplier;
 
 /** IO implementation for real Limelight hardware. */
 public class VisionIOLimelight implements VisionIO {
   // Storing NT once avoids repeated static lookup
   private static final NetworkTableInstance NT = NetworkTableInstance.getDefault();
- 
+
   private final Supplier<Rotation2d> rotationSupplier;
   private final Supplier<Double> yawRateSupplier; // rad/s
 
   private final DoubleArrayPublisher orientationPublisher;
-  private final DoubleSubscriber     latencySubscriber;       // pipeline latency (ms)
-  private final DoubleArraySubscriber megatag2Subscriber;     // botpose_orb_wpiblue
+  private final DoubleSubscriber latencySubscriber; // pipeline latency (ms)
+  private final DoubleArraySubscriber megatag2Subscriber; // botpose_orb_wpiblue
   private final DoubleArraySubscriber limelightStdDevsSubscriber; // native units by LL
-  private final DoubleSubscriber     throttlePublisher;
+  private final DoubleSubscriber throttlePublisher;
 
   // Pre-allocate buffers
   private final ArrayList<PoseObservation> poseObservationCache = new ArrayList<>(8);
@@ -44,7 +39,7 @@ public class VisionIOLimelight implements VisionIO {
   // Rm Hashset method for preventing tagId duplication
   // 32 tag is totally unrealistic but let's just not get a overflow error
   private static final int MAX_TAGS = 32;
-  private final int[] tagIdScratchLottery  = new int[MAX_TAGS];
+  private final int[] tagIdScratchLottery = new int[MAX_TAGS];
   private int tagIdCount = 0;
 
   // Output array for inputs.poseObservations
@@ -60,31 +55,27 @@ public class VisionIOLimelight implements VisionIO {
    * @param name The configured name of the Limelight.
    * @param rotationSupplier Supplier for the current estimated rotation, used for MegaTag 2.
    */
-  public VisionIOLimelight(String name, Supplier<Rotation2d> rotationSupplier, Supplier<Double> yawRateSupplier) {
+  public VisionIOLimelight(
+      String name, Supplier<Rotation2d> rotationSupplier, Supplier<Double> yawRateSupplier) {
 
     var table = NT.getTable(name);
 
     this.rotationSupplier = rotationSupplier;
-    this.yawRateSupplier  = yawRateSupplier;
+    this.yawRateSupplier = yawRateSupplier;
 
-    orientationPublisher =
-        table.getDoubleArrayTopic("robot_orientation_set").publish();
-        // [yaw,yawrate,pitch,pitchrate,roll,rollrate] - Degrees / Degrees per second
-    latencySubscriber =
-        table.getDoubleTopic("tl").subscribe(0.0);
-        // Select pipeline's latency in ms. Total Latency = tl + cl.
+    orientationPublisher = table.getDoubleArrayTopic("robot_orientation_set").publish();
+    // [yaw,yawrate,pitch,pitchrate,roll,rollrate] - Degrees / Degrees per second
+    latencySubscriber = table.getDoubleTopic("tl").subscribe(0.0);
+    // Select pipeline's latency in ms. Total Latency = tl + cl.
     megatag2Subscriber =
-        table.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[]{});
-        // Translation (X,Y,Z) in meters Rotation(Roll,Pitch,Yaw) in degrees
+        table.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
+    // Translation (X,Y,Z) in meters Rotation(Roll,Pitch,Yaw) in degrees
 
-    limelightStdDevsSubscriber =
-        table.getDoubleArrayTopic("stddevs").subscribe(stdDevCache);
+    limelightStdDevsSubscriber = table.getDoubleArrayTopic("stddevs").subscribe(stdDevCache);
 
     // Not to sure if this is going to work
     // NT topics are write only so im goofing a DoubleSubscriber to publish changes
-    throttlePublisher =
-        table.getDoubleTopic("throttle_set").subscribe(0.0);
-
+    throttlePublisher = table.getDoubleTopic("throttle_set").subscribe(0.0);
   }
 
   @Override
@@ -106,8 +97,7 @@ public class VisionIOLimelight implements VisionIO {
     // Update orientation for MegaTag 2
     double yawDeg = rotationSupplier.get().getDegrees();
     double yawRateDegPerSec = Units.radiansToDegrees(yawRateSupplier.get());
-    orientationPublisher.accept(
-        new double[] {yawDeg, yawRateDegPerSec, 0.0, 0.0, 0.0, 0.0});
+    orientationPublisher.accept(new double[] {yawDeg, yawRateDegPerSec, 0.0, 0.0, 0.0, 0.0});
 
     // -------  LL NATIVE STD DEV  -------- \\
     inputs.limelightStdDevs = limelightStdDevsSubscriber.get(stdDevCache);
@@ -120,11 +110,11 @@ public class VisionIOLimelight implements VisionIO {
     tagIdCount = 0;
 
     // Process Buffer Frames
-    //readQueue() returns all frames captured since the last call (0 or multiple)
+    // readQueue() returns all frames captured since the last call (0 or multiple)
     for (var rawSample : megatag2Subscriber.readQueue()) {
       if (rawSample.value.length == 0) continue;
 
-       // Use the NT server timestamp of this sample (multiply conversion for seconds)
+      // Use the NT server timestamp of this sample (multiply conversion for seconds)
       inputs.lastFrameTimestampSec = rawSample.timestamp * 1.0e-6;
 
       // I might go insane but here we go
@@ -134,7 +124,10 @@ public class VisionIOLimelight implements VisionIO {
         int id = (int) rawSample.value[i];
         boolean found = false;
         for (int j = 0; j < tagIdCount; j++) {
-          if (tagIdScratchLottery[j] == id) { found = true; break; }
+          if (tagIdScratchLottery[j] == id) {
+            found = true;
+            break;
+          }
         }
         if (!found && tagIdCount < MAX_TAGS) {
           tagIdScratchLottery[tagIdCount++] = id;
@@ -157,9 +150,9 @@ public class VisionIOLimelight implements VisionIO {
               rawSample.timestamp * 1.0e-6 - rawSample.value[6] * 1.0e-3,
               parsePose(rawSample.value),
               0.0,
-              (int) rawSample.value[7],          // tagCount
-              rawSample.value[9],                 // averageTagDistance (meters)
-              rawSample.value[10] / 100.0,        // averageTagArea: convert % to fraction
+              (int) rawSample.value[7], // tagCount
+              rawSample.value[9], // averageTagDistance (meters)
+              rawSample.value[10] / 100.0, // averageTagArea: convert % to fraction
               PoseObservationType.MEGATAG_2));
     }
 
@@ -167,7 +160,7 @@ public class VisionIOLimelight implements VisionIO {
     int observationSize = poseObservationCache.size();
     if (poseObservationOutput.length < observationSize) {
       poseObservationOutput = new PoseObservation[observationSize * 2];
-      // If not enough space, double that size. 
+      // If not enough space, double that size.
     }
 
     // Note: toArray writes into the provided array and returns it
@@ -179,7 +172,6 @@ public class VisionIOLimelight implements VisionIO {
       inputs.tagIds = new int[tagIdCount];
     }
     System.arraycopy(tagIdScratchLottery, 0, inputs.tagIds, 0, tagIdCount);
-
   }
 
   /**

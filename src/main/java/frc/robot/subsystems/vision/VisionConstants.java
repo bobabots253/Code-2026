@@ -18,19 +18,20 @@ public final class VisionConstants {
 
   // ------- APRILTAG FIELD CONSTANTS -------- \\
 
-public static final AprilTagFieldLayout aprilTagLayout;
+  public static final AprilTagFieldLayout aprilTagLayout;
+
   static {
-      aprilTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
-      // All California District Events and DCMP should be WELDED fields.
+    aprilTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+    // All California District Events and DCMP should be WELDED fields.
   }
 
   // ------- LIMELIGHT NAME -------- \\
 
   // The User MUST get this right
-  public static final String cameraPurple = "limelight-purple"; 
-  public static final String cameraOrange = "limelight-orange"; 
-  public static final String cameraYellow = "limelight-yellow"; 
-  public static final String cameraPink = "limelight-pink"; 
+  public static final String cameraPurple = "limelight-purple";
+  public static final String cameraOrange = "limelight-orange";
+  public static final String cameraYellow = "limelight-yellow";
+  public static final String cameraPink = "limelight-pink";
 
   // Unused
   public static String cameraPlaceholder = "limelight-placeholder";
@@ -45,7 +46,6 @@ public static final AprilTagFieldLayout aprilTagLayout;
       new Transform3d(-0.127, 0.3302, 0.18415, new Rotation3d(0.0, 0.38, -90.0)); // updated 1/22
   public static Transform3d cameraTransformToBlue =
       new Transform3d(0.127, -0.3302, 0.18415, new Rotation3d(0.0, 0.38, -90.0)); // updated 1/22
-
 
   // ------- PER-LIMELIGHT TRUST MULTIPLIERS -------- \\
   // Note: This is indexed in the same order that the cameras are passed into the Vision constructor
@@ -98,12 +98,12 @@ public static final AprilTagFieldLayout aprilTagLayout;
   // ------- MISC / UTIL  -------- \\
 
   // Index constants for limelight NT entry for std. dev.
-  // Layout: [MT1x, MT1y, MT1z, MT1roll, MT1pitch, MT1yaw, MT2x, MT2y, MT2z, MT2roll, MT2pitch, MT2yaw] - IIRC
-  public static final int kMT2XStdDevIndex   = 6;
-  public static final int kMT2YStdDevIndex   = 7;
+  // Layout: [MT1x, MT1y, MT1z, MT1roll, MT1pitch, MT1yaw, MT2x, MT2y, MT2z, MT2roll, MT2pitch,
+  // MT2yaw] - IIRC
+  public static final int kMT2XStdDevIndex = 6;
+  public static final int kMT2YStdDevIndex = 7;
   public static final int kMT2YawStdDevIndex = 11;
   public static final int kExpectedStdDevLen = 12;
-
 
   // Used for avoiding goofy floating point overflow
   public static final double LARGE_VARIANCE = 1e9;
