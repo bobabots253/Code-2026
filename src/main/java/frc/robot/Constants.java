@@ -33,6 +33,7 @@ public final class Constants {
 
   public static final boolean tuningMode = false;
   public static boolean disableHAL = false;
+  public static int AmountOfAutos = 2;
 
   public static Mode getMode() {
     return switch (robot) {
