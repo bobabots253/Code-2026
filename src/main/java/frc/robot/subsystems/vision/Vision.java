@@ -4,14 +4,6 @@
 
 package frc.robot.subsystems.vision;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Supplier;
-
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -27,25 +19,31 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import frc.robot.util.FullSubsystem;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class Vision extends FullSubsystem {
   /*
    * Pipeline:
-   *  1. Read all cameras. Send single NT flush after all cameras.
-   *  2. For each observation from each camera, run the rejection checks.
-   *  3. For single-tag observations that pass intial, run quality gate check.
-   *  4. For multi-tag observations, run the std. dev. euqation
+   * 1. Read all cameras. Send single NT flush after all cameras.
+   * 2. For each observation from each camera, run the rejection checks.
+   * 3. For single-tag observations that pass intial, run quality gate check.
+   * 4. For multi-tag observations, run the std. dev. euqation
    *
-   *  Then, accumulate accepted observations into a list.
-   *  Sort by timestamps.
-   *  Submit all sorted observations to the pose estimator consumer.
+   * Then, accumulate accepted observations into a list.
+   * Sort by timestamps.
+   * Submit all sorted observations to the pose estimator consumer.
    *
-   *  Memory Estimations (I am not a memory expert):
-   *  8 - Per-LL Oberservations: I am expecting maybe 1-2 frames per 50 hz, maybe 3-4. Double for safety.
-   *  Java's backend defaults ArrayList internal array length to an Object sized at [10]. I don't think that
-   *  matter too much but yeah.
-   *  16 - Per-LL Oberservation x Cameras (4 poseObs  x 4 LL)
-   *  Don't overcommit memory.
+   * Memory Estimations (I am not a memory expert):
+   * 8 - Per-LL Oberservations: I am expecting maybe 1-2 frames per 50 hz, maybe 3-4. Double for safety.
+   * Java's backend defaults ArrayList internal array length to an Object sized at [10]. I don't think that
+   * matter too much but yeah.
+   * 16 - Per-LL Oberservation x Cameras (4 poseObs  x 4 LL)
+   * Don't overcommit memory.
    */
 
   // Capacity Constants - See memory estimation notes in the class-level comment above
@@ -334,14 +332,16 @@ public class Vision extends FullSubsystem {
 
           Logger.recordOutput(cameraLogPrefixes[cameraIndex] + "/RejectedSingleTagArea", false);
           // If singleTag is accepted, use MT2 translation
-          Logger.recordOutput(cameraLogPrefixes[cameraIndex] + "/RejectedSingleTagAngularVel", false);
+          Logger.recordOutput(
+              cameraLogPrefixes[cameraIndex] + "/RejectedSingleTagAngularVel", false);
 
           // If singleTag is accepted, use MT2 translation
           acceptedPose2d = observation.pose().toPose2d();
           xyStdDev = calculateXYStdDev(observation, cameraIndex, inputs[cameraIndex]);
           thetaStdDev = VisionConstants.singleTagThetaStdDev;
 
-          Logger.recordOutput(cameraLogPrefixes[cameraIndex] + "/AcceptedSingleTag", acceptedPose2d);
+          Logger.recordOutput(
+              cameraLogPrefixes[cameraIndex] + "/AcceptedSingleTag", acceptedPose2d);
 
         } else {
 
@@ -350,41 +350,41 @@ public class Vision extends FullSubsystem {
           thetaStdDev = Double.POSITIVE_INFINITY;
 
           Logger.recordOutput(cameraLogPrefixes[cameraIndex] + "/AcceptedMultiTag", acceptedPose2d);
+        }
 
-          // Utility for forcing AdvantageScope to keep Tag visible
-          for (int tagId : inputs[cameraIndex].tagIds) {
-            lastTagDetectionTimes.put(tagId, Timer.getTimestamp());
-          }
+        // Utility for forcing AdvantageScope to keep Tag visible
+        for (int tagId : inputs[cameraIndex].tagIds) {
+          lastTagDetectionTimes.put(tagId, Timer.getTimestamp());
+        }
 
-          // Aggregate accepted poses into a list
-          robotPosesAccepted.add(observation.pose());
+        // Aggregate accepted poses into a list
+        robotPosesAccepted.add(observation.pose());
 
-          // Sorting by timestamp is done at the end of the loop
-          pendingObservations.add(
-              new PendingObservation(
-                  observation.timestamp(),
-                  acceptedPose2d,
-                  VecBuilder.fill(xyStdDev, xyStdDev, thetaStdDev)));
-        } // End of Pose Oberservation Loop
-
-        // Per-Camera Summary logging
-        Logger.recordOutput(cameraPosesAcceptedKeys[cameraIndex], toArray(robotPosesAccepted));
-        Logger.recordOutput(
-            cameraLogPrefixes[cameraIndex] + "/TagCount", inputs[cameraIndex].tagIds.length);
-        Logger.recordOutput(cameraLogPrefixes[cameraIndex] + "/Connected", !disconnected);
-
-        allRobotPoses.addAll(robotPoses);
-        allRobotPosesAccepted.addAll(robotPosesAccepted);
-      } // End of Camera Loop
-
-      // Sort accumalated tag poses by timestamp
-      // Taken from 6328
-      pendingObservations.sort(Comparator.comparingDouble(PendingObservation::timestamp));
-
-      // Submit ordered accpeted pose estimations to vision consumer
-      for (var observation : pendingObservations) {
-        consumer.accept(observation.pose(), observation.timestamp(), observation.stdDevs());
+        // Sorting by timestamp is done at the end of the loop
+        pendingObservations.add(
+            new PendingObservation(
+                observation.timestamp(),
+                acceptedPose2d,
+                VecBuilder.fill(xyStdDev, xyStdDev, thetaStdDev)));
       }
+
+      // Per-Camera Summary logging
+      Logger.recordOutput(cameraPosesAcceptedKeys[cameraIndex], toArray(robotPosesAccepted));
+      Logger.recordOutput(
+          cameraLogPrefixes[cameraIndex] + "/TagCount", inputs[cameraIndex].tagIds.length);
+      Logger.recordOutput(cameraLogPrefixes[cameraIndex] + "/Connected", !disconnected);
+
+      allRobotPoses.addAll(robotPoses);
+      allRobotPosesAccepted.addAll(robotPosesAccepted);
+    } // End of Camera Loop
+
+    // Sort accumalated tag poses by timestamp
+    // Taken from 6328
+    pendingObservations.sort(Comparator.comparingDouble(PendingObservation::timestamp));
+
+    // Submit ordered accpeted pose estimations to vision consumer
+    for (var observation : pendingObservations) {
+      consumer.accept(observation.pose(), observation.timestamp(), observation.stdDevs());
     }
   }
 
