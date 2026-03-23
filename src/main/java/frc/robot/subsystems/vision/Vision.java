@@ -4,6 +4,14 @@
 
 package frc.robot.subsystems.vision;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -19,12 +27,6 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import frc.robot.util.FullSubsystem;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 
 public class Vision extends FullSubsystem {
   /*
@@ -45,6 +47,11 @@ public class Vision extends FullSubsystem {
    *  16 - Per-LL Oberservation x Cameras (4 poseObs  x 4 LL)
    *  Don't overcommit memory.
    */
+
+  // Capacity Constants - See memory estimation notes in the class-level comment above
+  // Check these by logging .size() at peak usage and adjusting if resizes occur
+  private static final int PER_CAMERA_CAPACITY = 8;
+  private static final int PENDING_OBSERVATION_CAPACITY = 16;
 
   private final VisionConsumer consumer;
   private final Supplier<Rotation2d> gyroRotationSupplier;
@@ -91,9 +98,6 @@ public class Vision extends FullSubsystem {
 
   private Rotation3d cachedGyroRotation3d = new Rotation3d();
   private double lastGyroRadians = Double.NaN; // DO NOT USE 0.0
-
-  private static final int PER_CAMERA_CAPACITY = 8;
-  private static final int PENDING_OBSERVATION_CAPACITY = 16;
 
   private final ArrayList<PendingObservation> pendingObservations =
       new ArrayList<>(PENDING_OBSERVATION_CAPACITY);
@@ -328,15 +332,23 @@ public class Vision extends FullSubsystem {
             continue;
           }
 
+          Logger.recordOutput(cameraLogPrefixes[cameraIndex] + "/RejectedSingleTagArea", false);
+          // If singleTag is accepted, use MT2 translation
+          Logger.recordOutput(cameraLogPrefixes[cameraIndex] + "/RejectedSingleTagAngularVel", false);
+
           // If singleTag is accepted, use MT2 translation
           acceptedPose2d = observation.pose().toPose2d();
           xyStdDev = calculateXYStdDev(observation, cameraIndex, inputs[cameraIndex]);
           thetaStdDev = VisionConstants.singleTagThetaStdDev;
 
+          Logger.recordOutput(cameraLogPrefixes[cameraIndex] + "/AcceptedSingleTag", acceptedPose2d);
+
         } else {
+
           acceptedPose2d = observation.pose().toPose2d();
           xyStdDev = calculateXYStdDev(observation, cameraIndex, inputs[cameraIndex]);
           thetaStdDev = Double.POSITIVE_INFINITY;
+
           Logger.recordOutput(cameraLogPrefixes[cameraIndex] + "/AcceptedMultiTag", acceptedPose2d);
 
           // Utility for forcing AdvantageScope to keep Tag visible
@@ -353,8 +365,9 @@ public class Vision extends FullSubsystem {
                   observation.timestamp(),
                   acceptedPose2d,
                   VecBuilder.fill(xyStdDev, xyStdDev, thetaStdDev)));
-        }
+        } // End of Pose Oberservation Loop
 
+        // Per-Camera Summary logging
         Logger.recordOutput(cameraPosesAcceptedKeys[cameraIndex], toArray(robotPosesAccepted));
         Logger.recordOutput(
             cameraLogPrefixes[cameraIndex] + "/TagCount", inputs[cameraIndex].tagIds.length);
@@ -362,7 +375,7 @@ public class Vision extends FullSubsystem {
 
         allRobotPoses.addAll(robotPoses);
         allRobotPosesAccepted.addAll(robotPosesAccepted);
-      }
+      } // End of Camera Loop
 
       // Sort accumalated tag poses by timestamp
       // Taken from 6328

@@ -31,7 +31,6 @@ public class VisionIOLimelight implements VisionIO {
   private final DoubleSubscriber latencySubscriber; // pipeline latency (ms)
   private final DoubleArraySubscriber megatag2Subscriber; // botpose_orb_wpiblue
   private final DoubleArraySubscriber limelightStdDevsSubscriber; // native units by LL
-  private final DoubleSubscriber throttlePublisher;
 
   // Pre-allocate buffers
   private final ArrayList<PoseObservation> poseObservationCache = new ArrayList<>(8);
@@ -72,10 +71,6 @@ public class VisionIOLimelight implements VisionIO {
     // Translation (X,Y,Z) in meters Rotation(Roll,Pitch,Yaw) in degrees
 
     limelightStdDevsSubscriber = table.getDoubleArrayTopic("stddevs").subscribe(stdDevCache);
-
-    // Not to sure if this is going to work
-    // NT topics are write only so im goofing a DoubleSubscriber to publish changes
-    throttlePublisher = table.getDoubleTopic("throttle_set").subscribe(0.0);
   }
 
   @Override
