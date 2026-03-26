@@ -423,6 +423,17 @@ public class RobotContainer {
     return autoChooser.get();
   }
 
+  /**
+   * See: https://www.chiefdelphi.com/t/fatal-robot-code-crash/427074/26
+   *
+   * <p>Use this to clear the autonomous command connected to main {@link Robot} class.
+   *
+   * @return
+   */
+  //   public void killAutonomousBuilder(){
+  //     autoChooser.
+  //   }
+
   // Only use for Driver Reset Button Binding
   public Rotation2d returnGlobalSwerveOffset() {
     if (!DriverStation.getAlliance().isPresent()) {

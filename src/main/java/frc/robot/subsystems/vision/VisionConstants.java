@@ -76,7 +76,7 @@ public final class VisionConstants {
 
   public static final double maxAngularSpeed = Math.toRadians(720); // rad/s (~2 full rotations)
 
-  public static final double maxGyroError = 1.0; // Degrees
+  public static final double maxGyroError = 5.0; // Degrees
 
   // Only for when only one tag is present
   public static final double singleTagMinAreaPercent = 0.10; // Percent of Image frame

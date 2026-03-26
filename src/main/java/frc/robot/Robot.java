@@ -189,6 +189,7 @@ public class Robot extends LoggedRobot {
     // this line or comment it out.
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
+      autonomousCommand = null;
     }
 
     // Handle edge case where alliance data isn't recieved before enabled

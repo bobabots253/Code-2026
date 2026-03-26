@@ -61,6 +61,7 @@ public class Vision extends FullSubsystem {
   // Frame-based check: no frames received for frameDisconnectedTimeoutSec.
   private final Timer[] frameDisconnectTimers;
   private final Alert[] disconnectedAlerts;
+  private final double[] lastFrameTimestamps; // Tracks previous timestamps to detect new timestamps
 
   // Logging key strings
   private final String[] cameraInputKeys;
@@ -78,6 +79,7 @@ public class Vision extends FullSubsystem {
   // Per-LL accepted and all pose lists. Cleared and reused each loop.
   // JVM has type-erasure for generic casting on ArrayLists
   // Bad programming habits, fix later.
+  // Can be fixed by List<List<Pose3d>>
   @SuppressWarnings("unchecked")
   private final ArrayList<Pose3d>[] perCameraRobotPoses;
 
@@ -87,12 +89,6 @@ public class Vision extends FullSubsystem {
   // Global summary lists. Cleared and reused each loop.
   private final ArrayList<Pose3d> allRobotPoses;
   private final ArrayList<Pose3d> allRobotPosesAccepted;
-
-  // Output buffers
-  private Pose3d[] allRobotPosesBuffer = new Pose3d[0];
-  private Pose3d[] allRobotPosesAcceptedBuffer = new Pose3d[0];
-  private Pose3d[] perCameraBuffer = new Pose3d[PER_CAMERA_CAPACITY];
-  private static final Pose3d[] EMPTY_POSE3D = new Pose3d[0];
 
   private Rotation3d cachedGyroRotation3d = new Rotation3d();
   private double lastGyroRadians = Double.NaN; // DO NOT USE 0.0
@@ -121,6 +117,7 @@ public class Vision extends FullSubsystem {
     this.inputs = new VisionIOInputsAutoLogged[io.length];
     frameDisconnectTimers = new Timer[io.length];
     disconnectedAlerts = new Alert[io.length];
+    lastFrameTimestamps = new double[io.length];
     cameraInputKeys = new String[io.length];
     cameraPosesAcceptedKeys = new String[io.length];
     cameraLogPrefixes = new String[io.length];
@@ -138,6 +135,7 @@ public class Vision extends FullSubsystem {
       // I don't think this should be too memory intensive
       frameDisconnectTimers[i] = new Timer();
       frameDisconnectTimers[i].start();
+      lastFrameTimestamps[i] = 0.0;
       disconnectedAlerts[i] =
           new Alert("Vision camera " + i + " is disconnected.", AlertType.kWarning);
 
@@ -184,7 +182,7 @@ public class Vision extends FullSubsystem {
       Logger.processInputs(cameraInputKeys[i], inputs[i]);
     }
 
-    // Updated all 4 cameras then flush
+    // Updated all cameras then flush
     NetworkTableInstance.getDefault().flush();
 
     // Cache Gyro Rotation
@@ -215,9 +213,11 @@ public class Vision extends FullSubsystem {
       // NT check handled by [cameraIndex].connected
 
       // Stolen from 6328
-      if (inputs[cameraIndex].lastFrameTimestampSec > 0
-          && inputs[cameraIndex].poseObservations.length > 0) {
+      if (inputs[cameraIndex].lastFrameTimestampSec != lastFrameTimestamps[cameraIndex]) {
         frameDisconnectTimers[cameraIndex].reset();
+        lastFrameTimestamps[cameraIndex] = inputs[cameraIndex].lastFrameTimestampSec;
+        // Only reset the disconnect timer if the current timestamp is different from the last
+        // recorded timestamp
       }
 
       boolean frameDisconnected =
@@ -293,7 +293,7 @@ public class Vision extends FullSubsystem {
         // Reject if yawRate is too high = timestamp might not be as reliable
         if (!reject) reject = (angularSpeed > VisionConstants.maxAngularSpeed);
 
-        // Check reprojection error for MT2 measurements
+        // MT2 measurements should already be pre-seeded, disable if redundant
         if (!reject) {
           double gyroVisionDifferenceDeg =
               Math.abs(
@@ -438,25 +438,10 @@ public class Vision extends FullSubsystem {
   @Override
   public void periodicAfterScheduler() {
     // Log summary data
-    int allSize = allRobotPoses.size();
-    int allAcceptedSize = allRobotPosesAccepted.size();
 
-    // Resizing if needed
-    if (allRobotPosesBuffer.length < allSize) {
-      allRobotPosesBuffer = new Pose3d[allSize * 2];
-    }
-    if (allRobotPosesAcceptedBuffer.length < allAcceptedSize) {
-      allRobotPosesAcceptedBuffer = new Pose3d[allAcceptedSize * 2];
-    }
-
+    Logger.recordOutput("Vision/Summary/RobotPoses", allRobotPoses.toArray(new Pose3d[0]));
     Logger.recordOutput(
-        "Vision/Summary/RobotPoses",
-        allSize == 0 ? EMPTY_POSE3D : allRobotPoses.toArray(allRobotPosesBuffer));
-    Logger.recordOutput(
-        "Vision/Summary/RobotPosesAccepted",
-        allAcceptedSize == 0
-            ? EMPTY_POSE3D
-            : allRobotPosesAccepted.toArray(allRobotPosesAcceptedBuffer));
+        "Vision/Summary/RobotPosesAccepted", allRobotPosesAccepted.toArray(new Pose3d[0]));
 
     // Taken from 6328
     ArrayList<Pose3d> recentTagPoses = new ArrayList<>();
@@ -467,18 +452,15 @@ public class Vision extends FullSubsystem {
       }
     }
     // Log persistent tags
-    Logger.recordOutput("Vision/Summary/RecentTagPoses", recentTagPoses.toArray(EMPTY_POSE3D));
+    Logger.recordOutput("Vision/Summary/RecentTagPoses", recentTagPoses.toArray(new Pose3d[0]));
   }
 
   // ------- UTIL  -------- \\
 
-  // Because the buffer length grows, this util helps alleviate some of the array allocation
+  // Refactored toArray Helper method after removing output buffer logic
+  // See
+  // https://stackoverflow.com/questions/70154349/why-java-inserts-null-to-array-when-using-list-toarray
   private Pose3d[] toArray(ArrayList<Pose3d> list) {
-    int size = list.size();
-    if (size == 0) return EMPTY_POSE3D;
-    if (perCameraBuffer.length < size) {
-      perCameraBuffer = new Pose3d[size * 2];
-    }
-    return list.toArray(perCameraBuffer);
+    return list.toArray(new Pose3d[0]);
   }
 }

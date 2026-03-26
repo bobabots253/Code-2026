@@ -41,10 +41,6 @@ public class VisionIOLimelight implements VisionIO {
   private final int[] tagIdScratchLottery = new int[MAX_TAGS];
   private int tagIdCount = 0;
 
-  // Output array for inputs.poseObservations
-  // Rm the PoseObservation[n] memory allocation required
-  private PoseObservation[] poseObservationOutput = new PoseObservation[8];
-
   // Default a blank array to store the std dev in case it doesn't work
   private static final double[] stdDevCache = new double[0];
 
@@ -152,14 +148,8 @@ public class VisionIOLimelight implements VisionIO {
     }
 
     // Write Pose Observations
-    int observationSize = poseObservationCache.size();
-    if (poseObservationOutput.length < observationSize) {
-      poseObservationOutput = new PoseObservation[observationSize * 2];
-      // If not enough space, double that size.
-    }
-
     // Note: toArray writes into the provided array and returns it
-    inputs.poseObservations = poseObservationCache.toArray(poseObservationOutput);
+    inputs.poseObservations = poseObservationCache.toArray(new PoseObservation[0]);
 
     // Write Tag ID's
     // Only reallocate inputs.tagIds if the count changed
