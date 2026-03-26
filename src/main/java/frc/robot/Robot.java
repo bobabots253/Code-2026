@@ -13,10 +13,12 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.FullSubsystem;
@@ -148,6 +150,12 @@ public class Robot extends LoggedRobot {
     } else {
       hasInitializedAlliancePose = false;
     }
+
+    // Handle PathPlanner States Initialization by Running an Auto Routine
+    // Should not actually drive, only warmups up the PathPlanner library
+    // See: https://www.chiefdelphi.com/t/pathplanner-initial-lag-after-deploying-code/455068/7
+    Command forcedAutoInitCommand = new PathPlannerAuto("Force Warmup").ignoringDisable(true);
+    CommandScheduler.getInstance().schedule(forcedAutoInitCommand);
   }
 
   /** This function is called periodically when disabled. */
@@ -170,9 +178,12 @@ public class Robot extends LoggedRobot {
 
     autonomousCommand = robotContainer.getAutonomousCommand();
 
+    // 3847: Time Delay to prevent Auto from firing with a delay
+    Command delaggerWaitCommand = new WaitCommand(0.01);
+
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
-      CommandScheduler.getInstance().schedule(autonomousCommand);
+      CommandScheduler.getInstance().schedule(delaggerWaitCommand.andThen(autonomousCommand));
     }
   }
 

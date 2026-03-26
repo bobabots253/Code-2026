@@ -4,14 +4,16 @@
   "holonomicMode": true,
   "pathFolders": [
     "CLB Citrus Auto",
+    "CRB Citrus Auto",
     "Default NZ Auto",
     "Depot Auto",
-    "CRB Citrus Auto",
+    "Force Warmup",
     "Testing"
   ],
   "autoFolders": [
     "Citrus Auto",
     "Default NZ Auto",
+    "Force Warmup",
     "TestingSpartan"
   ],
   "defaultMaxVel": 3.0,

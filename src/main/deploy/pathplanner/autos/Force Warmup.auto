@@ -1,0 +1,19 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Force Warmup"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": false,
+  "folder": "Force Warmup",
+  "choreoAuto": false
+}
