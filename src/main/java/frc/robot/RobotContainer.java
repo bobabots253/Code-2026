@@ -466,8 +466,9 @@ public class RobotContainer {
   }
 
   // ------- Josh Auto Commands -------- \\
+
   public Command getLeftSwipeAutoCommand(){
-    Commands.sequence(
+    return Commands.sequence(
         //toggle warm
         flywheelSubsystem.toggleWarm(),
         //Go under trench befor the fuel
@@ -482,7 +483,7 @@ public class RobotContainer {
             //possible idea to add a timeout to each command with .withTimeout()
             ),
         //This moves towards the midline through the fuel to intake it then move to before the trench
-        Commands.parallel(
+        Commands.race(
             Commands.sequence(
                 new HolonomicAutoAlign(swerveSubsystem, new Pose2d(8.130,7.017, new Rotation2d(-110.000 * (Math.PI/180))), 1.0, true),
                 new HolonomicAutoAlign(swerveSubsystem, new Pose2d(6.130,7.440, new Rotation2d(0)), 0.25, false)
@@ -515,7 +516,7 @@ public class RobotContainer {
             new WaitCommand(2)
         )
         );
-    return new HolonomicAutoAlign(swerveSubsystem, new Pose2d(0,0, new Rotation2d(-20.642 * (Math.PI/180))), 0.0, true);
+    // return new HolonomicAutoAlign(swerveSubsystem, new Pose2d(0,0, new Rotation2d(-20.642 * (Math.PI/180))), 0.0, true);
     // Commands.
     // return Commands.race(null);
   }
