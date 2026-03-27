@@ -4,7 +4,7 @@ import edu.wpi.first.math.util.Units;
 
 public class PivotConstants {
   public static final int sparkMasterPivotCanId = 9;
-  public static final int pivotCurrentLimit = 50; // amps
+  public static final int pivotCurrentLimit = 70; // amps
   public static final double pivotkP = 0.8;
   // big distance, big speed; small distance, small speed
   // start small 0.001, then step up slowly
