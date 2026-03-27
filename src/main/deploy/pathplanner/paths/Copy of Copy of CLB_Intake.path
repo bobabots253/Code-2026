@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.126000184885955,
-        "y": 6.575320550590469
+        "x": 8.125999043896847,
+        "y": 6.575320560924652
       },
       "isLocked": false,
       "linkedName": null
@@ -17,59 +17,27 @@
     {
       "anchor": {
         "x": 8.13,
-        "y": 4.593968407467296
+        "y": 5.054753442150735
       },
       "prevControl": {
         "x": 8.157996058825054,
-        "y": 4.893345965899657
+        "y": 5.354131000583097
       },
       "nextControl": {
         "x": 8.09464321482716,
-        "y": 4.215878473980298
+        "y": 4.676663508663737
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.782054208274462,
-        "y": 4.593968407467296
+        "x": 5.984,
+        "y": 5.37
       },
       "prevControl": {
-        "x": 7.040268247163615,
-        "y": 4.35572390478454
-      },
-      "nextControl": {
-        "x": 6.497403708987161,
-        "y": 4.85660485021398
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 6.264507845934379,
-        "y": 5.982268188302426
-      },
-      "prevControl": {
-        "x": 6.258815974209174,
-        "y": 5.69767460204221
-      },
-      "nextControl": {
-        "x": 6.2774465049928665,
-        "y": 6.629201141226819
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 5.747,
-        "y": 7.403
-      },
-      "prevControl": {
-        "x": 6.588012838801711,
-        "y": 7.0820542082738935
+        "x": 6.689183944381631,
+        "y": 5.035724493897019
       },
       "nextControl": null,
       "isLocked": false,
@@ -85,8 +53,8 @@
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.8397022332506205,
-      "maxWaypointRelativePos": 0.18858560794044665,
+      "minWaypointRelativePos": 0.811910669975181,
+      "maxWaypointRelativePos": 0.3513647642680001,
       "constraints": {
         "maxVelocity": 1.0,
         "maxAcceleration": 3.0,
@@ -105,14 +73,14 @@
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
-    "unlimited": false
+    "unlimited": true
   },
   "goalEndState": {
-    "velocity": 4.0,
-    "rotation": 0.0
+    "velocity": 5.5,
+    "rotation": 180.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Josh Auto",
   "idealStartingState": {
     "velocity": 2.0,
     "rotation": -107.64200000000001
