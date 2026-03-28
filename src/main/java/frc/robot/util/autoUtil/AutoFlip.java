@@ -7,18 +7,18 @@ public class AutoFlip {
 
     
         public static double applyX(double x){
-            return autoFlipped() ? FieldConstants.fieldLength -x : x;
+            return isRedAlliance() ? FieldConstants.fieldLength -x : x;
         }
         // '^' is the exclusive or operator.
         public static double applyY(double y, boolean isRightSide){
-            return autoFlipped() ^ isRightSide ? FieldConstants.fieldWidth -y : y;
+            return isRedAlliance() ^ isRightSide ? FieldConstants.fieldWidth -y : y;
         }
     
         public static Rotation2d applyRot(Rotation2d rotation) {
-            return autoFlipped() ? rotation.rotateBy(new Rotation2d(0.0, Math.PI)) : rotation;
+            return isRedAlliance() ? rotation.rotateBy(new Rotation2d(0.0, Math.PI)) : rotation;
   }
 
-   public static boolean autoFlipped(){
+   public static boolean isRedAlliance(){
             return 
             DriverStation.getAlliance().isPresent()
             && DriverStation.getAlliance().get() == DriverStation.Alliance.Red;

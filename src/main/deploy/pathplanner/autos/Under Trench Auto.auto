@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Go to Mid"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Sweep Mid"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Return To Trench"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Cross Trench"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Go to Hub"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Josh",
+  "choreoAuto": false
+}
