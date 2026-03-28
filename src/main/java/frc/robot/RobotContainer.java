@@ -466,10 +466,10 @@ public class RobotContainer {
     return lastAppliedAlliance == DriverStation.getAlliance().get();
   }
 
-  // ------- Josh Auto Commands -------- \\
+  // ------- Auto Commands -------- \\
 /**
- * Race command to shoot in autonomous for a specified duration. (First time writing a javadoc, sorry if this is bad)
- * @param waitTime defines the duration of the shooting action. After [waitTime] seconds, the command stops.
+ * Race command to shoot in autonomous for a specified duration. 
+ * @param waitTime defines the duration of the shooting action. After [waitTime] seconds, the command is interupted.
  * @return a race command group that runs commands from the flywheel, 
  * hood, and agitator and pivot subsystems to make the robot shoot for [waitTime] seconds.
  */
@@ -483,9 +483,10 @@ public class RobotContainer {
             new WaitCommand(waitTime)
         );
   }
+
   /**
    * Race command to "lock" the robot's heading onto the hub
-   * @param waitTime defines the duration of the hublock action. After [waitTime] seconds, the command stops.
+   * @param waitTime defines the duration of the hublock action. After [waitTime] seconds, the command interrupted.
    * @return a race command group that runs commands from the hood and shooter, 
    * as well as DriveCommands to set up for shooting into the hub.
    */
@@ -501,20 +502,18 @@ public class RobotContainer {
             new WaitCommand(waitTime)
             );
     }
+
+    // Referncing 254's auto
   public Command getSwipeAutoCommand(boolean isRightSide){
     return Commands.sequence(
         //toggle warm
         flywheelSubsystem.toggleWarm(),
-        //Go under trench befor the fuel
+        //Go under trench into the nuetral zone
         Commands.parallel(
             new HolonomicAutoAlign(swerveSubsystem, new Pose2d(applyX(8.130),applyY(7.240, isRightSide), applyRot((-107.642 * (Math.PI/180)), isRightSide)), 2.0, false), 
             pivotSubsystem.deployCommand(), 
             rollerSubsystem.intakeCommand(), 
-            //This is in the citrus auto and I don't think we need it but its here if we need it.
-            // flywheelSubsystem.runLayupCommand()
-            // hoodSubsystem.runLayupCommand(),
             agitatorSubsystem.intakeCommand()
-            //possible idea to add a timeout to each command with .withTimeout()
             ),
         //This moves towards the midline through the fuel to intake it then move to before the trench
         Commands.race(
@@ -529,14 +528,10 @@ public class RobotContainer {
         new HolonomicAutoAlign(swerveSubsystem, new Pose2d(applyX(3.100),applyY(7.440,isRightSide), applyRot(0, isRightSide)), 0.5, false),
         //This goes in front of the hub
         new HolonomicAutoAlign(swerveSubsystem, new Pose2d(applyX(2.980),applyY(4.665,isRightSide), applyRot(0, isRightSide)), 0, true),
-        //The hub Lock with race but it can technically be a timeout
         getAutoHublockCommand(1),
-        //Shooting the balls that are inside the hopper
         getAutoShootCommand(2)
         );
-    // return new HolonomicAutoAlign(swerveSubsystem, new Pose2d(0,0, new Rotation2d(-20.642 * (Math.PI/180))), 0.0, true);
-    // Commands.
-    // return Commands.race(null);
+
   }
 
 }
