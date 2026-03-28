@@ -18,8 +18,8 @@ public class AutoFlip {
     
         public static Rotation2d applyRot(double rotation, boolean isRightSide) {
             if (!isRightSide) {
-            return isRedAlliance() ? new Rotation2d((-rotation) + Math.PI) : new Rotation2d(-rotation);
-            } else return isRedAlliance() ? new Rotation2d(rotation + Math.PI) : new Rotation2d(rotation);
+            return isRedAlliance() ? new Rotation2d((-rotation) + Math.PI) : new Rotation2d(rotation);
+            } else return isRedAlliance() ? new Rotation2d(rotation + Math.PI) : new Rotation2d(-rotation);
             
   }
 
