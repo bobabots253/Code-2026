@@ -1,5 +1,7 @@
 package frc.robot.util.autoUtil;
 
+import java.security.PublicKey;
+
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -12,9 +14,7 @@ public class AutoCommandPicker {
     TRENCH_ENTRY,
     LEFT_SWIPE,
     RIGHT_SWIPE;
-  
   }
-
 
   private static SendableChooser<CommandName> mModeChooser = new SendableChooser<>();
 
