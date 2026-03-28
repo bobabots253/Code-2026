@@ -1,4 +1,6 @@
 package frc.robot.util.autoUtil;
+import org.opencv.core.Mat;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.FieldConstants;
@@ -14,8 +16,11 @@ public class AutoFlip {
             return isRedAlliance() ^ isRightSide ? FieldConstants.fieldWidth -y : y;
         }
     
-        public static Rotation2d applyRot(Rotation2d rotation) {
-            return isRedAlliance() ? rotation.rotateBy(new Rotation2d(0.0, Math.PI)) : rotation;
+        public static Rotation2d applyRot(double rotation, boolean isRightSide) {
+            if (!isRightSide) {
+            return isRedAlliance() ? new Rotation2d((-rotation) + Math.PI) : new Rotation2d(-rotation);
+            } else return isRedAlliance() ? new Rotation2d(rotation + Math.PI) : new Rotation2d(rotation);
+            
   }
 
    public static boolean isRedAlliance(){
