@@ -16,7 +16,6 @@ public class fieldSetup {
   public static final double fieldLength = 16.540988;
   public static final double fieldWidth = 8.069326;
 
-
   public static final Translation3d blueHubCenter = new Translation3d(4.626, 4.035, 1.45); // meters
   public static final Translation3d redHubCenter = new Translation3d(11.915, 4.035, 1.45); // meters
 

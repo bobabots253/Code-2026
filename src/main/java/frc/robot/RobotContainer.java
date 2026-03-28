@@ -12,6 +12,7 @@
 // GNU General Public License for more details.
 
 package frc.robot;
+
 import static frc.robot.util.autoUtil.AutoFlip.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -25,7 +26,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -467,71 +467,94 @@ public class RobotContainer {
   }
 
   // ------- Auto Commands -------- \\
-/**
- * Race command to shoot in autonomous for a specified duration. 
- * @param waitTime defines the duration of the shooting action. After [waitTime] seconds, the command is interupted.
- * @return a race command group that runs commands from the flywheel, 
- * hood, and agitator and pivot subsystems to make the robot shoot for [waitTime] seconds.
- */
+  /**
+   * Race command to shoot in autonomous for a specified duration.
+   *
+   * @param waitTime defines the duration of the shooting action. After [waitTime] seconds, the
+   *     command is interupted.
+   * @return a race command group that runs commands from the flywheel, hood, and agitator and pivot
+   *     subsystems to make the robot shoot for [waitTime] seconds.
+   */
   public Command getAutoShootCommand(int waitTime) {
     return Commands.race(
-            flywheelSubsystem.runLayupCommand(),
-            hoodSubsystem.runLayupCommand(),
-            agitatorSubsystem.indexCommand(),
-            indexerSubsystem.indexCommand(),
-            pivotSubsystem.runSaltAndPepperCommand(),
-            new WaitCommand(waitTime)
-        );
+        flywheelSubsystem.runLayupCommand(),
+        hoodSubsystem.runLayupCommand(),
+        agitatorSubsystem.indexCommand(),
+        indexerSubsystem.indexCommand(),
+        pivotSubsystem.runSaltAndPepperCommand(),
+        new WaitCommand(waitTime));
   }
 
   /**
    * Race command to "lock" the robot's heading onto the hub
-   * @param waitTime defines the duration of the hublock action. After [waitTime] seconds, the command interrupted.
-   * @return a race command group that runs commands from the hood and shooter, 
-   * as well as DriveCommands to set up for shooting into the hub.
+   *
+   * @param waitTime defines the duration of the hublock action. After [waitTime] seconds, the
+   *     command interrupted.
+   * @return a race command group that runs commands from the hood and shooter, as well as
+   *     DriveCommands to set up for shooting into the hub.
    */
-    public Command getAutoHublockCommand(int waitTime) {
+  public Command getAutoHublockCommand(int waitTime) {
     return Commands.race(
-            DriveCommands.joystickDriveAtAngle(
-                swerveSubsystem,
-                () -> -driver.getLeftY(),
-                () -> -driver.getLeftX(),
-                () -> shotCalculator.getCorrectTargetRotation()),
-            flywheelSubsystem.runLayupCommand(),
-            hoodSubsystem.runLayupCommand(),
-            new WaitCommand(waitTime)
-            );
-    }
-
-    // Referncing 254's auto
-  public Command getSwipeAutoCommand(boolean isRightSide){
-    return Commands.sequence(
-        //toggle warm
-        flywheelSubsystem.toggleWarm(),
-        //Go under trench into the nuetral zone
-        Commands.parallel(
-            new HolonomicAutoAlign(swerveSubsystem, new Pose2d(applyX(8.130),applyY(7.240, isRightSide), applyRot((-107.642 * (Math.PI/180)), isRightSide)), 2.0, false), 
-            pivotSubsystem.deployCommand(), 
-            rollerSubsystem.intakeCommand(), 
-            agitatorSubsystem.intakeCommand()
-            ),
-        //This moves towards the midline through the fuel to intake it then move to before the trench
-        Commands.race(
-            Commands.sequence(
-                new HolonomicAutoAlign(swerveSubsystem, new Pose2d(applyX(8.130),applyY(4.550,isRightSide), applyRot((-110.000 * (Math.PI/180)), isRightSide)), 1.0, true),
-                new HolonomicAutoAlign(swerveSubsystem, new Pose2d(applyX(6.100),applyY(7.440,isRightSide), applyRot(0, isRightSide)), 0.25, false)
-            ),
-            rollerSubsystem.intakeCommand(),
-            agitatorSubsystem.intakeCommand()
-        ),
-        //This goes under the trench
-        new HolonomicAutoAlign(swerveSubsystem, new Pose2d(applyX(3.100),applyY(7.440,isRightSide), applyRot(0, isRightSide)), 0.5, false),
-        //This goes in front of the hub
-        new HolonomicAutoAlign(swerveSubsystem, new Pose2d(applyX(2.980),applyY(4.665,isRightSide), applyRot(0, isRightSide)), 0, true),
-        getAutoHublockCommand(1),
-        getAutoShootCommand(2)
-        );
-
+        DriveCommands.joystickDriveAtAngle(
+            swerveSubsystem,
+            () -> -driver.getLeftY(),
+            () -> -driver.getLeftX(),
+            () -> shotCalculator.getCorrectTargetRotation()),
+        flywheelSubsystem.runLayupCommand(),
+        hoodSubsystem.runLayupCommand(),
+        new WaitCommand(waitTime));
   }
 
+  // Referncing 254's auto
+  public Command getSwipeAutoCommand(boolean isRightSide) {
+    return Commands.sequence(
+        // toggle warm
+        flywheelSubsystem.toggleWarm(),
+        // Go under trench into the nuetral zone
+        Commands.parallel(
+            new HolonomicAutoAlign(
+                swerveSubsystem,
+                new Pose2d(
+                    applyX(8.130),
+                    applyY(7.240, isRightSide),
+                    applyRot((-107.642 * (Math.PI / 180)), isRightSide)),
+                2.0,
+                false),
+            pivotSubsystem.deployCommand(),
+            rollerSubsystem.intakeCommand(),
+            agitatorSubsystem.intakeCommand()),
+        // This moves towards the midline through the fuel to intake it then move to before the
+        // trench
+        Commands.race(
+            Commands.sequence(
+                new HolonomicAutoAlign(
+                    swerveSubsystem,
+                    new Pose2d(
+                        applyX(8.130),
+                        applyY(4.550, isRightSide),
+                        applyRot((-110.000 * (Math.PI / 180)), isRightSide)),
+                    1.0,
+                    true),
+                new HolonomicAutoAlign(
+                    swerveSubsystem,
+                    new Pose2d(applyX(6.100), applyY(7.440, isRightSide), applyRot(0, isRightSide)),
+                    0.25,
+                    false)),
+            rollerSubsystem.intakeCommand(),
+            agitatorSubsystem.intakeCommand()),
+        // This goes under the trench
+        new HolonomicAutoAlign(
+            swerveSubsystem,
+            new Pose2d(applyX(3.100), applyY(7.440, isRightSide), applyRot(0, isRightSide)),
+            0.5,
+            false),
+        // This goes in front of the hub
+        new HolonomicAutoAlign(
+            swerveSubsystem,
+            new Pose2d(applyX(2.980), applyY(4.665, isRightSide), applyRot(0, isRightSide)),
+            0,
+            true),
+        getAutoHublockCommand(1),
+        getAutoShootCommand(2));
+  }
 }
