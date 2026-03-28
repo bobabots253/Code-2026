@@ -15,9 +15,6 @@ public class AutoCommandPicker {
   
   }
 
-  public boolean isRight(){
-    
-  }
 
   private static SendableChooser<CommandName> mModeChooser = new SendableChooser<>();
 
