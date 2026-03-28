@@ -2,7 +2,7 @@ package frc.robot.subsystems.intake.roller;
 
 public class RollerConstants {
   public static final int sparkMasterRollerCanId = 10;
-  public static final int masterCurrentLimit = 45; // amps
+  public static final int masterCurrentLimit = 70; // amps
 
   // Temporary Values (Confirm Functionality)
   public static final double stowVolts = 0.0;
