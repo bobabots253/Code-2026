@@ -519,16 +519,16 @@ public class RobotContainer {
         //This moves towards the midline through the fuel to intake it then move to before the trench
         Commands.race(
             Commands.sequence(
-                new HolonomicAutoAlign(swerveSubsystem, new Pose2d(applyX(8.130),applyY(7.017,isRightSide), applyRot(new Rotation2d(-110.000 * (Math.PI/180)))), 1.0, true),
-                new HolonomicAutoAlign(swerveSubsystem, new Pose2d(applyX(6.130),applyY(7.440,isRightSide), applyRot(new Rotation2d(0))), 0.25, false)
+                new HolonomicAutoAlign(swerveSubsystem, new Pose2d(applyX(8.130),applyY(4.550,isRightSide), applyRot(new Rotation2d(-110.000 * (Math.PI/180)))), 1.0, true),
+                new HolonomicAutoAlign(swerveSubsystem, new Pose2d(applyX(6.100),applyY(7.440,isRightSide), applyRot(new Rotation2d(0))), 0.25, false)
             ),
             rollerSubsystem.intakeCommand(),
             agitatorSubsystem.intakeCommand()
         ),
         //This goes under the trench
-        new HolonomicAutoAlign(swerveSubsystem, new Pose2d(applyX(3.071),applyY(7.440,isRightSide), applyRot(new Rotation2d(0))), 0.5, false),
+        new HolonomicAutoAlign(swerveSubsystem, new Pose2d(applyX(3.100),applyY(7.440,isRightSide), applyRot(new Rotation2d(0))), 0.5, false),
         //This goes in front of the hub
-        new HolonomicAutoAlign(swerveSubsystem, new Pose2d(applyX(2.978),applyY(4.665,isRightSide), applyRot(new Rotation2d(0))), 0, true),
+        new HolonomicAutoAlign(swerveSubsystem, new Pose2d(applyX(2.980),applyY(4.665,isRightSide), applyRot(new Rotation2d(0))), 0, true),
         //The hub Lock with race but it can technically be a timeout
         getAutoHublockCommand(1),
         //Shooting the balls that are inside the hopper
