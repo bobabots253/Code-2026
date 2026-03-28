@@ -11,7 +11,6 @@ public class AutoCommandPicker {
   private RobotContainer container;
   enum CommandName {
     DO_NOTHING,
-    TRENCH_ENTRY,
     LEFT_SWIPE,
     RIGHT_SWIPE;
   }
@@ -20,7 +19,8 @@ public class AutoCommandPicker {
 
   public AutoCommandPicker(RobotContainer container) {
     this.container = container;
-    mModeChooser.addOption("shoot", CommandName.TRENCH_ENTRY);
+    mModeChooser.addOption("shoot - left side", CommandName.LEFT_SWIPE);
+    mModeChooser.addOption("shoot - right side", CommandName.RIGHT_SWIPE);
     mModeChooser.setDefaultOption("Nothing", CommandName.DO_NOTHING);
   }
 
@@ -30,6 +30,10 @@ public class AutoCommandPicker {
     switch (choice) {
       case DO_NOTHING:
         return new InstantCommand();
+    case LEFT_SWIPE:
+        return container.getSwipeAutoCommand(false);
+    case RIGHT_SWIPE:
+        return container.getSwipeAutoCommand(true);
 
       default:
         return new InstantCommand();

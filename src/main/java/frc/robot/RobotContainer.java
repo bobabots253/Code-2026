@@ -501,7 +501,7 @@ public class RobotContainer {
             new WaitCommand(waitTime)
             );
     }
-  public Command getLeftSwipeAutoCommand(boolean isRightSide){
+  public Command getSwipeAutoCommand(boolean isRightSide){
     return Commands.sequence(
         //toggle warm
         flywheelSubsystem.toggleWarm(),
