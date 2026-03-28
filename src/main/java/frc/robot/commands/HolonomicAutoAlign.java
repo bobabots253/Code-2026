@@ -30,27 +30,30 @@ public class HolonomicAutoAlign extends Command {
   public ChassisSpeeds chassis;
   private double endingVelocity;
 
-
-  public HolonomicAutoAlign(SwerveSubsystem driveSubsystem, Pose2d targetPose, double endingVelocity, boolean lowTolerance) {
+  public HolonomicAutoAlign(
+      SwerveSubsystem driveSubsystem,
+      Pose2d targetPose,
+      double endingVelocity,
+      boolean lowTolerance) {
     targetfield.setRobotPose(targetPose);
     SmartDashboard.putData("TargetField", targetfield);
     this.driveSubsystem = driveSubsystem;
     this.targetPose = targetPose;
     this.endingVelocity = endingVelocity;
-    //TODO tune pid values for LeBobaJames
+    // TODO tune pid values for LeBobaJames
     xController = new PIDController(3.25, 0, 0.5); // Max Low Accuracy: 3.5, 0, 0.25
     yController = new PIDController(3.25, 0, 0.5); // Testing: 3.5, 0, 0.5
 
     rotController = new ProfiledPIDController(2, 0, 0, new TrapezoidProfile.Constraints(5, 5));
     holonomicDriveController =
         new HolonomicDriveController(xController, yController, rotController);
-    if(lowTolerance){
-        //TODO make an reasonable low tolerance values
-        holonomicDriveController.setTolerance(
-            new Pose2d(new Translation2d(0.125, 0.125), Rotation2d.fromDegrees(5)));
-    }else{
-        holonomicDriveController.setTolerance(
-            new Pose2d(new Translation2d(0.015, 0.015), Rotation2d.fromDegrees(1)));
+    if (lowTolerance) {
+      // TODO make an reasonable low tolerance values
+      holonomicDriveController.setTolerance(
+          new Pose2d(new Translation2d(0.125, 0.125), Rotation2d.fromDegrees(5)));
+    } else {
+      holonomicDriveController.setTolerance(
+          new Pose2d(new Translation2d(0.015, 0.015), Rotation2d.fromDegrees(1)));
     }
 
     addRequirements(driveSubsystem);

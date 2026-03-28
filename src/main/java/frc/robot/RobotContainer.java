@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -467,35 +466,45 @@ public class RobotContainer {
 
   // ------- Josh Auto Commands -------- \\
 
-  public Command getLeftSwipeAutoCommand(){
+  public Command getLeftSwipeAutoCommand() {
     return Commands.sequence(
-        //toggle warm
+        // toggle warm
         flywheelSubsystem.toggleWarm(),
-        //Go under trench befor the fuel
+        // Go under trench befor the fuel
         Commands.parallel(
-            new HolonomicAutoAlign(swerveSubsystem, new Pose2d(8.130,7.240, new Rotation2d(-107.642 * (Math.PI/180))), 2.0, false), 
-            pivotSubsystem.deployCommand(), 
-            rollerSubsystem.intakeCommand(), 
-            //This is in the citrus auto and I don't think we need it but its here if we need it.
+            new HolonomicAutoAlign(
+                swerveSubsystem,
+                new Pose2d(8.130, 7.240, new Rotation2d(-107.642 * (Math.PI / 180))),
+                2.0,
+                false),
+            pivotSubsystem.deployCommand(),
+            rollerSubsystem.intakeCommand(),
+            // This is in the citrus auto and I don't think we need it but its here if we need it.
             // flywheelSubsystem.runLayupCommand()
             // hoodSubsystem.runLayupCommand(),
             agitatorSubsystem.intakeCommand()
-            //possible idea to add a timeout to each command with .withTimeout()
+            // possible idea to add a timeout to each command with .withTimeout()
             ),
-        //This moves towards the midline through the fuel to intake it then move to before the trench
+        // This moves towards the midline through the fuel to intake it then move to before the
+        // trench
         Commands.race(
             Commands.sequence(
-                new HolonomicAutoAlign(swerveSubsystem, new Pose2d(8.130,7.017, new Rotation2d(-110.000 * (Math.PI/180))), 1.0, true),
-                new HolonomicAutoAlign(swerveSubsystem, new Pose2d(6.130,7.440, new Rotation2d(0)), 0.25, false)
-            ),
+                new HolonomicAutoAlign(
+                    swerveSubsystem,
+                    new Pose2d(8.130, 7.017, new Rotation2d(-110.000 * (Math.PI / 180))),
+                    1.0,
+                    true),
+                new HolonomicAutoAlign(
+                    swerveSubsystem, new Pose2d(6.130, 7.440, new Rotation2d(0)), 0.25, false)),
             rollerSubsystem.intakeCommand(),
-            agitatorSubsystem.intakeCommand()
-        ),
-        //This goes under the trench
-        new HolonomicAutoAlign(swerveSubsystem, new Pose2d(3.071,7.440, new Rotation2d(0)), 0.5, false),
-        //This goes in front of the hub
-        new HolonomicAutoAlign(swerveSubsystem, new Pose2d(2.978,4.665, new Rotation2d(0)), 0, true),
-        //The hub Lock with race but it can technically be a timeout
+            agitatorSubsystem.intakeCommand()),
+        // This goes under the trench
+        new HolonomicAutoAlign(
+            swerveSubsystem, new Pose2d(3.071, 7.440, new Rotation2d(0)), 0.5, false),
+        // This goes in front of the hub
+        new HolonomicAutoAlign(
+            swerveSubsystem, new Pose2d(2.978, 4.665, new Rotation2d(0)), 0, true),
+        // The hub Lock with race but it can technically be a timeout
         Commands.race(
             DriveCommands.joystickDriveAtAngle(
                 swerveSubsystem,
@@ -504,21 +513,18 @@ public class RobotContainer {
                 () -> shotCalculator.getCorrectTargetRotation()),
             flywheelSubsystem.runLayupCommand(),
             hoodSubsystem.runLayupCommand(),
-            new WaitCommand(1)
-        ),
-        //Shooting the balls that are inside the hopper
+            new WaitCommand(1)),
+        // Shooting the balls that are inside the hopper
         Commands.race(
             flywheelSubsystem.runLayupCommand(),
             hoodSubsystem.runLayupCommand(),
             agitatorSubsystem.indexCommand(),
             indexerSubsystem.indexCommand(),
             pivotSubsystem.runSaltAndPepperCommand(),
-            new WaitCommand(2)
-        )
-        );
-    // return new HolonomicAutoAlign(swerveSubsystem, new Pose2d(0,0, new Rotation2d(-20.642 * (Math.PI/180))), 0.0, true);
+            new WaitCommand(2)));
+    // return new HolonomicAutoAlign(swerveSubsystem, new Pose2d(0,0, new Rotation2d(-20.642 *
+    // (Math.PI/180))), 0.0, true);
     // Commands.
     // return Commands.race(null);
   }
-
 }

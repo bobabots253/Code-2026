@@ -17,11 +17,11 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.FullSubsystem;
 import frc.robot.util.LimelightHelpers;
+import frc.robot.util.autoUtil.AutoCommandPicker;
 import frc.robot.util.fuelSimUtil.FuelSim;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -31,7 +31,6 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.littletonrobotics.urcl.URCL;
-import frc.robot.util.autoUtil.AutoCommandPicker;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -101,8 +100,8 @@ public class Robot extends LoggedRobot {
     // Start AdvantageKit logger
     Logger.start();
 
-    for(int i = 0; i< Constants.AmountOfAutos; i++){
-      autos[i] = new AutoCommandPicker();
+    for (int i = 0; i < Constants.AmountOfAutos; i++) {
+      autos[i] = new AutoCommandPicker(robotContainer);
     }
 
     // Instantiate our RobotContainer. This will perform all our button bindings,
@@ -176,9 +175,9 @@ public class Robot extends LoggedRobot {
     hasInitializedAlliancePose = true;
 
     autonomousCommand = robotContainer.getAutonomousCommand();
-    
+
     Command[] listOfCommands = new Command[Constants.AmountOfAutos];
-    for(int i = 0; i<Constants.AmountOfAutos; i++){
+    for (int i = 0; i < Constants.AmountOfAutos; i++) {
       listOfCommands[i] = autos[i].getCommand();
     }
 
