@@ -13,7 +13,10 @@ public class AutoCommandPicker {
     LEFT_SWIPE,
     RIGHT_SWIPE;
   
+  }
 
+  public boolean isRight(){
+    
   }
 
   private static SendableChooser<CommandName> mModeChooser = new SendableChooser<>();
