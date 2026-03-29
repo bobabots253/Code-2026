@@ -73,6 +73,9 @@ public class ShootOnTheFlyConstants {
     FLYWHEEL_VELOCITY_INTERPOLATOR.put(4.5, Units.rotationsPerMinuteToRadiansPerSecond(3100));
     FLYWHEEL_VELOCITY_INTERPOLATOR.put(5.0, Units.rotationsPerMinuteToRadiansPerSecond(3200));
     FLYWHEEL_VELOCITY_INTERPOLATOR.put(5.5, Units.rotationsPerMinuteToRadiansPerSecond(3200));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(6.2, Units.rotationsPerMinuteToRadiansPerSecond(3400));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(7.0, Units.rotationsPerMinuteToRadiansPerSecond(3500));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(8.0, Units.rotationsPerMinuteToRadiansPerSecond(3500));
 
     // Check
 
@@ -87,6 +90,9 @@ public class ShootOnTheFlyConstants {
     HOOD_DEGREES_INTERPOLATOR.put(4.5, 27.50);
     HOOD_DEGREES_INTERPOLATOR.put(5.0, 24.0);
     HOOD_DEGREES_INTERPOLATOR.put(5.5, 16.0);
+    HOOD_DEGREES_INTERPOLATOR.put(6.2, 5.0);
+    HOOD_DEGREES_INTERPOLATOR.put(7.0, 5.0);
+    HOOD_DEGREES_INTERPOLATOR.put(8.0, 5.0);
 
     // HOOD_DEGREES_INTERPOLATOR.put(4.0, 31.31); // Check
   }
