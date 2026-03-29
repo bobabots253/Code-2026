@@ -355,8 +355,9 @@ public class RobotContainer {
                     swerveSubsystem)
                 .ignoringDisable(true));
 
-    driver.povUp().onTrue(hoodSubsystem.runDebuggingUpCommand());
-    driver.povDown().onTrue(hoodSubsystem.runDebuggingDownCommand());
+    driver.povUp().whileTrue(hoodSubsystem.runDebuggingUpCommand());
+    driver.povDown().whileTrue(hoodSubsystem.runDebuggingDownCommand());
+    driver.povRight().whileTrue(flywheelSubsystem.runDebuggingVelocityCommand());
 
     // ------- Operator Controls -------- \\
 

@@ -102,9 +102,9 @@ public class FlywheelConstants {
 
   // ------- GOAL CONSTANTS -------- \\
 
-  public static final double debuggingVelocity = Units.rotationsPerMinuteToRadiansPerSecond(3300);
+  public static final double debuggingVelocity = Units.rotationsPerMinuteToRadiansPerSecond(3200);
 
-  public static final double layupVelocity = Units.rotationsPerMinuteToRadiansPerSecond(3000);
+  public static final double layupVelocity = Units.rotationsPerMinuteToRadiansPerSecond(2500);
 
   // Testing Voltage Values
   public static final double kDebuggingVoltage = 10; // Volts
