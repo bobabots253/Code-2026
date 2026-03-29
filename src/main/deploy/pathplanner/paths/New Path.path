@@ -3,53 +3,48 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.570597542462827,
-        "y": 7.2399152688456425
+        "x": 6.820870185449357,
+        "y": 1.2079029957203988
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.818453571143939,
-        "y": 7.207244348343955
+        "x": 6.251569186875892,
+        "y": 0.6515406562054202
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.801699086016681,
-        "y": 7.2399152688456425
+        "x": 5.979857346647646,
+        "y": 0.6774179743223976
       },
       "prevControl": {
-        "x": 5.242062213225864,
-        "y": 7.298498707433236
+        "x": 6.808001727659159,
+        "y": 1.1486035704151556
       },
       "nextControl": {
-        "x": 7.858192079336999,
-        "y": 7.200231036270625
+        "x": 5.229415121255349,
+        "y": 0.2504422253922971
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.13,
-        "y": 7.017
+        "x": 3.4050641940085593,
+        "y": 0.5350927246790309
       },
       "prevControl": {
-        "x": 7.01397693202842,
-        "y": 7.262801062125605
+        "x": 4.039058487874465,
+        "y": 0.6386019971469341
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.5593360995850597,
-      "rotationDegrees": -0.2447803134171029
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -62,14 +57,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.5,
-    "rotation": -107.64200000000001
+    "velocity": 0,
+    "rotation": 90.0
   },
   "reversed": false,
-  "folder": "CLB Citrus Auto",
+  "folder": "[Left] Double Swipe",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 88.52172734331111
   },
   "useDefaultConstraints": true
 }

@@ -323,7 +323,7 @@ public class RobotContainer {
 
     driver
         .leftBumper()
-        .whileTrue(indexerSubsystem.runCurrentCommand())
+        .whileTrue(indexerSubsystem.indexCommand())
         .whileTrue(kickerSubsystem.indexCommand())
         .whileTrue(agitatorSubsystem.indexCommand())
         .whileTrue(pivotSubsystem.runSaltAndPepperCommand());

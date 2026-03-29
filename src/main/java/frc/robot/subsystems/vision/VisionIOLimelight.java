@@ -143,7 +143,7 @@ public class VisionIOLimelight implements VisionIO {
               0.0,
               (int) rawSample.value[7], // tagCount
               rawSample.value[9], // averageTagDistance (meters)
-              rawSample.value[10] / 100.0, // averageTagArea: convert % to fraction
+              rawSample.value[10], // averageTagArea: convert % to fraction
               PoseObservationType.MEGATAG_2));
     }
 
