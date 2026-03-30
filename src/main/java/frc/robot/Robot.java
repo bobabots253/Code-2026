@@ -13,12 +13,12 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.FullSubsystem;
@@ -44,6 +44,9 @@ public class Robot extends LoggedRobot {
   private RobotContainer robotContainer;
 
   private Timer m_gcTimer = new Timer();
+  private Timer m_matchTimer = new Timer();
+  private Timer m_shiftTimer = new Timer();
+  private boolean shiftBoolean = false;
 
   // Flag to ensure we only apply the alliance offset once per DS connection
   @AutoLogOutput(key = "Robot/HasInitializedAlliancePose")
@@ -150,12 +153,6 @@ public class Robot extends LoggedRobot {
     } else {
       hasInitializedAlliancePose = false;
     }
-
-    // Handle PathPlanner States Initialization by Running an Auto Routine
-    // Should not actually drive, only warmups up the PathPlanner library
-    // See: https://www.chiefdelphi.com/t/pathplanner-initial-lag-after-deploying-code/455068/7
-    Command forcedAutoInitCommand = new PathPlannerAuto("Force Warmup").ignoringDisable(true);
-    CommandScheduler.getInstance().schedule(forcedAutoInitCommand);
   }
 
   /** This function is called periodically when disabled. */
@@ -178,13 +175,9 @@ public class Robot extends LoggedRobot {
 
     autonomousCommand = robotContainer.getAutonomousCommand();
 
-    // 3847: Time Delay to prevent Auto from firing with a delay
-    Command delaggerWaitCommand = new WaitCommand(0.01);
-
     // schedule the autonomous command (example)
-    if (autonomousCommand != null) {
-      CommandScheduler.getInstance().schedule(delaggerWaitCommand.andThen(autonomousCommand));
-    }
+    // SequentialCommandGroup autoCommand = new SequentialCommandGroup(listOfCommands);
+
   }
 
   /** This function is called periodically during autonomous. */
@@ -200,18 +193,53 @@ public class Robot extends LoggedRobot {
     // this line or comment it out.
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
-      autonomousCommand = null;
     }
 
     // Handle edge case where alliance data isn't recieved before enabled
     if (!hasInitializedAlliancePose) {
       robotContainer.applyAlliancePoseOffset();
     }
+    m_matchTimer.reset();
+    m_shiftTimer.stop();
+    m_shiftTimer.reset();
+    m_matchTimer.start();
   }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+
+    if (!DriverStation.getGameSpecificMessage().isEmpty()) {
+      SmartDashboard.putBoolean("Game MSG Recieved", true);
+      if (!m_shiftTimer.isRunning()) {
+        shiftBoolean =
+            !(((DriverStation.getGameSpecificMessage().charAt(0) == 'B')
+                    && (DriverStation.getAlliance().get() == Alliance.Blue))
+                || ((DriverStation.getGameSpecificMessage().charAt(0) == 'R')
+                    && (DriverStation.getAlliance().get() == Alliance.Red)));
+      }
+    } else {
+      SmartDashboard.putBoolean("Game MSG Recieved", false);
+    }
+    if (m_matchTimer.hasElapsed(10)) {
+      if (!m_shiftTimer.isRunning() && !m_matchTimer.hasElapsed(110)) {
+        m_shiftTimer.start();
+      } else if (m_shiftTimer.advanceIfElapsed(25)) {
+        shiftBoolean = !shiftBoolean;
+      } else if (m_matchTimer.hasElapsed(110)) {
+        m_shiftTimer.stop();
+        SmartDashboard.putBoolean("EndGame", true);
+        shiftBoolean = true;
+      } else SmartDashboard.putBoolean("EndGame", false);
+
+    } else {
+      shiftBoolean = true;
+    }
+
+    SmartDashboard.putBoolean("SHOOT", shiftBoolean);
+    SmartDashboard.putNumber("Match Timer", 140 - m_matchTimer.get());
+    SmartDashboard.putNumber("Shift Timer", 25 - m_shiftTimer.get());
+  }
 
   /** This function is called once when test mode is enabled. */
   @Override
