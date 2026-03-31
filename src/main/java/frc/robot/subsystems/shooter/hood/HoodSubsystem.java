@@ -30,7 +30,8 @@ public class HoodSubsystem extends FullSubsystem {
     DEBUGGING_PID_DOWN,
     DEBUGGING_VOLT_UP,
     DEBUGGING_VOLT_DOWN,
-    LAYUP;
+    LAYUP,
+    TRENCH;
   }
 
   private double getGoalAsDouble(Goal currentGoal) {
@@ -49,6 +50,8 @@ public class HoodSubsystem extends FullSubsystem {
         return HoodConstants.debuggingVoltageDOWN;
       case LAYUP:
         return HoodConstants.layupAngle;
+      case TRENCH:
+        return HoodConstants.idleAngle;
       default:
         return 0.0;
     }
@@ -147,6 +150,10 @@ public class HoodSubsystem extends FullSubsystem {
   // vision
   public Command dynamicUpdatedShootCommand(DoubleSupplier positionRad) {
     return run(() -> runAngular(positionRad.getAsDouble())).withName("Hood Shoot");
+  }
+
+  public Command trenchDownCommand(){
+    return run (() -> runAngular(getGoalAsDouble(Goal.TRENCH)));
   }
 
   // ----------------------------------LAYUP COMMANDS------------------------------//

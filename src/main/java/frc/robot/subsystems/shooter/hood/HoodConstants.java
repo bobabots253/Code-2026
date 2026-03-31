@@ -51,6 +51,8 @@ public class HoodConstants {
 
   public static final double layupAngle = Units.degreesToRadians(41.9); // 41.55 @ 1.5m
 
+  public static final double idleAngle = Units.degreesToRadians(38.87);
+
   public static final double debuggingAngleDown = Units.degreesToRadians(5.0); // Change as needed
   public static final double debuggingAngleUp = Units.degreesToRadians(42); // Change as needed
 
