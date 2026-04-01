@@ -200,7 +200,20 @@ public class ShotCalculator extends FullSubsystem {
 
     targetSpeedRadPerSec =
         ShootOnTheFlyConstants.FLYWHEEL_VELOCITY_INTERPOLATOR.get(distanceToTarget2D);
-    targetAngleDeg = ShootOnTheFlyConstants.HOOD_DEGREES_INTERPOLATOR.get(distanceToTarget2D);
+
+    // This makes the targetAngleDeg equal to a low value if the shooterCoords are in the trench
+    // Area. Else return the interpolating distance.
+    if (((shooterXYCoords.getX() > ShootOnTheFlyConstants.BLUE_STARTING_LINE)
+            && (shooterXYCoords.getX() < ShootOnTheFlyConstants.BLUE_TRENCH_LINE))
+        || ((shooterXYCoords.getX() > ShootOnTheFlyConstants.RED_TRENCH_LINE)
+            && (shooterXYCoords.getX() < ShootOnTheFlyConstants.RED_STARTING_LINE))) {
+      if ((shooterXYCoords.getY() < ShootOnTheFlyConstants.BOTTOM_TRENCH_LINE)
+          || (shooterXYCoords.getY() > ShootOnTheFlyConstants.TOP_TRENCH_LINE)) {
+        targetAngleDeg = ShootOnTheFlyConstants.HOOD_DOWN;
+      }
+    } else {
+      targetAngleDeg = ShootOnTheFlyConstants.HOOD_DEGREES_INTERPOLATOR.get(distanceToTarget2D);
+    }
 
     angularError = fieldToTargetAngle.minus(robotPose.getRotation());
 

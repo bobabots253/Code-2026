@@ -142,7 +142,7 @@ public class RobotContainer {
         indexerSubsystem = new IndexerSubsystem(new IndexerIOSpark());
         kickerSubsystem = new KickerSubsystem(new KickerIOSpark());
         flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSpark());
-        hoodSubsystem = new HoodSubsystem(new HoodIOSpark());
+        hoodSubsystem = new HoodSubsystem(new HoodIOSpark(), shotCalculator);
 
         break;
 
@@ -186,7 +186,7 @@ public class RobotContainer {
         indexerSubsystem = new IndexerSubsystem(new IndexerIOSim());
         kickerSubsystem = new KickerSubsystem(new KickerIOSim());
         flywheelSubsystem = new FlywheelSubsystem(new FlywheelIOSim());
-        hoodSubsystem = new HoodSubsystem(new HoodIOSim());
+        hoodSubsystem = new HoodSubsystem(new HoodIOSim(), shotCalculator);
 
         // configureFuelSim();
         break;
@@ -217,7 +217,7 @@ public class RobotContainer {
         indexerSubsystem = new IndexerSubsystem(new IndexerIO() {});
         kickerSubsystem = new KickerSubsystem(new KickerIO() {});
         flywheelSubsystem = new FlywheelSubsystem(new FlywheelIO() {});
-        hoodSubsystem = new HoodSubsystem(new HoodIO() {});
+        hoodSubsystem = new HoodSubsystem(new HoodIO() {}, shotCalculator);
 
         break;
     }
@@ -374,13 +374,8 @@ public class RobotContainer {
     operator
         .y()
         .whileTrue(
-            hoodSubsystem.dynamicUpdatedShootCommand(
-                () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())))
-        .whileTrue(
             flywheelSubsystem.dynamicUpdatedShootCommand(
-                () -> shotCalculator.getCorrectTargetVelocity()))
-        .whileFalse(
-            hoodSubsystem.trenchDownCommand());
+                () -> shotCalculator.getCorrectTargetVelocity()));
 
     operator.a().onTrue(flywheelSubsystem.toggleWarm()); // Shifted from DPad Left
 

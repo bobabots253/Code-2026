@@ -1,11 +1,14 @@
 package frc.robot.subsystems.shooter.hood;
 
 import static frc.robot.subsystems.shooter.hood.HoodConstants.highCurrentThreshold;
+import static frc.robot.subsystems.shooter.hood.HoodConstants.idleAngle;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
+import frc.robot.subsystems.shooter.ShotCalculator;
 import frc.robot.subsystems.shooter.hood.HoodIO.HoodIOOutputMode;
 import frc.robot.subsystems.shooter.hood.HoodIO.HoodIOOutputs;
 import frc.robot.util.FullSubsystem;
@@ -17,7 +20,7 @@ public class HoodSubsystem extends FullSubsystem {
   private final HoodIO io;
   private final HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
   private final HoodIOOutputs outputs = new HoodIOOutputs();
-
+  private final ShotCalculator shotCalculator;
   private Alert masterDisconnected;
 
   /*
@@ -60,8 +63,9 @@ public class HoodSubsystem extends FullSubsystem {
   @AutoLogOutput(key = "Hood/Goal")
   private Goal currentGoal = Goal.IDLE;
 
-  public HoodSubsystem(HoodIO io) {
+  public HoodSubsystem(HoodIO io, ShotCalculator shotCalculator) {
     this.io = io;
+    this.shotCalculator = shotCalculator;
 
     masterDisconnected = new Alert("Hood motor disconnected!", Alert.AlertType.kWarning);
 
@@ -81,11 +85,11 @@ public class HoodSubsystem extends FullSubsystem {
 
     // Re-poll the supplier every loop to handle new shot calculations
     if (currentGoal == Goal.IDLE) {
-      stop();
+      runAngular(Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle()));
     } else if (currentGoal == Goal.DEBUGGING_VOLT_UP || currentGoal == Goal.DEBUGGING_VOLT_DOWN) {
       runVoltage(getGoalAsDouble(currentGoal));
     } else {
-      runAngular(getGoalAsDouble(currentGoal));
+      stop();
     }
   }
 
@@ -152,8 +156,8 @@ public class HoodSubsystem extends FullSubsystem {
     return run(() -> runAngular(positionRad.getAsDouble())).withName("Hood Shoot");
   }
 
-  public Command trenchDownCommand(){
-    return run (() -> runAngular(getGoalAsDouble(Goal.TRENCH)));
+  public Command trenchDownCommand() {
+    return run(() -> runAngular(idleAngle));
   }
 
   // ----------------------------------LAYUP COMMANDS------------------------------//

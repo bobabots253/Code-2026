@@ -43,6 +43,22 @@ public class ShootOnTheFlyConstants {
           new Translation3d(-0.25, 0.0, 0.5), // Meters, forward, left, up
           new Rotation3d(0.0, 0.0, 0.0)); // Radians, roll, pitch, yaw
 
+  public static final double HOOD_DOWN = 39.14;
+
+  // ------- Trench Constants -------- \\
+  public static final double BLUE_STARTING_LINE = 4.028694;
+  public static final double BLUE_TRENCH_LINE =
+      5.222494; // The line on the other side of the Blue trench
+  public static final double RED_STARTING_LINE = 12.512294;
+  public static final double RED_TRENCH_LINE =
+      11.318494; // The line on the other side of the Red trench
+  public static final double BOTTOM_TRENCH_LINE =
+      1.265936; // The maximume y value for the bottom trench since it will be bounded by this value
+  // and 0
+  public static final double TOP_TRENCH_LINE =
+      1.265936; // The maximume y value for the top trench since it will be bounded by this value
+  // and 8.069326;
+
   // Shooting RPMs for Hub Shooting
   // https://www.desmos.com/3d/rbrerrotsx
   // https://www.reca.lc/flywheel?currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&flywheelMomentOfInertia=%7B%22s%22%3A4.356%2C%22u%22%3A%22in2%2Albs%22%7D&flywheelRadius=%7B%22s%22%3A1.65%2C%22u%22%3A%22in%22%7D&flywheelRatio=%7B%22magnitude%22%3A1%2C%22ratioType%22%3A%22Reduction%22%7D&flywheelWeight=%7B%22s%22%3A3.2%2C%22u%22%3A%22lbs%22%7D&motor=%7B%22quantity%22%3A2%2C%22name%22%3A%22NEO%22%7D&motorRatio=%7B%22magnitude%22%3A1%2C%22ratioType%22%3A%22Step-up%22%7D&projectileRadius=%7B%22s%22%3A2%2C%22u%22%3A%22in%22%7D&projectileWeight=%7B%22s%22%3A1%2C%22u%22%3A%22lbs%22%7D&shooterMomentOfInertia=%7B%22s%22%3A2.4%2C%22u%22%3A%22in2%2Albs%22%7D&shooterRadius=%7B%22s%22%3A2%2C%22u%22%3A%22in%22%7D&shooterTargetSpeed=%7B%22s%22%3A4000%2C%22u%22%3A%22rpm%22%7D&shooterWeight=%7B%22s%22%3A1.2%2C%22u%22%3A%22lbs%22%7D&useCustomFlywheelMoi=0&useCustomShooterMoi=0
