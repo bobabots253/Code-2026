@@ -89,7 +89,7 @@ public class HoodSubsystem extends FullSubsystem {
     } else if (currentGoal == Goal.DEBUGGING_VOLT_UP || currentGoal == Goal.DEBUGGING_VOLT_DOWN) {
       runVoltage(getGoalAsDouble(currentGoal));
     } else {
-      stop();
+      runAngular(getGoalAsDouble(currentGoal));
     }
   }
 
