@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.FullSubsystem;
@@ -32,6 +33,8 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.littletonrobotics.urcl.URCL;
+
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -153,6 +156,12 @@ public class Robot extends LoggedRobot {
     } else {
       hasInitializedAlliancePose = false;
     }
+
+    // Handle PathPlanner States Initialization by Running an Auto Routine
+    // Should not actually drive, only warmups up the PathPlanner library
+    // See: https://www.chiefdelphi.com/t/pathplanner-initial-lag-after-deploying-code/455068/7
+    Command forcedAutoInitCommand = new PathPlannerAuto("Force Warmup").ignoringDisable(true);
+    CommandScheduler.getInstance().schedule(forcedAutoInitCommand);
   }
 
   /** This function is called periodically when disabled. */
@@ -176,7 +185,13 @@ public class Robot extends LoggedRobot {
     autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
-    // SequentialCommandGroup autoCommand = new SequentialCommandGroup(listOfCommands);
+    // 3847: Time Delay to prevent Auto from firing with a delay
+    Command delaggerWaitCommand = new WaitCommand(0.01);
+
+    // schedule the autonomous command (example)
+    if (autonomousCommand != null) {
+      CommandScheduler.getInstance().schedule(delaggerWaitCommand.andThen(autonomousCommand));
+    }
 
   }
 
@@ -193,6 +208,7 @@ public class Robot extends LoggedRobot {
     // this line or comment it out.
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
+      autonomousCommand = null;
     }
 
     // Handle edge case where alliance data isn't recieved before enabled
