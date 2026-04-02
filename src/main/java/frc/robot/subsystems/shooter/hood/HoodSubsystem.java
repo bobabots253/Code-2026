@@ -153,7 +153,8 @@ public class HoodSubsystem extends FullSubsystem {
   // Working 3/10/26, doesn't respect State-Based but allows for dynamic updates to hood angle from
   // vision
   public Command dynamicUpdatedShootCommand(DoubleSupplier positionRad) {
-    return run(() -> runAngular(positionRad.getAsDouble())).withName("Hood Shoot");
+    return startEnd(() -> runAngular(positionRad.getAsDouble()), () -> runAngular(Units.degreesToRadians(39.14))).withName("Hood Shoot");
+
   }
 
   public Command trenchDownCommand() {

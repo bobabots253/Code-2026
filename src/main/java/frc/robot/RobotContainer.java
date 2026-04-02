@@ -375,7 +375,10 @@ public class RobotContainer {
         .y()
         .whileTrue(
             flywheelSubsystem.dynamicUpdatedShootCommand(
-                () -> shotCalculator.getCorrectTargetVelocity()));
+                () -> shotCalculator.getCorrectTargetVelocity()))
+        .whileTrue(
+            hoodSubsystem.dynamicUpdatedShootCommand(
+                () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())));
 
     operator.a().onTrue(flywheelSubsystem.toggleWarm()); // Shifted from DPad Left
 
