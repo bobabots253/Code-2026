@@ -58,4 +58,6 @@ public class HoodConstants {
 
   public static final double debuggingVoltageUP = -1.0;
   public static final double debuggingVoltageDOWN = 1.0;
+
+  public static final double trenchAngle = Units.degreesToRadians(38.84);
 }

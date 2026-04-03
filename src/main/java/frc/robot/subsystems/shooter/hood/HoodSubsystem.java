@@ -147,6 +147,13 @@ public class HoodSubsystem extends FullSubsystem {
   // vision
   public Command dynamicUpdatedShootCommand(DoubleSupplier positionRad) {
     return run(() -> runAngular(positionRad.getAsDouble())).withName("Hood Shoot");
+    //To test but this will run the Trench angle once interupptted
+    //startEnd(() -> runAngular(positionRad.getAsDouble()), () -> runAngular(HoodConstants.trenchAngle)).withName("Hood Shoot");
+  }
+
+  //This would be used if we want a while false
+  public Command trenchHoodCommand(){
+    return run(() -> runAngular(HoodConstants.trenchAngle)).withName("Hood Trench");
   }
 
   // ----------------------------------LAYUP COMMANDS------------------------------//
