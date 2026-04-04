@@ -336,7 +336,10 @@ public class RobotContainer {
                 () -> -driver.getLeftY(),
                 () -> -driver.getLeftX(),
                 () -> shotCalculator.getCorrectTargetRotation()))
-        .whileTrue(hoodSubsystem.dynamicUpdatedShootCommand(() -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())));
+        .whileTrue(
+            hoodSubsystem.dynamicUpdatedShootCommandWithLinearCompensation(
+                () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())))
+        .whileFalse(hoodSubsystem.trenchHoodCommand());
 
     driver
         .b()
@@ -356,8 +359,17 @@ public class RobotContainer {
                     swerveSubsystem)
                 .ignoringDisable(true));
 
+    driver.povUp().onTrue(Commands.runOnce(() -> hoodSubsystem.shotCompensation--, hoodSubsystem));
+    driver
+        .povDown()
+        .onTrue(Commands.runOnce(() -> hoodSubsystem.shotCompensation++, hoodSubsystem));
+
+    driver
+        .povLeft()
+        .onTrue(Commands.runOnce(() -> hoodSubsystem.shotCompensation = 0, hoodSubsystem));
+
     driver.povRight().whileTrue(flywheelSubsystem.runDebuggingVelocityCommand());
-    
+
     driver.leftTrigger().whileTrue(hoodSubsystem.runDebuggingVoltageUpCommand());
     driver.rightTrigger().whileTrue(hoodSubsystem.runDebuggingVoltageDownCommand());
 
