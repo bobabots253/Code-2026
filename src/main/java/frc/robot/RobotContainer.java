@@ -326,7 +326,8 @@ public class RobotContainer {
         .whileTrue(indexerSubsystem.indexCommand())
         .whileTrue(kickerSubsystem.indexCommand())
         .whileTrue(agitatorSubsystem.indexCommand())
-        .whileTrue(pivotSubsystem.runSaltAndPepperCommand());
+        .whileTrue(pivotSubsystem.runSaltAndPepperCommand())
+        .whileTrue(rollerSubsystem.intakeCommand());
 
     driver
         .rightBumper()
@@ -386,12 +387,13 @@ public class RobotContainer {
     operator.b().whileTrue(rollerSubsystem.runUnjamCommand());
 
     operator
-        .y()
+        .rightTrigger()
         .whileTrue(
             flywheelSubsystem.dynamicUpdatedShootCommand(
                 () -> shotCalculator.getCorrectTargetVelocity()));
 
-    operator.a().onTrue(flywheelSubsystem.toggleWarm()); // Shifted from DPad Left
+    // Disabled toggleWarm on Operator because of fat-keying during intaking
+    // operator.a().onTrue(flywheelSubsystem.toggleWarm()); // Shifted from DPad Left
 
     operator
         .povUp()

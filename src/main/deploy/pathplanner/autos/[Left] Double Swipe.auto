@@ -184,7 +184,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 4.0
+                  "waitTime": 10.0
                 }
               },
               {
@@ -221,43 +221,6 @@
                 "type": "named",
                 "data": {
                   "name": "indexerIndex"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "race",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "[Left Swipe] Reentry 1"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "pivotDown"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "rollerIntake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "agitatorIntake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "hoodLayup"
                 }
               }
             ]
