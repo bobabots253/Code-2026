@@ -14,7 +14,7 @@ public class ShootOnTheFlyConstants {
   public static final double shooterHeightOffset = 0.5; // Meters, height of shooter from ground
 
   public static final double shortMissFlywheelCalibration = 0.3; // meters
-  public static final double shortMissHoodCalibration = -3; // degrees
+  public static final double shortMissHoodCalibration = -5; // degrees
 
   // ------- Transform Constants -------- \\
   public static final Transform3d SHOOTER_TRANSFORM_CENTER =
