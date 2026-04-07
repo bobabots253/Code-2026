@@ -232,7 +232,7 @@ public class RobotContainer {
 
     // ------- Indexer Auto NamedCommands -------- \\
 
-    NamedCommands.registerCommand("indexerIndex", indexerSubsystem.runCurrentCommand());
+    NamedCommands.registerCommand("indexerIndex", indexerSubsystem.indexCommand());
 
     // ------- Kicker Auto NamedCommands -------- \\
 
@@ -318,7 +318,7 @@ public class RobotContainer {
 
     driver
         .leftBumper()
-        .whileTrue(indexerSubsystem.runCurrentCommand())
+        .whileTrue(indexerSubsystem.indexCommand())
         .whileTrue(kickerSubsystem.indexCommand())
         .whileTrue(agitatorSubsystem.indexCommand())
         .whileTrue(pivotSubsystem.runSaltAndPepperCommand());
