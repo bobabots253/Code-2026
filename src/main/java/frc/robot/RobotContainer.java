@@ -237,7 +237,7 @@ public class RobotContainer {
 
     // ------- Indexer Auto NamedCommands -------- \\
 
-    NamedCommands.registerCommand("indexerIndex", indexerSubsystem.runCurrentCommand());
+    NamedCommands.registerCommand("indexerIndex", indexerSubsystem.indexCommand());
 
     // ------- Kicker Auto NamedCommands -------- \\
 
