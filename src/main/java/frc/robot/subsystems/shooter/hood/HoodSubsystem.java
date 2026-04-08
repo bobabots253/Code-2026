@@ -21,7 +21,7 @@ public class HoodSubsystem extends FullSubsystem {
 
   private Alert masterDisconnected;
 
-  @AutoLogOutput public int shotCompensation = 0;
+  @AutoLogOutput private int shotCompensation = 0;
 
   /*
    * Defines all possible states for the hood. Each goal state has a DoubleSupplier arguement that updates from Robot State. Note: Only input static choices.
@@ -209,6 +209,19 @@ public class HoodSubsystem extends FullSubsystem {
     return runOnce(this::stop);
   }
 
+  // ----------------------------------SHOT COMPENSATION COMMANDS------------------------------//
+  public Command incrementShotCompensationCommand() {
+    return runOnce(() -> incrementShotCompensation());
+  }
+
+  public Command decrementShotCompensationCommand() {
+    return runOnce(() -> decrementShotCompensation());
+  }
+
+  public Command resetShotCompensationCommand() {
+    return runOnce(() -> resetShotCompensation());
+  }
+
   /**
    * Manual override command to run a specific velocity. Note: This bypasses the "state machine".
    */
@@ -218,5 +231,17 @@ public class HoodSubsystem extends FullSubsystem {
 
   private void stop() {
     outputs.mode = HoodIOOutputMode.BRAKE;
+  }
+
+  public void incrementShotCompensation() {
+    shotCompensation++;
+  }
+
+  public void decrementShotCompensation() {
+    shotCompensation--;
+  }
+
+  public void resetShotCompensation() {
+    shotCompensation = 0;
   }
 }
