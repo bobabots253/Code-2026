@@ -339,8 +339,8 @@ public class RobotContainer {
                 () -> shotCalculator.getCorrectTargetRotation()))
         .whileTrue(
             hoodSubsystem.dynamicUpdatedShootCommandWithLinearCompensation(
-                () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())));
-    // .whileFalse(hoodSubsystem.trenchHoodCommand());
+                () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())))
+        .whileFalse(hoodSubsystem.trenchHoodCommand());
 
     driver
         .b()
