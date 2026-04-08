@@ -31,6 +31,8 @@ import frc.robot.util.swerveUtil.PrimitiveDoubleQueue;
 public class GyroIOPigeon2 implements GyroIO {
   private final Pigeon2 pigeon = new Pigeon2(pigeonCanId);
   private final StatusSignal<Angle> yaw = pigeon.getYaw();
+  private final StatusSignal<Angle> pitch = pigeon.getPitch();
+  private final StatusSignal<AngularVelocity> pitchVelocity = pigeon.getAngularVelocityYWorld();
   private final PrimitiveDoubleQueue yawPositionQueue;
   private final PrimitiveDoubleQueue yawTimestampQueue;
   private final StatusSignal<AngularVelocity> yawVelocity = pigeon.getAngularVelocityZWorld();
@@ -42,7 +44,9 @@ public class GyroIOPigeon2 implements GyroIO {
     pigeon.getConfigurator().apply(gyroTrimConfigs);
     pigeon.getConfigurator().setYaw(0.0);
     yaw.setUpdateFrequency(odometryFrequency);
-    yawVelocity.setUpdateFrequency(50.0);
+    pitch.setUpdateFrequency(odometryFrequency);
+    yawVelocity.setUpdateFrequency(odometryFrequency);
+    pitchVelocity.setUpdateFrequency(odometryFrequency);
     pigeon.optimizeBusUtilization();
     yawTimestampQueue = SparkOdometryThread.getInstance().makeTimestampQueue();
 
@@ -55,8 +59,14 @@ public class GyroIOPigeon2 implements GyroIO {
   @Override
   public void updateInputs(GyroIOInputs inputs) {
     inputs.connected = BaseStatusSignal.refreshAll(yaw, yawVelocity).equals(StatusCode.OK);
+
     inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
     inputs.yawVelocityRadPerSec = Units.degreesToRadians(yawVelocity.getValueAsDouble());
+
+    // Values from [Pigeon 2.0] are in degrees and degrees per second, so convert to radians and
+    // radians per second
+    inputs.pitchPositionRad = Units.degreesToRadians(pitch.getValueAsDouble()); // invert if needed
+    inputs.pitchVelocityRadPerSec = Units.degreesToRadians(pitchVelocity.getValueAsDouble());
 
     inputs.odometryYawTimestamps = yawTimestampQueue.toArray();
 

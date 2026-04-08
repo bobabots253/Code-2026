@@ -350,9 +350,19 @@ public class SwerveSubsystem extends FullSubsystem {
     return getPose().getRotation();
   }
 
+  /** Returns the current pitch position in radians. */
+  public double getPitchPositionRad() {
+    return gyroInputs.pitchPositionRad;
+  }
+
   /** Returns the current yaw velocity rate */
   public double getYawVelocityRate() {
     return rawGyroYawRate;
+  }
+
+  /** Returns the current pitch velocity in radians per second. */
+  public double getPitchVelocityRadPerSec() {
+    return gyroInputs.pitchVelocityRadPerSec;
   }
 
   /** Resets the current odometry pose. */

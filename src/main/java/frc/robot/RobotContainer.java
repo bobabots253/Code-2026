@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.CrossBumpCommand;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.agitator.AgitatorIO;
 import frc.robot.subsystems.agitator.AgitatorIOSim;
@@ -269,6 +270,14 @@ public class RobotContainer {
             () -> -driver.getLeftY(),
             () -> -driver.getLeftX(),
             () -> shotCalculator.getCorrectTargetRotation()));
+
+    NamedCommands.registerCommand(
+        "crossBumpNeutralZone",
+        new CrossBumpCommand(swerveSubsystem, CrossBumpCommand.CrossDirection.TO_NEUTRAL));
+
+    NamedCommands.registerCommand(
+        "crossBumpAllianceZone",
+        new CrossBumpCommand(swerveSubsystem, CrossBumpCommand.CrossDirection.TO_ALLIANCE));
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
