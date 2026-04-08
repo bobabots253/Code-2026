@@ -2,7 +2,7 @@ package frc.robot.subsystems.agitator;
 
 public class AgitatorConstants {
   public static final int sparkMasterAgitatorCanId = 11;
-  public static final int masterCurrentLimit = 25; // amps
+  public static final int masterCurrentLimit = 15; // amps
 
   // Temporary Values (Confirm Functionality)
   public static final double indexingVolts = -6.0;
