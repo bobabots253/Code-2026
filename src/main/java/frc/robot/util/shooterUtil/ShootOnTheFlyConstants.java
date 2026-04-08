@@ -78,7 +78,15 @@ public class ShootOnTheFlyConstants {
     FLYWHEEL_VELOCITY_INTERPOLATOR.put(5.5, Units.rotationsPerMinuteToRadiansPerSecond(3200));
     FLYWHEEL_VELOCITY_INTERPOLATOR.put(6.2, Units.rotationsPerMinuteToRadiansPerSecond(3400));
     FLYWHEEL_VELOCITY_INTERPOLATOR.put(7.0, Units.rotationsPerMinuteToRadiansPerSecond(3500));
-    FLYWHEEL_VELOCITY_INTERPOLATOR.put(8.0, Units.rotationsPerMinuteToRadiansPerSecond(3500));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(8.0, Units.rotationsPerMinuteToRadiansPerSecond(3600));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(9.0, Units.rotationsPerMinuteToRadiansPerSecond(3800));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(10.0, Units.rotationsPerMinuteToRadiansPerSecond(4000));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(11.0, Units.rotationsPerMinuteToRadiansPerSecond(4200));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(12.0, Units.rotationsPerMinuteToRadiansPerSecond(4500));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(13.0, Units.rotationsPerMinuteToRadiansPerSecond(4700));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(14.0, Units.rotationsPerMinuteToRadiansPerSecond(4950));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(15.0, Units.rotationsPerMinuteToRadiansPerSecond(5200));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(16.0, Units.rotationsPerMinuteToRadiansPerSecond(5450));
 
     // Check
 
@@ -96,6 +104,14 @@ public class ShootOnTheFlyConstants {
     HOOD_DEGREES_INTERPOLATOR.put(6.2, 5.0);
     HOOD_DEGREES_INTERPOLATOR.put(7.0, 5.0);
     HOOD_DEGREES_INTERPOLATOR.put(8.0, 5.0);
+    HOOD_DEGREES_INTERPOLATOR.put(9.0, 5.0);
+    HOOD_DEGREES_INTERPOLATOR.put(10.0, 5.0);
+    HOOD_DEGREES_INTERPOLATOR.put(11.0, 5.0);
+    HOOD_DEGREES_INTERPOLATOR.put(12.0, 5.0);
+    HOOD_DEGREES_INTERPOLATOR.put(13.0, 5.0);
+    HOOD_DEGREES_INTERPOLATOR.put(14.0, 5.0);
+    HOOD_DEGREES_INTERPOLATOR.put(15.0, 5.0);
+    HOOD_DEGREES_INTERPOLATOR.put(16.0, 5.0);
 
     // HOOD_DEGREES_INTERPOLATOR.put(4.0, 31.31); // Check
   }

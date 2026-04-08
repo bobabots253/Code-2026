@@ -339,8 +339,8 @@ public class RobotContainer {
                 () -> shotCalculator.getCorrectTargetRotation()))
         .whileTrue(
             hoodSubsystem.dynamicUpdatedShootCommandWithLinearCompensation(
-                () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())))
-        .whileFalse(hoodSubsystem.trenchHoodCommand());
+                () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())));
+    // .whileFalse(hoodSubsystem.trenchHoodCommand());
 
     driver
         .b()
@@ -393,7 +393,7 @@ public class RobotContainer {
                 () -> shotCalculator.getCorrectTargetVelocity()));
 
     // Disabled toggleWarm on Operator because of fat-keying during intaking
-    // operator.a().onTrue(flywheelSubsystem.toggleWarm()); // Shifted from DPad Left
+    operator.a().onTrue(flywheelSubsystem.toggleWarm()); // Shifted from DPad Left
 
     operator
         .povUp()

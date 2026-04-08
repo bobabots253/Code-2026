@@ -2,7 +2,7 @@ package frc.robot.subsystems.indexer;
 
 public class IndexerConstants {
   public static final int sparkMasterIndexerCanId = 12;
-  public static final int masterCurrentLimit = 65; // amps
+  public static final int masterCurrentLimit = 50; // amps
 
   // Temporary Values (Confirm Functionality)
   public static final double stowVolts = 0.0;
