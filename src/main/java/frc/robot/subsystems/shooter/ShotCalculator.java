@@ -226,6 +226,9 @@ public class ShotCalculator extends FullSubsystem {
     return fieldToTargetAngle;
   }
 
+  /*
+   * Note: the rotation of this Pose2d is meaningless
+   */
   public Pose2d getCorrectedTargetPose2d() {
     return new Pose2d(correctedTargetPose3d.getX(), correctedTargetPose3d.getY(), new Rotation2d());
   }
