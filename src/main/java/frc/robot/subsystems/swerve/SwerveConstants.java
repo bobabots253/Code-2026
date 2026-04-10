@@ -69,7 +69,7 @@ public class SwerveConstants {
   public static final int backRightTurnCanId = 6;
 
   // Drive motor configuration (MAXSwerve with 14 pinion teeth and 22 spur teeth)
-  public static final int driveMotorCurrentLimit = 60; // Vortex 80A, NEO 60A
+  public static final int driveMotorCurrentLimit = 50; // Vortex 80A, NEO 60A
 
   // Remeasure the radius in the Makerspace, Run the Wheel Characterization Auto
   public static final double wheelRadiusMeters = Units.inchesToMeters(1.498);

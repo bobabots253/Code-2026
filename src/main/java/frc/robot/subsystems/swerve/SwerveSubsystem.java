@@ -72,6 +72,7 @@ public class SwerveSubsystem extends FullSubsystem {
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
   private Rotation2d rawGyroRotation = new Rotation2d();
   private double rawGyroYawRate = 0.0;
+  private double rawGyroPitch = 0.0;
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] {
         new SwerveModulePosition(),
@@ -210,6 +211,7 @@ public class SwerveSubsystem extends FullSubsystem {
         // Use the real gyro angle
         rawGyroRotation = gyroInputs.odometryYawPositions[i];
         rawGyroYawRate = gyroInputs.yawVelocityRadPerSec;
+        rawGyroPitch = gyroInputs.pitchPositionRad;
       } else {
         // Use the angle delta from the kinematics and module deltas
         Twist2d twist = kinematics.toTwist2d(moduleDeltas);
@@ -350,9 +352,10 @@ public class SwerveSubsystem extends FullSubsystem {
     return getPose().getRotation();
   }
 
+  @AutoLogOutput(key = "Odometry/PitchRad")
   /** Returns the current pitch position in radians. */
   public double getPitchPositionRad() {
-    return gyroInputs.pitchPositionRad;
+    return rawGyroPitch;
   }
 
   /** Returns the current yaw velocity rate */

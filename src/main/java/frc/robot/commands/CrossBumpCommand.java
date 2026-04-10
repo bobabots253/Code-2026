@@ -4,9 +4,12 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
+import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -60,9 +63,9 @@ public class CrossBumpCommand extends Command {
   public static final class BumpConstants {
 
     // Start at 1.0 m/s/low value and tune up if the robot stalls on the ramp edge.
-    public static double APPROACH_SPEED_MS = 1.0;
+    public static double APPROACH_SPEED_MS = 4.0;
 
-    public static double BUMP_SPEED_MS = 0.6;
+    public static double BUMP_SPEED_MS = 5.0;
 
     // Speed during the LEVELING phase (all wheels back on flat ground) in m/s.
     public static double SETTLE_SPEED_MS = 0.4;
@@ -104,7 +107,8 @@ public class CrossBumpCommand extends Command {
   private final CrossDirection direction;
 
   // +1 for TO_NEUTRAL, -1 for TO_ALLIANCE.
-  private final double driveSign;
+  private double driveSign;
+  private double pitchSign;
 
   private BumpState state = BumpState.APPROACHING;
 
@@ -125,7 +129,7 @@ public class CrossBumpCommand extends Command {
   public CrossBumpCommand(SwerveSubsystem drive, CrossDirection direction) {
     this.drive = drive;
     this.direction = direction;
-    this.driveSign = (direction == CrossDirection.TO_NEUTRAL) ? 1.0 : -1.0;
+    // Don't add in the drive sign early into construction, FMS not ready
     addRequirements(drive);
   }
 
@@ -142,6 +146,17 @@ public class CrossBumpCommand extends Command {
     // Reset debouncer to ensure it starts in the not-debounced state
     flatDebouncer.calculate(false);
 
+    Optional<Alliance> alliance = DriverStation.getAlliance();
+    boolean isRed = alliance.isPresent() && alliance.get() == Alliance.Red;
+
+    double allianceMultiplier = isRed ? -1.0 : 1.0;
+    double directionMultiplier = (direction == CrossDirection.TO_NEUTRAL) ? 1.0 : -1.0;
+
+    // Pre-Calculate driveSign to prevent double signing logic in run-time
+    this.driveSign = directionMultiplier * allianceMultiplier;
+
+    Logger.recordOutput("CrossBump/CalculatedDriveSign", driveSign);
+    Logger.recordOutput("CrossBump/CalculatedPitchSign", pitchSign);
     Logger.recordOutput("CrossBump/Direction", direction.name());
     Logger.recordOutput("CrossBump/State", state.name());
   }
@@ -151,8 +166,12 @@ public class CrossBumpCommand extends Command {
   // NOTE: Use this is as a gold standard template
   @Override
   public void execute() {
-    double pitch = drive.getPitchPositionRad();
-    double pitchRate = drive.getPitchVelocityRadPerSec();
+    // Raw data from SwerveSubsystem
+    double rawPitch = drive.getPitchPositionRad();
+    double rawPitchRate = drive.getPitchVelocityRadPerSec();
+
+    double pitch = rawPitch * driveSign;
+    double pitchRate = rawPitchRate * driveSign;
     double absPitch = Math.abs(pitch);
 
     // total timeout for safety
@@ -179,7 +198,7 @@ public class CrossBumpCommand extends Command {
         // Bump detected: pitch is rising and exceeds entry threshold.
         // Important: Also check that the pitch sign matches the direction of travel:
         // Might be better: just check |pitch| > threshold regardless of sign
-        if (absPitch > BumpConstants.PITCH_ENTRY_THRESHOLD_RAD) {
+        if (pitch > BumpConstants.PITCH_ENTRY_THRESHOLD_RAD) {
           peakPitchRad = absPitch; // peak tracker
           transitionTo(BumpState.CLIMBING);
         }
@@ -210,16 +229,16 @@ public class CrossBumpCommand extends Command {
 
         // Descent confirmation: pitch has gone negative enough on the other
         // side of the bump.
-        if (pitch < -BumpConstants.PITCH_ENTRY_THRESHOLD_RAD) {
+        if (absPitch < -BumpConstants.PITCH_ENTRY_THRESHOLD_RAD) {
           transitionTo(BumpState.DESCENDING);
         }
 
         // Edge case: if the bump detection was very small (robot barely pitched) and
         // pitch has already returned near flat, skip straight to LEVELING.
-        if (absPitch < BumpConstants.PITCH_FLAT_THRESHOLD_RAD
-            && peakPitchRad > BumpConstants.PITCH_PEAK_MIN_RAD) {
-          transitionTo(BumpState.LEVELING);
-        }
+        // if (absPitch < BumpConstants.PITCH_FLAT_THRESHOLD_RAD
+        //     && peakPitchRad > BumpConstants.PITCH_PEAK_MIN_RAD) {
+        //   transitionTo(BumpState.LEVELING);
+        // }
         break;
 
       case DESCENDING:
@@ -308,7 +327,7 @@ public class CrossBumpCommand extends Command {
   /** NEW: Template logging format we should be using from now on */
   private void logState(double pitch, double pitchRate, double vx) {
     Logger.recordOutput("CrossBump/State", state.name());
-    Logger.recordOutput("CrossBump/PitchRad", pitch);
+    Logger.recordOutput("CrossBump/PitchRad", drive.getPitchPositionRad());
     Logger.recordOutput("CrossBump/PitchDeg", Math.toDegrees(pitch));
     Logger.recordOutput("CrossBump/PitchRateRadPerSec", pitchRate);
     Logger.recordOutput("CrossBump/PeakPitchDeg", Math.toDegrees(peakPitchRad));

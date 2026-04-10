@@ -31,11 +31,11 @@ import frc.robot.util.swerveUtil.PrimitiveDoubleQueue;
 public class GyroIOPigeon2 implements GyroIO {
   private final Pigeon2 pigeon = new Pigeon2(pigeonCanId);
   private final StatusSignal<Angle> yaw = pigeon.getYaw();
-  private final StatusSignal<Angle> pitch = pigeon.getPitch();
-  private final StatusSignal<AngularVelocity> pitchVelocity = pigeon.getAngularVelocityYWorld();
+  private final StatusSignal<Angle> pitch = pigeon.getRoll();
   private final PrimitiveDoubleQueue yawPositionQueue;
   private final PrimitiveDoubleQueue yawTimestampQueue;
   private final StatusSignal<AngularVelocity> yawVelocity = pigeon.getAngularVelocityZWorld();
+  private final StatusSignal<AngularVelocity> pitchVelocity = pigeon.getAngularVelocityXWorld();
   private final GyroTrimConfigs gyroTrimConfigs = new GyroTrimConfigs().withGyroScalarZ(-2.04);
 
   public GyroIOPigeon2() {
@@ -43,11 +43,15 @@ public class GyroIOPigeon2 implements GyroIO {
     pigeon.getConfigurator().apply(new Pigeon2Configuration());
     pigeon.getConfigurator().apply(gyroTrimConfigs);
     pigeon.getConfigurator().setYaw(0.0);
+
     yaw.setUpdateFrequency(odometryFrequency);
     pitch.setUpdateFrequency(odometryFrequency);
+
     yawVelocity.setUpdateFrequency(odometryFrequency);
     pitchVelocity.setUpdateFrequency(odometryFrequency);
+
     pigeon.optimizeBusUtilization();
+
     yawTimestampQueue = SparkOdometryThread.getInstance().makeTimestampQueue();
 
     var yawClone = yaw.clone(); // Status signals are not thread-safe
@@ -58,7 +62,8 @@ public class GyroIOPigeon2 implements GyroIO {
 
   @Override
   public void updateInputs(GyroIOInputs inputs) {
-    inputs.connected = BaseStatusSignal.refreshAll(yaw, yawVelocity).equals(StatusCode.OK);
+    inputs.connected =
+        BaseStatusSignal.refreshAll(yaw, yawVelocity, pitch, pitchVelocity).equals(StatusCode.OK);
 
     inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
     inputs.yawVelocityRadPerSec = Units.degreesToRadians(yawVelocity.getValueAsDouble());

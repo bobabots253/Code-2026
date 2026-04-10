@@ -9,17 +9,21 @@
     "Depot Auto",
     "Force Warmup",
     "Misc",
-    "[Right] Double Swipe",
+    "[Right] Bump",
     "Testing",
-    "[Left] Double Swipe"
+    "[Left] Bump",
+    "[Left] Double Swipe",
+    "[Right] Double Swipe"
   ],
   "autoFolders": [
     "Citrus Auto",
     "Default NZ Auto",
     "Force Warmup",
-    "[Right] Double Swipe",
+    "[Right] Bump",
     "TestingSpartan",
-    "[Left] Double Swipe"
+    "[Left] Bump",
+    "[Left] Double Swipe",
+    "[Right] Double Swipe"
   ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,
