@@ -1,0 +1,68 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 6.812685393258427,
+        "y": 7.061730337078652
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.802494382022473,
+        "y": 6.144539325842698
+      },
+      "isLocked": false,
+      "linkedName": "[Left Swipe] Reentry 1 to Intake 2"
+    },
+    {
+      "anchor": {
+        "x": 5.922158156517307,
+        "y": 5.567559408383813
+      },
+      "prevControl": {
+        "x": 6.5082850713280145,
+        "y": 5.576717641427731
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "[Left Swipe] Intake2 to StageShoot2"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.0,
+      "maxWaypointRelativePos": 0.2,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.5,
+    "maxAcceleration": 4.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 3.0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": "[Left] Double Swipe",
+  "idealStartingState": {
+    "velocity": 3.5,
+    "rotation": -102.265
+  },
+  "useDefaultConstraints": false
+}

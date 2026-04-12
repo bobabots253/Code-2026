@@ -17,7 +17,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 0.75
+                  "waitTime": 0.5
                 }
               },
               {
@@ -128,7 +128,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "flywheelLayup"
+                  "name": "flywheelDynamic"
                 }
               }
             ]
@@ -147,7 +147,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.0
+                  "waitTime": 0.5
                 }
               },
               {
@@ -184,7 +184,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 12.0
+                  "waitTime": 4.0
                 }
               },
               {
@@ -227,6 +227,167 @@
                 "type": "named",
                 "data": {
                   "name": "agitatorIndex"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "[Left Swipe] Reentry 1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "pivotDown"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "rollerIntake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "agitatorIntake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "[Left Swipe] Intake 2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "pivotDown"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "rollerIntake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "agitatorIntake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "[Left Swipe] StageShoot2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "flywheelDynamic"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "driveHubLock"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "flywheelDynamic"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "hoodDynamic"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "driveHubLock"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "flywheelDynamic"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "hoodDynamic"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 5.0
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "agitatorIndex"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "indexerIndex"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "pivotShake"
                 }
               }
             ]

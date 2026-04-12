@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.184685393258427,
-        "y": 7.367460674157303
+        "x": 3.4323011519061213,
+        "y": 7.333015992865022
       },
       "isLocked": false,
       "linkedName": "[Left Swipe] PostShoot1 to Reentry 1"
     },
     {
       "anchor": {
-        "x": 7.933696629212264,
-        "y": 7.03115730337087
+        "x": 6.812685393258427,
+        "y": 7.061730337078652
       },
       "prevControl": {
-        "x": 7.148988764044943,
-        "y": 7.5101348314606735
+        "x": 4.871526943777191,
+        "y": 7.505709086836602
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,7 +34,7 @@
       "rotationDegrees": 0.0
     },
     {
-      "waypointRelativePos": 0.3842323651452348,
+      "waypointRelativePos": 0.6315352697095409,
       "rotationDegrees": 0.0
     }
   ],
@@ -42,8 +42,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 4.0,
+    "maxAcceleration": 3.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -59,5 +59,5 @@
     "velocity": 0,
     "rotation": -66.52706715066263
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

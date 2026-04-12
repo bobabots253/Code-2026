@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.639534881514021,
-        "y": 0.6719662921348311
+        "x": 5.922158156517307,
+        "y": 5.567559408383813
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.639534881514023,
-        "y": 0.6719662921348311
+        "x": 4.560471910112359,
+        "y": 5.543269662921348
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "[Left Swipe] Intake2 to StageShoot2"
     },
     {
       "anchor": {
-        "x": 6.009974856443805,
-        "y": 0.6719662921348311
+        "x": 2.991056179775281,
+        "y": 5.567559408383813
       },
       "prevControl": {
-        "x": 5.009974856443805,
-        "y": 0.6719662921348312
+        "x": 4.580853932584269,
+        "y": 5.553460674157304
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "[Right Bump Disrupt] Entry"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -38,17 +38,17 @@
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
-    "unlimited": true
+    "unlimited": false
   },
   "goalEndState": {
-    "velocity": 3.5,
-    "rotation": 0.0
+    "velocity": 4.5,
+    "rotation": 180.0
   },
   "reversed": false,
-  "folder": "[Right] Bump Disrupt",
+  "folder": "[Left] Double Swipe",
   "idealStartingState": {
-    "velocity": 0,
-    "rotation": 0.0
+    "velocity": 3.0,
+    "rotation": 180.0
   },
   "useDefaultConstraints": false
 }
