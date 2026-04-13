@@ -80,6 +80,18 @@
                 "data": {
                   "name": "kickerIndex"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "agitatorIndex"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "pivotShake"
+                }
               }
             ]
           }

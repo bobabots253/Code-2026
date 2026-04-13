@@ -147,7 +147,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.0
+                  "waitTime": 0.5
                 }
               },
               {
@@ -184,7 +184,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 12.0
+                  "waitTime": 3.25
                 }
               },
               {
@@ -227,6 +227,203 @@
                 "type": "named",
                 "data": {
                   "name": "agitatorIndex"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "[Right Swipe] Reentry 1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "pivotDown"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "rollerIntake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "agitatorIntake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "hoodLayup"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "[Right Swipe] Intake 2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "pivotDown"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "rollerIntake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "agitatorIntake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "[Right Swipe] StageShoot2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "pivotDown"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "rollerIntake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "agitatorIntake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "flywheelDynamic"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "driveHubLock"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.5
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "flywheelDynamic"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "hoodDynamic"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "kickerIndex"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "driveHubLock"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 3.5
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "flywheelDynamic"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "hoodDynamic"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "kickerIndex"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "agitatorIndex"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "indexerIndex"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "pivotShake"
                 }
               }
             ]

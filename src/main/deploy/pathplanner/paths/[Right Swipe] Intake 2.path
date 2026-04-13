@@ -3,61 +3,56 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.933696629212264,
-        "y": 1.0378426966291308
+        "x": 7.281471910117554,
+        "y": 1.0694157303404221
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.933696629212264,
-        "y": 1.7311311315050846
+        "x": 7.3516932933484975,
+        "y": 2.0031704948881686
       },
       "isLocked": false,
-      "linkedName": "[Right Swipe] Entry 1 to Intake 1"
+      "linkedName": "[Right Swipe] Reentry 1 to Intake 2"
     },
     {
       "anchor": {
-        "x": 7.933696629212264,
-        "y": 2.9975487986925713
+        "x": 6.924786516853931,
+        "y": 3.0260898876404485
       },
       "prevControl": {
-        "x": 7.969051968270556,
-        "y": 2.750061425277132
+        "x": 7.639184049069801,
+        "y": 2.8367736612095276
       },
       "nextControl": {
-        "x": 7.892932584269662,
-        "y": 3.282897113299312
+        "x": 6.683127875040819,
+        "y": 3.090129725530952
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.985932584269663,
-        "y": 2.0263707865168543
+        "x": 6.099314606746768,
+        "y": 1.8643146067449163
       },
       "prevControl": {
-        "x": 6.840959608233403,
-        "y": 3.3887350357286063
+        "x": 6.048760951336342,
+        "y": 3.005068379793869
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "[Right Swipe] Intake 1 to StageShoot1"
+      "linkedName": "[Right Swipe] Intake2 to StageShoot2"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.5560165975103781,
-      "rotationDegrees": 102.40100556375558
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.04565756823821024,
-      "maxWaypointRelativePos": 0.3712158808933023,
+      "minWaypointRelativePos": 0.36327543424318565,
+      "maxWaypointRelativePos": 0.6531017369727078,
       "constraints": {
-        "maxVelocity": 1.0,
-        "maxAcceleration": 3.0,
+        "maxVelocity": 2.0,
+        "maxAcceleration": 3.5,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -76,13 +71,13 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 3.0,
+    "velocity": 1.0,
     "rotation": -90.0
   },
   "reversed": false,
   "folder": "[Right] Double Swipe",
   "idealStartingState": {
-    "velocity": 0,
+    "velocity": 2.0,
     "rotation": 102.265
   },
   "useDefaultConstraints": false

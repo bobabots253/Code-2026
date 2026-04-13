@@ -330,31 +330,31 @@ public class RobotContainer {
             () -> -driver.getLeftX(),
             () -> -driver.getRightX()));
 
-    // driver
-    //     .leftBumper()
-    //     .whileTrue(indexerSubsystem.indexCommand())
-    //     .whileTrue(kickerSubsystem.indexCommand())
-    //     .whileTrue(agitatorSubsystem.indexCommand())
-    //     .whileTrue(pivotSubsystem.runSaltAndPepperCommand())
-    //     .whileTrue(rollerSubsystem.intakeCommand());
+    driver
+        .leftBumper()
+        .whileTrue(indexerSubsystem.indexCommand())
+        .whileTrue(kickerSubsystem.indexCommand())
+        .whileTrue(agitatorSubsystem.indexCommand())
+        .whileTrue(pivotSubsystem.runSaltAndPepperCommand())
+        .whileTrue(rollerSubsystem.intakeCommand());
 
-    // driver
-    //     .rightBumper()
-    //     .whileTrue(
-    //         DriveCommands.joystickDriveAtAngle(
-    //             swerveSubsystem,
-    //             () -> -driver.getLeftY(),
-    //             () -> -driver.getLeftX(),
-    //             () -> shotCalculator.getCorrectTargetRotation()))
-    //     .whileTrue(
-    //         hoodSubsystem.dynamicUpdatedShootCommandWithLinearCompensation(
-    //             () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())))
-    //     .whileFalse(hoodSubsystem.trenchHoodCommand());
+    driver
+        .rightBumper()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                swerveSubsystem,
+                () -> -driver.getLeftY(),
+                () -> -driver.getLeftX(),
+                () -> shotCalculator.getCorrectTargetRotation()))
+        .whileTrue(
+            hoodSubsystem.dynamicUpdatedShootCommandWithLinearCompensation(
+                () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())))
+        .whileFalse(hoodSubsystem.trenchHoodCommand());
 
-    // driver
-    //     .b()
-    //     .whileTrue(flywheelSubsystem.juggleCommand())
-    //     .whileTrue(hoodSubsystem.juggleCommand());
+    driver
+        .b()
+        .whileTrue(flywheelSubsystem.juggleCommand())
+        .whileTrue(hoodSubsystem.juggleCommand());
 
     // Reset gyro to 0° when B button is pressed
     driver
@@ -385,21 +385,21 @@ public class RobotContainer {
 
     // ------- Operator Controls -------- \\
 
-    // operator.leftBumper().onTrue(pivotSubsystem.deployCommand());
-    // operator.rightBumper().onTrue(pivotSubsystem.stowCommand());
+    operator.leftBumper().onTrue(pivotSubsystem.deployCommand());
+    operator.rightBumper().onTrue(pivotSubsystem.stowCommand());
 
-    // operator
-    //     .x()
-    //     .whileTrue(rollerSubsystem.intakeCommand())
-    //     .whileTrue(agitatorSubsystem.intakeCommand());
+    operator
+        .x()
+        .whileTrue(rollerSubsystem.intakeCommand())
+        .whileTrue(agitatorSubsystem.intakeCommand());
 
-    // operator.b().whileTrue(rollerSubsystem.runUnjamCommand());
+    operator.b().whileTrue(rollerSubsystem.runUnjamCommand());
 
-    // operator
-    //     .rightTrigger()
-    //     .whileTrue(
-    //         flywheelSubsystem.dynamicUpdatedShootCommand(
-    //             () -> shotCalculator.getCorrectTargetVelocity()));
+    operator
+        .rightTrigger()
+        .whileTrue(
+            flywheelSubsystem.dynamicUpdatedShootCommand(
+                () -> shotCalculator.getCorrectTargetVelocity()));
 
     // Disabled toggleWarm on Operator because of fat-keying during intaking
     operator.a().onTrue(flywheelSubsystem.toggleWarm()); // Shifted from DPad Left
