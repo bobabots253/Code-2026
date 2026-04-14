@@ -36,6 +36,7 @@ public class IndexerIOSpark implements IndexerIO {
     masterSparkMaxConfig
         .idleMode(IdleMode.kCoast)
         .smartCurrentLimit(IndexerConstants.masterCurrentLimit)
+        .voltageCompensation(12.0)
         .signals
         .appliedOutputPeriodMs(20)
         .busVoltagePeriodMs(20)

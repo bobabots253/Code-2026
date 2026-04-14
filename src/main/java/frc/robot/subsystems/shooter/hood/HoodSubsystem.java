@@ -2,6 +2,7 @@ package frc.robot.subsystems.shooter.hood;
 
 import static frc.robot.subsystems.shooter.hood.HoodConstants.highCurrentThreshold;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,6 +20,8 @@ public class HoodSubsystem extends FullSubsystem {
   private final HoodIOOutputs outputs = new HoodIOOutputs();
 
   private Alert masterDisconnected;
+
+  @AutoLogOutput public int shotCompensation = 0;
 
   /*
    * Defines all possible states for the hood. Each goal state has a DoubleSupplier arguement that updates from Robot State. Note: Only input static choices.
@@ -147,6 +150,20 @@ public class HoodSubsystem extends FullSubsystem {
   // vision
   public Command dynamicUpdatedShootCommand(DoubleSupplier positionRad) {
     return run(() -> runAngular(positionRad.getAsDouble())).withName("Hood Shoot");
+    // To test but this will run the Trench angle once interupptted
+    // startEnd(() -> runAngular(positionRad.getAsDouble()), () ->
+    // runAngular(HoodConstants.trenchAngle)).withName("Hood Shoot");
+  }
+
+  public Command dynamicUpdatedShootCommandWithLinearCompensation(DoubleSupplier positionRad) {
+    return run(() ->
+            runAngular(positionRad.getAsDouble() + Units.degreesToRadians(shotCompensation)))
+        .withName("Hood Shoot With Angular Compensation");
+  }
+
+  // This would be used if we want a while false
+  public Command trenchHoodCommand() {
+    return run(() -> runAngular(HoodConstants.trenchAngle)).withName("Hood Trench");
   }
 
   // ----------------------------------LAYUP COMMANDS------------------------------//

@@ -49,7 +49,7 @@ public class HoodConstants {
 
   // ------- GOAL CONSTANTS -------- \\
 
-  public static final double layupAngle = Units.degreesToRadians(41.55); // 41.55 @ 1.5m
+  public static final double layupAngle = Units.degreesToRadians(41.9); // 41.55 @ 1.5m
 
   public static final double debuggingAngleDown = Units.degreesToRadians(5.0); // Change as needed
   public static final double debuggingAngleUp = Units.degreesToRadians(42); // Change as needed
@@ -58,4 +58,6 @@ public class HoodConstants {
 
   public static final double debuggingVoltageUP = -1.0;
   public static final double debuggingVoltageDOWN = 1.0;
+
+  public static final double trenchAngle = Units.degreesToRadians(38.84);
 }

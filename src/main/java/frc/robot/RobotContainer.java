@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.CrossBumpCommand;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.agitator.AgitatorIO;
 import frc.robot.subsystems.agitator.AgitatorIOSim;
@@ -125,10 +126,14 @@ public class RobotContainer {
                 swerveSubsystem::addVisionMeasurement,
                 swerveSubsystem::getRotation,
                 swerveSubsystem::getChassisSpeeds,
-                new VisionIOLimelight(VisionConstants.cameraYellow, swerveSubsystem::getRotation),
-                new VisionIOLimelight(VisionConstants.cameraPurple, swerveSubsystem::getRotation));
-        // new VisionIOLimelight(VisionConstants.cameraPink, swerveSubsystem::getRotation));
-        // new VisionIOLimelight(VisionConstants.cameraOrange, swerveSubsystem::getRotation));
+                new VisionIOLimelight(
+                    VisionConstants.cameraYellow,
+                    swerveSubsystem::getRotation,
+                    swerveSubsystem::getYawVelocityRate),
+                new VisionIOLimelight(
+                    VisionConstants.cameraPink,
+                    swerveSubsystem::getRotation,
+                    swerveSubsystem::getYawVelocityRate));
 
         shotCalculator = new ShotCalculator(swerveSubsystem);
 
@@ -233,7 +238,7 @@ public class RobotContainer {
 
     // ------- Indexer Auto NamedCommands -------- \\
 
-    NamedCommands.registerCommand("indexerIndex", indexerSubsystem.runCurrentCommand());
+    NamedCommands.registerCommand("indexerIndex", indexerSubsystem.indexCommand());
 
     // ------- Kicker Auto NamedCommands -------- \\
 
@@ -265,6 +270,14 @@ public class RobotContainer {
             () -> -driver.getLeftY(),
             () -> -driver.getLeftX(),
             () -> shotCalculator.getCorrectTargetRotation()));
+
+    NamedCommands.registerCommand(
+        "crossBumpNeutralZone",
+        new CrossBumpCommand(swerveSubsystem, CrossBumpCommand.CrossDirection.TO_NEUTRAL));
+
+    NamedCommands.registerCommand(
+        "crossBumpAllianceZone",
+        new CrossBumpCommand(swerveSubsystem, CrossBumpCommand.CrossDirection.TO_ALLIANCE));
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -319,10 +332,11 @@ public class RobotContainer {
 
     driver
         .leftBumper()
-        .whileTrue(indexerSubsystem.runCurrentCommand())
+        .whileTrue(indexerSubsystem.indexCommand())
         .whileTrue(kickerSubsystem.indexCommand())
         .whileTrue(agitatorSubsystem.indexCommand())
-        .whileTrue(pivotSubsystem.runSaltAndPepperCommand());
+        .whileTrue(pivotSubsystem.runSaltAndPepperCommand())
+        .whileTrue(rollerSubsystem.intakeCommand());
 
     driver
         .rightBumper()
@@ -331,7 +345,11 @@ public class RobotContainer {
                 swerveSubsystem,
                 () -> -driver.getLeftY(),
                 () -> -driver.getLeftX(),
-                () -> shotCalculator.getCorrectTargetRotation()));
+                () -> shotCalculator.getCorrectTargetRotation()))
+        .whileTrue(
+            hoodSubsystem.dynamicUpdatedShootCommandWithLinearCompensation(
+                () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())))
+        .whileFalse(hoodSubsystem.trenchHoodCommand());
 
     driver
         .b()
@@ -351,8 +369,19 @@ public class RobotContainer {
                     swerveSubsystem)
                 .ignoringDisable(true));
 
-    driver.povUp().onTrue(hoodSubsystem.runDebuggingUpCommand());
-    driver.povDown().onTrue(hoodSubsystem.runDebuggingDownCommand());
+    driver.povUp().onTrue(Commands.runOnce(() -> hoodSubsystem.shotCompensation--, hoodSubsystem));
+    driver
+        .povDown()
+        .onTrue(Commands.runOnce(() -> hoodSubsystem.shotCompensation++, hoodSubsystem));
+
+    driver
+        .povLeft()
+        .onTrue(Commands.runOnce(() -> hoodSubsystem.shotCompensation = 0, hoodSubsystem));
+
+    driver.povRight().whileTrue(flywheelSubsystem.runDebuggingVelocityCommand());
+
+    driver.leftTrigger().whileTrue(hoodSubsystem.runDebuggingVoltageUpCommand());
+    driver.rightTrigger().whileTrue(hoodSubsystem.runDebuggingVoltageDownCommand());
 
     // ------- Operator Controls -------- \\
 
@@ -367,14 +396,12 @@ public class RobotContainer {
     operator.b().whileTrue(rollerSubsystem.runUnjamCommand());
 
     operator
-        .y()
-        .whileTrue(
-            hoodSubsystem.dynamicUpdatedShootCommand(
-                () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())))
+        .rightTrigger()
         .whileTrue(
             flywheelSubsystem.dynamicUpdatedShootCommand(
                 () -> shotCalculator.getCorrectTargetVelocity()));
 
+    // Disabled toggleWarm on Operator because of fat-keying during intaking
     operator.a().onTrue(flywheelSubsystem.toggleWarm()); // Shifted from DPad Left
 
     operator
@@ -425,6 +452,17 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return autoChooser.get();
   }
+
+  /**
+   * See: https://www.chiefdelphi.com/t/fatal-robot-code-crash/427074/26
+   *
+   * <p>Use this to clear the autonomous command connected to main {@link Robot} class.
+   *
+   * @return
+   */
+  //   public void killAutonomousBuilder(){
+  //     autoChooser.
+  //   }
 
   // Only use for Driver Reset Button Binding
   public Rotation2d returnGlobalSwerveOffset() {

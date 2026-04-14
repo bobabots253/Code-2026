@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.922158156517307,
+        "y": 5.567559408383813
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.560471910112359,
+        "y": 5.543269662921348
+      },
+      "isLocked": false,
+      "linkedName": "[Left Swipe] Intake2 to StageShoot2"
+    },
+    {
+      "anchor": {
+        "x": 2.991056179775281,
+        "y": 5.567559408383813
+      },
+      "prevControl": {
+        "x": 4.580853932584269,
+        "y": 5.553460674157304
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.5,
+    "maxAcceleration": 4.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 4.5,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": "[Left] Double Swipe",
+  "idealStartingState": {
+    "velocity": 3.0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": false
+}

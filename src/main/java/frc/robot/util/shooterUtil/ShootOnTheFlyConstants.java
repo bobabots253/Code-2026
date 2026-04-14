@@ -13,6 +13,9 @@ public class ShootOnTheFlyConstants {
 
   public static final double shooterHeightOffset = 0.5; // Meters, height of shooter from ground
 
+  public static final double shortMissFlywheelCalibration = 0.3; // meters
+  public static final double shortMissHoodCalibration = -5; // degrees
+
   // ------- Transform Constants -------- \\
   public static final Transform3d SHOOTER_TRANSFORM_CENTER =
       new Transform3d(-0.24, 0, 0.5, Rotation3d.kZero);
@@ -52,33 +55,64 @@ public class ShootOnTheFlyConstants {
     // Key: Distance (meters), Value: Shooter Speed (RPM)
     // TO-DO: Combine Interpolators using Units.rotationsPerMinuteToRadiansPerSecond()
     // DO NOT USE THIS
-    FLYWHEEL_RPM_INTERPOLATOR.put(1.0, 3400.0); // Touching Hub //3400
-    FLYWHEEL_RPM_INTERPOLATOR.put(1.5, 3400.0); // 3400
-    FLYWHEEL_RPM_INTERPOLATOR.put(2.0, 3400.0); // 3400
-    FLYWHEEL_RPM_INTERPOLATOR.put(2.5, 3650.0); // 3650
-    FLYWHEEL_RPM_INTERPOLATOR.put(3.0, 3900.0); // 3900
-    FLYWHEEL_RPM_INTERPOLATOR.put(3.5, 3970.0); // 3970
-    FLYWHEEL_RPM_INTERPOLATOR.put(4.0, 4050.0); // 4050
-    FLYWHEEL_RPM_INTERPOLATOR.put(4.5, 4225.0); // 4225
+    // FLYWHEEL_RPM_INTERPOLATOR.put(1.0, 3400.0); // Touching Hub //3400
+    // FLYWHEEL_RPM_INTERPOLATOR.put(1.5, 3400.0); // 3400
+    // FLYWHEEL_RPM_INTERPOLATOR.put(2.0, 3400.0); // 3400
+    // FLYWHEEL_RPM_INTERPOLATOR.put(2.5, 3650.0); // 3650
+    // FLYWHEEL_RPM_INTERPOLATOR.put(3.0, 3900.0); // 3900
+    // FLYWHEEL_RPM_INTERPOLATOR.put(3.5, 3970.0); // 3970
+    // FLYWHEEL_RPM_INTERPOLATOR.put(4.0, 4050.0); // 4050
+    // FLYWHEEL_RPM_INTERPOLATOR.put(4.5, 4225.0); // 4225
 
     // Key: Distance (meters), Value: Shooter Velocity (rad/sec)
-    // USE THIS, BUT FIX FIRST
+    // USE THIS, BUT FIX FIRST\]
     // Touching Hub
-    FLYWHEEL_VELOCITY_INTERPOLATOR.put(2.0, Units.rotationsPerMinuteToRadiansPerSecond(3000));
-    FLYWHEEL_VELOCITY_INTERPOLATOR.put(2.5, Units.rotationsPerMinuteToRadiansPerSecond(3300));
-    FLYWHEEL_VELOCITY_INTERPOLATOR.put(3.0, Units.rotationsPerMinuteToRadiansPerSecond(3300));
-    FLYWHEEL_VELOCITY_INTERPOLATOR.put(3.5, Units.rotationsPerMinuteToRadiansPerSecond(3300));
-    FLYWHEEL_VELOCITY_INTERPOLATOR.put(4.0, Units.rotationsPerMinuteToRadiansPerSecond(3300));
-    // FLYWHEEL_VELOCITY_INTERPOLATOR.put(4.5, Units.rotationsPerMinuteToRadiansPerSecond(3400)); //
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(1.5, Units.rotationsPerMinuteToRadiansPerSecond(2500));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(2.0, Units.rotationsPerMinuteToRadiansPerSecond(2800));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(2.5, Units.rotationsPerMinuteToRadiansPerSecond(2900));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(3.0, Units.rotationsPerMinuteToRadiansPerSecond(3000));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(3.5, Units.rotationsPerMinuteToRadiansPerSecond(3000));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(4.0, Units.rotationsPerMinuteToRadiansPerSecond(3000));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(4.5, Units.rotationsPerMinuteToRadiansPerSecond(3100));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(5.0, Units.rotationsPerMinuteToRadiansPerSecond(3200));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(5.5, Units.rotationsPerMinuteToRadiansPerSecond(3200));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(6.2, Units.rotationsPerMinuteToRadiansPerSecond(3400));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(7.0, Units.rotationsPerMinuteToRadiansPerSecond(3500));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(8.0, Units.rotationsPerMinuteToRadiansPerSecond(3600));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(9.0, Units.rotationsPerMinuteToRadiansPerSecond(3800));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(10.0, Units.rotationsPerMinuteToRadiansPerSecond(4000));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(11.0, Units.rotationsPerMinuteToRadiansPerSecond(4200));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(12.0, Units.rotationsPerMinuteToRadiansPerSecond(4500));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(13.0, Units.rotationsPerMinuteToRadiansPerSecond(4700));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(14.0, Units.rotationsPerMinuteToRadiansPerSecond(4950));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(15.0, Units.rotationsPerMinuteToRadiansPerSecond(5200));
+    FLYWHEEL_VELOCITY_INTERPOLATOR.put(16.0, Units.rotationsPerMinuteToRadiansPerSecond(5450));
+
     // Check
 
     // Key: Distance (meters), Value: Hood Angle (DEGREES)
     // Touching Hub, Using Distance 2d
-    HOOD_DEGREES_INTERPOLATOR.put(2.0, 41.55);
-    HOOD_DEGREES_INTERPOLATOR.put(2.5, 44.7);
-    HOOD_DEGREES_INTERPOLATOR.put(3.0, 41.17);
-    HOOD_DEGREES_INTERPOLATOR.put(3.5, 30.4);
-    HOOD_DEGREES_INTERPOLATOR.put(4.0, 25.85);
+    HOOD_DEGREES_INTERPOLATOR.put(1.5, 41.98);
+    HOOD_DEGREES_INTERPOLATOR.put(2.0, 39.14);
+    HOOD_DEGREES_INTERPOLATOR.put(2.5, 41.90);
+    HOOD_DEGREES_INTERPOLATOR.put(3.0, 41.90);
+    HOOD_DEGREES_INTERPOLATOR.put(3.5, 38.87);
+    HOOD_DEGREES_INTERPOLATOR.put(4.0, 32.27);
+    HOOD_DEGREES_INTERPOLATOR.put(4.5, 27.50);
+    HOOD_DEGREES_INTERPOLATOR.put(5.0, 24.0);
+    HOOD_DEGREES_INTERPOLATOR.put(5.5, 16.0);
+    HOOD_DEGREES_INTERPOLATOR.put(6.2, 5.0);
+    HOOD_DEGREES_INTERPOLATOR.put(7.0, 5.0);
+    HOOD_DEGREES_INTERPOLATOR.put(8.0, 5.0);
+    HOOD_DEGREES_INTERPOLATOR.put(9.0, 5.0);
+    HOOD_DEGREES_INTERPOLATOR.put(10.0, 5.0);
+    HOOD_DEGREES_INTERPOLATOR.put(11.0, 5.0);
+    HOOD_DEGREES_INTERPOLATOR.put(12.0, 5.0);
+    HOOD_DEGREES_INTERPOLATOR.put(13.0, 5.0);
+    HOOD_DEGREES_INTERPOLATOR.put(14.0, 5.0);
+    HOOD_DEGREES_INTERPOLATOR.put(15.0, 5.0);
+    HOOD_DEGREES_INTERPOLATOR.put(16.0, 5.0);
+
     // HOOD_DEGREES_INTERPOLATOR.put(4.0, 31.31); // Check
   }
 }

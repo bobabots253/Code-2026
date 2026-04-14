@@ -17,6 +17,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "toggleHub"
+          }
+        },
+        {
           "type": "race",
           "data": {
             "commands": [
@@ -29,13 +35,13 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "flywheelLayup"
+                  "name": "flywheelDynamic"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "hoodLayup"
+                  "name": "hoodDynamic"
                 }
               }
             ]
@@ -48,13 +54,13 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "flywheelLayup"
+                  "name": "flywheelDynamic"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "hoodLayup"
+                  "name": "hoodDynamic"
                 }
               },
               {
