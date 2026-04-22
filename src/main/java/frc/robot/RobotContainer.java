@@ -369,14 +369,10 @@ public class RobotContainer {
                     swerveSubsystem)
                 .ignoringDisable(true));
 
-    driver.povUp().onTrue(Commands.runOnce(() -> hoodSubsystem.shotCompensation--, hoodSubsystem));
-    driver
-        .povDown()
-        .onTrue(Commands.runOnce(() -> hoodSubsystem.shotCompensation++, hoodSubsystem));
+    driver.povUp().onTrue(hoodSubsystem.decrementShotCompensationCommand());
+    driver.povDown().onTrue(hoodSubsystem.incrementShotCompensationCommand());
 
-    driver
-        .povLeft()
-        .onTrue(Commands.runOnce(() -> hoodSubsystem.shotCompensation = 0, hoodSubsystem));
+    driver.povLeft().onTrue(hoodSubsystem.resetShotCompensationCommand());
 
     driver.povRight().whileTrue(flywheelSubsystem.runDebuggingVelocityCommand());
 
