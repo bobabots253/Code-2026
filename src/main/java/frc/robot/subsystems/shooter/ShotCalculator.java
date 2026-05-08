@@ -194,13 +194,17 @@ public class ShotCalculator extends FullSubsystem {
     fieldToTargetAngle = correctedTargetXYCoords.minus(shooterXYCoords).getAngle();
     // Functionally equivalent to atan2(dy, dx) but avoids the manual subtraction + easier to read
 
-    distanceToTarget2D = shooterXYCoords.getDistance(correctedTargetXYCoords);
+    distanceToTarget2D =
+        shooterXYCoords.getDistance(correctedTargetXYCoords)
+            + ShootOnTheFlyConstants.shortMissFlywheelCalibration;
     distanceToTarget3D =
         shooterPose3d.getTranslation().getDistance(correctedTargetPose3d.getTranslation());
 
     targetSpeedRadPerSec =
         ShootOnTheFlyConstants.FLYWHEEL_VELOCITY_INTERPOLATOR.get(distanceToTarget2D);
-    targetAngleDeg = ShootOnTheFlyConstants.HOOD_DEGREES_INTERPOLATOR.get(distanceToTarget2D);
+    targetAngleDeg =
+        ShootOnTheFlyConstants.HOOD_DEGREES_INTERPOLATOR.get(distanceToTarget2D)
+            + ShootOnTheFlyConstants.shortMissHoodCalibration;
 
     angularError = fieldToTargetAngle.minus(robotPose.getRotation());
 

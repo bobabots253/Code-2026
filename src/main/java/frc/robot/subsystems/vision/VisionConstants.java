@@ -7,31 +7,37 @@
 
 package frc.robot.subsystems.vision;
 
-import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 
-public class VisionConstants {
-  // AprilTag layout - Test FieldConstants from 6328
-  public static AprilTagFieldLayout aprilTagLayout =
-      AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField); // Fix to 2026 Layout
-  //   FieldConstants();
+public final class VisionConstants {
 
-  // Camera names, must match names configured on coprocessor
-  public static String cameraPurple = "limelight-purple"; // BL
-  public static String cameraOrange = "limelight-orange"; // BR
-  public static String cameraYellow = "limelight-yellow"; // FL
-  public static String cameraPink = "limelight-pink"; // FR
+  private VisionConstants() {}
+
+  // ------- APRILTAG FIELD CONSTANTS -------- \\
+
+  public static final AprilTagFieldLayout aprilTagLayout;
+
+  static {
+    aprilTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+    // All California District Events and DCMP should be WELDED fields.
+  }
+
+  // ------- LIMELIGHT NAME -------- \\
+
+  // The User MUST get this right
+  public static final String cameraPurple = "limelight-purple";
+  public static final String cameraOrange = "limelight-orange";
+  public static final String cameraYellow = "limelight-yellow";
+  public static final String cameraPink = "limelight-pink";
 
   // Unused
   public static String cameraPlaceholder = "limelight-placeholder";
 
-  // Robot to camera transforms
-  // (Not used by Limelight, configure in LL Finder UI instead)
+  // ------- LIMELIGHT TRANSFORM (SIM) -------- \\
+
   public static Transform3d cameraTransformToPurple =
       new Transform3d(0.1397, -0.3302, 0.1778, new Rotation3d(0.0, 0.38, 90.0)); // updated 1/22
   public static Transform3d cameraTransformToOrange =
@@ -41,33 +47,71 @@ public class VisionConstants {
   public static Transform3d cameraTransformToBlue =
       new Transform3d(0.127, -0.3302, 0.18415, new Rotation3d(0.0, 0.38, -90.0)); // updated 1/22
 
-  // Basic filtering thresholds
-  public static double maxAmbiguity = 0.3;
-  public static double maxZError = 0.75;
+  // ------- PER-LIMELIGHT TRUST MULTIPLIERS -------- \\
+  // Note: This is indexed in the same order that the cameras are passed into the Vision constructor
+  // Increase the factor equals less trust in that limelight
 
-  // Standard deviation baselines at 1 meter
-  public static double linearStdDevBaseline = 0.04; // Meters
-  public static double angularStdDevBaseline = Double.POSITIVE_INFINITY; // Radians
-
-  // Standard deviation multipliers for each camera
-  // Manual Variance Weighting: (Adjust to trust some cameras more than others)
-  public static double[] cameraStdDevFactors =
+  public static final double[] cameraStdDevFactors =
       new double[] {
         1.0, // Camera 0 - Yellow - L
         1.0, // Camera 1 - Purple - L
-        2.0, // Camera 2 - Pink - R
-        2.0, // Camera 3 - Orange - L
+        1.0, // Camera 2 - Pink - R
+        1.0, // Camera 3 - Orange - L
       };
+
+  // ------- BUMPER CLIPPING MARGIN -------- \\
+
+  public static final double fieldBorderMargin = 0.5; // meters
+
+  // ------- DISCONNECTION UTIL -------- \\
+
+  public static final double ntDisconnectedTimeoutMs = 250.0; // please work
+  public static final double frameDisconnectedTimeoutSec = 0.5;
+
+  // ------- POSE FILTERING CONSTANTS -------- \\
+
+  public static final double maxZError = 0.5; // meters
+
+  public static final double maxLinearSpeed = 4.0; // m/s
+
+  public static final double maxAngularSpeed = Math.toRadians(720); // rad/s (~2 full rotations)
+
+  public static final double maxGyroError = 5.0; // Degrees
+
+  // Only for when only one tag is present
+  public static final double singleTagMinAreaPercent = 0.10; // Percent of Image frame
+  public static final double singleTagMaxAngularVelocityRadPerSec = Math.toRadians(360); // rad/s
+  public static final double singleTagThetaStdDev = Double.POSITIVE_INFINITY; // Redundant but wtv
+
+  // Standard deviation baselines at 1 meter
+  public static final double linearStdDevBaseline = 0.04; // Meters
+  public static final double angularStdDevBaseline = Double.POSITIVE_INFINITY; // Radians
 
   // Multipliers to apply for MegaTag 2 observations
   public static double linearStdDevMegatag2Factor = 0.5; // More stable than full 3D solve
   public static double angularStdDevMegatag2Factor = Double.POSITIVE_INFINITY; // Never Trust
 
-  // Clamping ranges for vision estimates (see units)
-  static final double maxLinearSpeed = 2.0; // Meters per second
-  static final double maxAngularSpeed =
-      DegreesPerSecond.of(270).in(RadiansPerSecond); // Radians per second
-  static final double maxGyroError = 1.0; // Degrees
-  static final double maxTranslationError = 1.0; // Meters
-  static final int LOCK_MODE = 10;
+  // Scale factor applied to Std. Devs. for Limelight's native Std. Devs.
+  // Set to 0.0 to disable the native std dev influence.
+  public static final double limelightStdDevWeight = 0.5;
+
+  // ------- MISC / UTIL  -------- \\
+
+  // Index constants for limelight NT entry for std. dev.
+  // Layout: [MT1x, MT1y, MT1z, MT1roll, MT1pitch, MT1yaw, MT2x, MT2y, MT2z, MT2roll, MT2pitch,
+  // MT2yaw] - IIRC
+  public static final int kMT2XStdDevIndex = 6;
+  public static final int kMT2YStdDevIndex = 7;
+  public static final int kMT2YawStdDevIndex = 11;
+  public static final int kExpectedStdDevLen = 12;
+
+  // Used for avoiding goofy floating point overflow
+  public static final double LARGE_VARIANCE = 1e9;
+
+  // Default (-1): No Tag ID filtering
+  public static final int NO_EXCLUSIVE_TAG = -1;
+
+  // How long AdvnatageScope holds onto the pose visualizer
+  // So I don't need super-ision to see the poses :skull:
+  public static final double tagLogPersistenceSeconds = 0.1;
 }

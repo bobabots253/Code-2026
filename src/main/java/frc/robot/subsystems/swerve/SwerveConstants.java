@@ -69,7 +69,7 @@ public class SwerveConstants {
   public static final int backRightTurnCanId = 6;
 
   // Drive motor configuration (MAXSwerve with 14 pinion teeth and 22 spur teeth)
-  public static final int driveMotorCurrentLimit = 50;
+  public static final int driveMotorCurrentLimit = 50; // Vortex 80A, NEO 60A
 
   // Remeasure the radius in the Makerspace, Run the Wheel Characterization Auto
   public static final double wheelRadiusMeters = Units.inchesToMeters(1.498);
@@ -97,7 +97,7 @@ public class SwerveConstants {
 
   // Turn motor configuration
   public static final boolean turnInverted = false; // <-- Check if Neccessary
-  public static final int turnMotorCurrentLimit = 20;
+  public static final int turnMotorCurrentLimit = 20; // 550 35A, SAFE = 20A
   public static final double turnMotorReduction = 9424.0 / 203.0;
   public static final DCMotor turnGearbox = DCMotor.getNeo550(1);
 
@@ -115,8 +115,8 @@ public class SwerveConstants {
   public static final double turnPIDMaxInput = 2 * Math.PI; // Radians
 
   // PathPlanner configuration (Get Values)
-  public static final double robotMassKg = 74.088;
-  public static final double robotMOI = 6.883;
+  public static final double robotMassKg = 61.088;
+  public static final double robotMOI = 6.583;
   public static final double wheelCOF = 1.2;
   public static final RobotConfig ppConfig =
       new RobotConfig(

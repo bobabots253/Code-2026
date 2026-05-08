@@ -4,15 +4,30 @@
   "holonomicMode": true,
   "pathFolders": [
     "CLB Citrus Auto",
+    "CRB Citrus Auto",
     "Default NZ Auto",
     "Depot Auto",
-    "CRB Citrus Auto",
-    "Testing"
+    "Force Warmup",
+    "Misc",
+    "[Right] Bump Disrupt",
+    "Testing",
+    "[Left] Bump",
+    "[Left] Bump Disrupt",
+    "[Left] Double Swipe",
+    "[Right] Bump",
+    "[Right] Double Swipe"
   ],
   "autoFolders": [
     "Citrus Auto",
     "Default NZ Auto",
-    "TestingSpartan"
+    "Force Warmup",
+    "[Right] Bump Disrupt",
+    "TestingSpartan",
+    "[Left] Bump",
+    "[Left] Bump Disrupt",
+    "[Left] Double Swipe",
+    "[Right] Bump",
+    "[Right] Double Swipe"
   ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,
