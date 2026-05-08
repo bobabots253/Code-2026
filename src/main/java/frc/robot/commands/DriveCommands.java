@@ -15,14 +15,12 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -40,12 +38,6 @@ import java.util.function.Supplier;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
-  private static final double ANGLE_KP = 8.0;
-  private static final double ANGLE_KD = 0.0;
-  private static final double DRIVE_AND_SHOOT_ANGLE_P = 5.0; // experimental value
-  private static final double DRIVE_AND_SHOOT_ANGLE_D = 0.4; // experimental value
-  private static final double ANGLE_MAX_VELOCITY = 999;
-  private static final double ANGLE_MAX_ACCELERATION = 999;
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
@@ -169,94 +161,15 @@ public class DriveCommands {
             drive)
 
         // Reset PID controller when command starts
-        .beforeStarting(() -> angleController.reset()); // (drive.getRotation().getRadians()
-  }
+        .beforeStarting(() -> angleController.reset()) // (drive.getRotation().getRadians()
 
-  public static Command pointAtHub(SwerveSubsystem drive, Supplier<Rotation2d> rotationSupplier) {
-
-    // Create PID controller
-    PIDController angleController = new PIDController(10, 0.0, 0.2); // Broken atm
-    angleController.enableContinuousInput(-Math.PI, Math.PI);
-
-    // Construct command
-    return Commands.run(
-            () -> {
-
-              // Calculate angular speed
-              double omega =
-                  angleController.calculate(
-                      drive.getRotation().getRadians(),
-                      rotationSupplier.get().getRadians()); // atan2 blue-origin setpoint
-
-              // Convert to field relative speeds & send command
-              ChassisSpeeds speeds = new ChassisSpeeds(0, 0, omega);
-
-              drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
-            },
-            drive)
-
-        // Reset PID controller when command starts
-        .beforeStarting(() -> angleController.reset());
-  }
-
-  public static Command joystickDriveAndShootHub(
-      SwerveSubsystem drive,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
-      Pose2d targetPose, // Changed from Rotation2d supplier
-      double driveScalar) {
-
-    // Create PID controller
-    ProfiledPIDController angleController =
-        new ProfiledPIDController(
-            DRIVE_AND_SHOOT_ANGLE_P,
-            0.0,
-            DRIVE_AND_SHOOT_ANGLE_D,
-            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-
-    // Use Radians for consistency with getRadians()
-    angleController.enableContinuousInput(-Math.PI, Math.PI);
-
-    return Commands.run(
-            () -> {
-              // 1. Get current robot state
-              Pose2d currentPose = drive.getPose();
-
-              // 2. Calculate the Angle to Target
-              // We subtract robot translation from target translation to get the heading vector
-              Rotation2d targetAngle =
-                  targetPose.getTranslation().minus(currentPose.getTranslation()).getAngle();
-
-              // 3. Get linear velocity from joysticks
-              Translation2d linearVelocity =
-                  getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-
-              // 4. Calculate angular speed (PID)
-              double omega =
-                  angleController.calculate(
-                      currentPose.getRotation().getRadians(), targetAngle.getRadians());
-
-              // 5. Convert to field relative speeds
-              ChassisSpeeds speeds =
-                  new ChassisSpeeds(
-                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec() * driveScalar,
-                      linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec() * driveScalar,
-                      omega);
-
-              // 6. Handle Alliance Flipping
-              boolean isFlipped =
-                  DriverStation.getAlliance().isPresent()
-                      && DriverStation.getAlliance().get() == Alliance.Red;
-
-              drive.runVelocity(
-                  ChassisSpeeds.fromFieldRelativeSpeeds(
-                      speeds,
-                      isFlipped
-                          ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                          : drive.getRotation()));
-            },
-            drive)
-        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+        // Fixes to close the close the controller
+        .until(angleController::atSetpoint)
+        .finallyDo(
+            (interrupted) -> {
+              drive.stopWithX();
+              angleController.close(); // Closes when command ends or is interrupted
+            });
   }
 
   /**

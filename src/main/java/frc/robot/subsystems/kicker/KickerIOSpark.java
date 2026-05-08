@@ -1,11 +1,7 @@
 package frc.robot.subsystems.kicker;
 
-import static frc.robot.subsystems.kicker.KickerConstants.kA;
-import static frc.robot.subsystems.kicker.KickerConstants.kS;
-import static frc.robot.subsystems.kicker.KickerConstants.kV;
 import static frc.robot.subsystems.kicker.KickerConstants.masterKickerEncoderPositionFactor;
 import static frc.robot.subsystems.kicker.KickerConstants.masterKickerEncoderVelocityFactor;
-import static frc.robot.subsystems.kicker.KickerConstants.maxAcceleration;
 import static frc.robot.subsystems.kicker.KickerConstants.sparkMasterKickerkD;
 import static frc.robot.subsystems.kicker.KickerConstants.sparkMasterKickerkI;
 import static frc.robot.subsystems.kicker.KickerConstants.sparkMasterKickerkP;
@@ -22,9 +18,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import java.util.function.DoubleSupplier;
 
 public class KickerIOSpark implements KickerIO {
@@ -39,12 +33,6 @@ public class KickerIOSpark implements KickerIO {
 
   // Declare WPILib Debouncer for Motor Disconnection Alerts here
   private final Debouncer masterNEODebouncer = new Debouncer(0.25, Debouncer.DebounceType.kFalling);
-
-  private final SimpleMotorFeedforward ffCalculator = new SimpleMotorFeedforward(kS, kV, kA);
-  private final SlewRateLimiter slewRateLimiter = new SlewRateLimiter(maxAcceleration);
-
-  // Hardware State Tracking
-  private boolean wasCoasting = true;
 
   public KickerIOSpark() {
     // Initialize REV motor hardware here
@@ -109,8 +97,6 @@ public class KickerIOSpark implements KickerIO {
 
   @Override
   public void applyOutputs(KickerIOOutputs outputs) {
-    // Utilize the same code logic from the flywheel
-    // See src\main\java\frc\robot\subsystems\shooter\flywheel\FlywheelIOSpark.java
     switch (outputs.mode) {
       case COAST:
       case VELOCITY_SETPOINT:

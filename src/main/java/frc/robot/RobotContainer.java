@@ -87,7 +87,7 @@ public class RobotContainer {
   private final KickerSubsystem kickerSubsystem;
   private final FlywheelSubsystem flywheelSubsystem;
   private final HoodSubsystem hoodSubsystem;
-  private final Vision vision;
+  private final Vision vision; // Flagged as 'Unused' due to no button bindings.
   private final ShotCalculator shotCalculator;
 
   private Alliance lastAppliedAlliance = null;

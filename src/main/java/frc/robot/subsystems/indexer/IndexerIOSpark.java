@@ -3,7 +3,6 @@ package frc.robot.subsystems.indexer;
 import static frc.robot.util.SparkUtil.*;
 
 import com.revrobotics.PersistMode;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase;
@@ -22,8 +21,6 @@ public class IndexerIOSpark implements IndexerIO {
 
   private final SparkClosedLoopController masterNEOController;
 
-  private final RelativeEncoder masterRelativeEncoder;
-
   // Declare WPILib Debouncer for Motor Disconnection Alerts here
   private final Debouncer masterNEODebouncer = new Debouncer(0.25, Debouncer.DebounceType.kFalling);
 
@@ -31,7 +28,6 @@ public class IndexerIOSpark implements IndexerIO {
     // Initialize REV motor hardware here
     masterNEO = new SparkMax(IndexerConstants.sparkMasterIndexerCanId, MotorType.kBrushless);
     masterNEOController = masterNEO.getClosedLoopController();
-    masterRelativeEncoder = masterNEO.getEncoder();
     SparkMaxConfig masterSparkMaxConfig = new SparkMaxConfig();
     masterSparkMaxConfig
         .idleMode(IdleMode.kCoast)
@@ -56,6 +52,8 @@ public class IndexerIOSpark implements IndexerIO {
     // Update all the IndexerIO inputs for the master motor
     // Use SparkStickyFaults to track motor connectivity (See SparkUtil for Implementation)
     sparkStickyFault = false;
+    inputs.masterMotorConnected =
+        masterNEODebouncer.calculate(!sparkStickyFault); // Force Connectivity Check
     ifOk(
         masterNEO,
         new DoubleSupplier[] {masterNEO::getAppliedOutput, masterNEO::getBusVoltage},

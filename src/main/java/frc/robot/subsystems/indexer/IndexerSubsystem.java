@@ -137,10 +137,10 @@ public class IndexerSubsystem extends FullSubsystem {
             () -> {
               ShooterSubsystemParameters coordinator =
                   RobotState.getInstance().getShotCoordinatorData();
-              double error =
-                  Math.abs(
-                      coordinator.flywheelVelocityRadPerSec()
-                          - coordinator.flywheelVelocityGoalRadPerSec());
+              // double error =
+              //     Math.abs(
+              //         coordinator.flywheelVelocityRadPerSec()
+              //             - coordinator.flywheelVelocityGoalRadPerSec());
               if (coordinator.flywheelVelocityRadPerSec()
                   > Units.rotationsPerMinuteToRadiansPerSecond(1000)) {
                 setGoal(Goal.CURRENT);

@@ -27,13 +27,6 @@ public class fieldSetup {
                   Units.inchesToMeters(35.00),
                   oneEightyRotation));
           put(
-              1,
-              new Pose3d(
-                  Units.inchesToMeters(467.64),
-                  Units.inchesToMeters(292.31),
-                  Units.inchesToMeters(35.00),
-                  oneEightyRotation));
-          put(
               2,
               new Pose3d(
                   Units.inchesToMeters(469.11),
