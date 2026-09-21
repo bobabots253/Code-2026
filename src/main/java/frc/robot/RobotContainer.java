@@ -267,8 +267,8 @@ public class RobotContainer {
         "driveHubLock",
         DriveCommands.joystickDriveAtAngle(
             swerveSubsystem,
-            () -> -driver.getLeftY() * 0.01,
-            () -> -driver.getLeftX(),
+            () -> -driver.getLeftY() * 0.5,
+            () -> -driver.getLeftX() * 0.5,
             () -> shotCalculator.getCorrectTargetRotation()));
 
     NamedCommands.registerCommand(
