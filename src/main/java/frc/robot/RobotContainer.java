@@ -267,7 +267,7 @@ public class RobotContainer {
         "driveHubLock",
         DriveCommands.joystickDriveAtAngle(
             swerveSubsystem,
-            () -> -driver.getLeftY(),
+            () -> -driver.getLeftY() * 0.01,
             () -> -driver.getLeftX(),
             () -> shotCalculator.getCorrectTargetRotation()));
 
@@ -326,9 +326,9 @@ public class RobotContainer {
     swerveSubsystem.setDefaultCommand(
         DriveCommands.joystickDrive(
             swerveSubsystem,
-            () -> -driver.getLeftY(),
-            () -> -driver.getLeftX(),
-            () -> -driver.getRightX()));
+            () -> -driver.getLeftY() * 0.5,
+            () -> -driver.getLeftX() * 0.5,
+            () -> -driver.getRightX() * 0.5));
 
     driver
         .leftBumper()
@@ -343,8 +343,8 @@ public class RobotContainer {
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 swerveSubsystem,
-                () -> -driver.getLeftY(),
-                () -> -driver.getLeftX(),
+                () -> -driver.getLeftY()*0.5,
+                () -> -driver.getLeftX()*0.5,
                 () -> shotCalculator.getCorrectTargetRotation()))
         .whileTrue(
             hoodSubsystem.dynamicUpdatedShootCommandWithLinearCompensation(
