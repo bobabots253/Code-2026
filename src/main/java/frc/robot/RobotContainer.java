@@ -343,8 +343,8 @@ public class RobotContainer {
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 swerveSubsystem,
-                () -> -driver.getLeftY()*0.5,
-                () -> -driver.getLeftX()*0.5,
+                () -> -driver.getLeftY() * 0.5,
+                () -> -driver.getLeftX() * 0.5,
                 () -> shotCalculator.getCorrectTargetRotation()))
         .whileTrue(
             hoodSubsystem.dynamicUpdatedShootCommandWithLinearCompensation(
@@ -396,10 +396,16 @@ public class RobotContainer {
     operator.b().whileTrue(rollerSubsystem.runUnjamCommand());
 
     operator
+        .povDown()
+        .whileTrue(indexerSubsystem.indexCommand())
+        .whileTrue(kickerSubsystem.indexCommand())
+        .whileTrue(agitatorSubsystem.indexCommand());
+
+    operator
         .rightTrigger()
         .whileTrue(
             flywheelSubsystem.dynamicUpdatedShootCommand(
-                () -> shotCalculator.getCorrectTargetVelocity()));
+                () -> shotCalculator.getCorrectTargetVelocity() * 0.5));
 
     // Disabled toggleWarm on Operator because of fat-keying during intaking
     operator.a().onTrue(flywheelSubsystem.toggleWarm()); // Shifted from DPad Left
