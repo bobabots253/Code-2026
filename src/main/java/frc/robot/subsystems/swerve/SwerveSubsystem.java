@@ -113,16 +113,7 @@ public class SwerveSubsystem extends FullSubsystem {
     // Start odometry thread
     SparkOdometryThread.getInstance().start();
     
-    FollowPath.Builder pathBuilder = new FollowPath.Builder(
-    this,
-    this::getPose,
-    this::getChassisSpeeds,
-    this::runVelocity,
-    new PIDController(2.0, 0.0, 0.0),
-    new PIDController(1.0, 0.0, 0.0),
-    new PIDController(0.2, 0.0, 0.0)
-).withDefaultShouldFlip()
- .withTRatioBasedTranslationHandoffs(true);
+
 
     // Pathfinding.setPathfinder(new LocalADStarAK());
     // PathPlannerLogging.setLogActivePathCallback(

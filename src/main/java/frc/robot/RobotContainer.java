@@ -15,6 +15,7 @@ package frc.robot;
 
 import edu.wpi.first.math.controller.PIDController;
 import frc.robot.lib.BLine.FollowPath;
+import frc.robot.lib.BLine.Path;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -227,7 +228,16 @@ public class RobotContainer {
         break;
     }
 
-
+    FollowPath.Builder pathBuilder = new FollowPath.Builder(
+    swerveSubsystem,
+    swerveSubsystem::getPose,
+    swerveSubsystem::getChassisSpeeds,
+    swerveSubsystem::runVelocity,
+    new PIDController(2.0, 0.0, 0.0),
+    new PIDController(1.0, 0.0, 0.0),
+    new PIDController(0.0, 0.0, 0.0)
+).withDefaultShouldFlip()
+ .withTRatioBasedTranslationHandoffs(true);
 
 
     // ------- Intake Auto NamedCommands -------- \\
@@ -286,10 +296,19 @@ public class RobotContainer {
         "crossBumpAllianceZone",
         new CrossBumpCommand(swerveSubsystem, CrossBumpCommand.CrossDirection.TO_ALLIANCE));
 
+    Path firstStraight = new Path("First Path");
+    
+    Command firstAuto = pathBuilder
+    .build(firstStraight);
+
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
+        autoChooser.addOption(
+        "1M Test",
+        firstAuto);
     // Set up SysId routines
+
+
     autoChooser.addOption(
         "Drive Wheel Radius Characterization",
         DriveCommands.wheelRadiusCharacterization(swerveSubsystem));
