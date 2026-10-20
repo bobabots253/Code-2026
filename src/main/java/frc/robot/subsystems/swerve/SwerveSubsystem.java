@@ -16,6 +16,8 @@ package frc.robot.subsystems.swerve;
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.swerve.SwerveConstants.*;
 
+import edu.wpi.first.math.controller.PIDController;
+import frc.robot.lib.BLine.FollowPath;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -110,27 +112,27 @@ public class SwerveSubsystem extends FullSubsystem {
 
     // Start odometry thread
     SparkOdometryThread.getInstance().start();
+    
+    FollowPath.Builder pathBuilder = new FollowPath.Builder(
+    this,
+    this::getPose,
+    this::getChassisSpeeds,
+    this::runVelocity,
+    new PIDController(2.0, 0.0, 0.0),
+    new PIDController(1.0, 0.0, 0.0),
+    new PIDController(0.2, 0.0, 0.0)
+).withDefaultShouldFlip()
+ .withTRatioBasedTranslationHandoffs(true);
 
-    // Configure AutoBuilder for PathPlanner
-    AutoBuilder.configure(
-        this::getPose,
-        this::setPose,
-        this::getChassisSpeeds,
-        this::runVelocity,
-        new PPHolonomicDriveController(
-            new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
-        ppConfig,
-        () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
-        this);
-    Pathfinding.setPathfinder(new LocalADStarAK());
-    PathPlannerLogging.setLogActivePathCallback(
-        (activePath) -> {
-          Logger.recordOutput("Odometry/Trajectory", activePath.toArray(new Pose2d[0]));
-        });
-    PathPlannerLogging.setLogTargetPoseCallback(
-        (targetPose) -> {
-          Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
-        });
+    // Pathfinding.setPathfinder(new LocalADStarAK());
+    // PathPlannerLogging.setLogActivePathCallback(
+    //     (activePath) -> {
+    //       Logger.recordOutput("Odometry/Trajectory", activePath.toArray(new Pose2d[0]));
+    //     });
+    // PathPlannerLogging.setLogTargetPoseCallback(
+    //     (targetPose) -> {
+    //       Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
+    //     });
 
     // Configure SysId
     sysId =
