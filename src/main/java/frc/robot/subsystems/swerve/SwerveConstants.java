@@ -24,8 +24,10 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
 
 public class SwerveConstants {
-  public static final double maxSpeedMetersPerSec = 5.74; // <- Check
+  ///public static final double maxSpeedMetersPerSec = 5.74; w/ Vortexes
+
   public static final double odometryFrequency = 50; // Hz, Test faster than periodic block timing
+  public static final double maxSpeedMetersPerSec = 4.8; 
   public static final double trackWidth = Units.inchesToMeters(26.5);
   public static final double wheelBase = Units.inchesToMeters(26.5);
 
@@ -69,7 +71,7 @@ public class SwerveConstants {
   public static final int backRightTurnCanId = 6;
 
   // Drive motor configuration (MAXSwerve with 14 pinion teeth and 22 spur teeth)
-  public static final int driveMotorCurrentLimit = 50; // Vortex 80A, NEO 60A
+  public static final int driveMotorCurrentLimit = 40; // Vortex 80A, NEO 60A
 
   // Remeasure the radius in the Makerspace, Run the Wheel Characterization Auto
   public static final double wheelRadiusMeters = Units.inchesToMeters(1.498);
