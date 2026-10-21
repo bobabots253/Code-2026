@@ -13,13 +13,8 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.controller.PIDController;
-import frc.robot.lib.BLine.FollowPath;
-import frc.robot.lib.BLine.Path;
-
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -29,10 +24,13 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.CrossBumpCommand;
 import frc.robot.commands.DriveCommands;
+import frc.robot.lib.BLine.FollowPath;
+import frc.robot.lib.BLine.Path;
 import frc.robot.subsystems.agitator.AgitatorIO;
 import frc.robot.subsystems.agitator.AgitatorIOSim;
 import frc.robot.subsystems.agitator.AgitatorIOSpark;
@@ -228,17 +226,17 @@ public class RobotContainer {
         break;
     }
 
-    FollowPath.Builder pathBuilder = new FollowPath.Builder(
-    swerveSubsystem,
-    swerveSubsystem::getPose,
-    swerveSubsystem::getChassisSpeeds,
-    swerveSubsystem::runVelocity,
-    new PIDController(2.0, 0.0, 0.0),
-    new PIDController(1.0, 0.0, 0.0),
-    new PIDController(0.0, 0.0, 0.0)
-).withDefaultShouldFlip()
- .withTRatioBasedTranslationHandoffs(true);
-
+    FollowPath.Builder pathBuilder =
+        new FollowPath.Builder(
+                swerveSubsystem,
+                swerveSubsystem::getPose,
+                swerveSubsystem::getChassisSpeeds,
+                swerveSubsystem::runVelocity,
+                new PIDController(2.0, 0.0, 0.0),
+                new PIDController(1.0, 0.0, 0.0),
+                new PIDController(0.0, 0.0, 0.0))
+            .withDefaultShouldFlip()
+            .withTRatioBasedTranslationHandoffs(true);
 
     // ------- Intake Auto NamedCommands -------- \\
 
@@ -296,18 +294,15 @@ public class RobotContainer {
         "crossBumpAllianceZone",
         new CrossBumpCommand(swerveSubsystem, CrossBumpCommand.CrossDirection.TO_ALLIANCE));
 
-    Path firstStraight = new Path("First Path");
-    
-    Command firstAuto = pathBuilder
-    .build(firstStraight);
+    Path firstStraight = new Path("First_Path");
+
+    Command firstAuto = pathBuilder.build(firstStraight);
 
     // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-        autoChooser.addOption(
-        "1M Test",
-        firstAuto);
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices");
+    autoChooser.addDefaultOption("None", new InstantCommand());
+    autoChooser.addOption("1M Test", firstAuto);
     // Set up SysId routines
-
 
     autoChooser.addOption(
         "Drive Wheel Radius Characterization",

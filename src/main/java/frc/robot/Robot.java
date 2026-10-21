@@ -13,7 +13,6 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
@@ -159,8 +158,8 @@ public class Robot extends LoggedRobot {
     // Handle PathPlanner States Initialization by Running an Auto Routine
     // Should not actually drive, only warmups up the PathPlanner library
     // See: https://www.chiefdelphi.com/t/pathplanner-initial-lag-after-deploying-code/455068/7
-    Command forcedAutoInitCommand = new PathPlannerAuto("Force Warmup").ignoringDisable(true);
-    CommandScheduler.getInstance().schedule(forcedAutoInitCommand);
+    // Command forcedAutoInitCommand = new PathPlannerAuto("Force Warmup").ignoringDisable(true);
+    // CommandScheduler.getInstance().schedule(forcedAutoInitCommand);
   }
 
   /** This function is called periodically when disabled. */

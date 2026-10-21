@@ -24,10 +24,10 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
 
 public class SwerveConstants {
-  ///public static final double maxSpeedMetersPerSec = 5.74; w/ Vortexes
+  /// public static final double maxSpeedMetersPerSec = 5.74; w/ Vortexes
 
   public static final double odometryFrequency = 50; // Hz, Test faster than periodic block timing
-  public static final double maxSpeedMetersPerSec = 4.8; 
+  public static final double maxSpeedMetersPerSec = 4.8;
   public static final double trackWidth = Units.inchesToMeters(26.5);
   public static final double wheelBase = Units.inchesToMeters(26.5);
 
@@ -52,7 +52,7 @@ public class SwerveConstants {
   public static final Distance ROBOT_WIDTH = FRAME_WIDTH.plus(BUMPER_THICKNESS.times(2));
 
   // Zeroed rotation values for each module, Setup Step 1: Rotation2d(0.0); |
-  public static final Rotation2d frontLeftZeroRotation = new Rotation2d((3 * Math.PI / 2));
+  public static final Rotation2d frontLeftZeroRotation = new Rotation2d((Math.PI / 2));
   public static final Rotation2d frontRightZeroRotation = new Rotation2d();
   public static final Rotation2d backLeftZeroRotation = new Rotation2d((Math.PI));
   public static final Rotation2d backRightZeroRotation = new Rotation2d((Math.PI / 2));
