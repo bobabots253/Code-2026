@@ -25,14 +25,57 @@
       "default_auto_velocity_merge_tolerance_meters_per_sec": 0.3
     }
   },
-  "active_path_file_name": "First_Path.json",
+  "active_path_file_name": "pidtest1.json",
   "active_path_group_id": null,
   "path_groups": [],
-  "linked_targets": [],
+  "linked_targets": [
+    {
+      "target_id": "target-50052694",
+      "display_name": "endingPos",
+      "kind": "waypoint",
+      "x_meters": 3.4,
+      "y_meters": 3.7,
+      "rotation_radians": 0.0
+    },
+    {
+      "target_id": "target-5270998b",
+      "display_name": "startPos",
+      "kind": "waypoint",
+      "x_meters": 2.0,
+      "y_meters": 6.0,
+      "rotation_radians": -3.14159
+    }
+  ],
   "paths": {
     "First_Path.json": {
       "display_name": "First Path",
-      "editor_metadata": null
+      "editor_metadata": {
+        "linked_targets": [
+          {
+            "element_index": 0.0,
+            "target_id": "target-50052694"
+          },
+          {
+            "element_index": 1.0,
+            "target_id": "target-5270998b"
+          }
+        ]
+      }
+    },
+    "pidtest1.json": {
+      "display_name": "pidTest1",
+      "editor_metadata": {
+        "linked_targets": [
+          {
+            "element_index": 0.0,
+            "target_id": "target-5270998b"
+          },
+          {
+            "element_index": 1.0,
+            "target_id": "target-50052694"
+          }
+        ]
+      }
     }
   },
   "field_assets": {}

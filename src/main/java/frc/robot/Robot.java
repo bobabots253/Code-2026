@@ -203,10 +203,10 @@ public class Robot extends LoggedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
-    if (autonomousCommand != null) {
-      autonomousCommand.cancel();
-      autonomousCommand = null;
-    }
+    // if (autonomousCommand != null) {
+    //   autonomousCommand.cancel();
+    //   autonomousCommand = null;
+    // }
 
     // Handle edge case where alliance data isn't recieved before enabled
     if (!hasInitializedAlliancePose) {

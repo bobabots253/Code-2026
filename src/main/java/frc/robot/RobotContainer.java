@@ -232,8 +232,8 @@ public class RobotContainer {
                 swerveSubsystem::getPose,
                 swerveSubsystem::getChassisSpeeds,
                 swerveSubsystem::runVelocity,
-                new PIDController(2.0, 0.0, 0.0),
-                new PIDController(1.0, 0.0, 0.0),
+                new PIDController(3.5, 0.0, 0.25),
+                new PIDController(1.5, 0.0, 0.0),
                 new PIDController(0.0, 0.0, 0.0))
             .withDefaultShouldFlip()
             .withTRatioBasedTranslationHandoffs(true);
@@ -295,13 +295,16 @@ public class RobotContainer {
         new CrossBumpCommand(swerveSubsystem, CrossBumpCommand.CrossDirection.TO_ALLIANCE));
 
     Path firstStraight = new Path("First_Path");
+    Path pidTest = new Path("pidtest1");
 
     Command firstAuto = pathBuilder.build(firstStraight);
+    Command pidAuto = pathBuilder.build(pidTest);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices");
     autoChooser.addDefaultOption("None", new InstantCommand());
     autoChooser.addOption("1M Test", firstAuto);
+    autoChooser.addOption("Pid testing Auto", pidAuto);
     // Set up SysId routines
 
     autoChooser.addOption(
