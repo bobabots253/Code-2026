@@ -38,6 +38,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.lib.BLine.FollowPath;
 import frc.robot.util.FullSubsystem;
 import frc.robot.util.swerveUtil.ChassisAccelerations;
 import java.util.concurrent.locks.Lock;
@@ -124,6 +125,8 @@ public class SwerveSubsystem extends FullSubsystem {
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+
+    configureBlineLog();
   }
 
   @Override
@@ -372,6 +375,18 @@ public class SwerveSubsystem extends FullSubsystem {
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
     return maxSpeedMetersPerSec / driveBaseRadius;
+  }
+
+  private void configureBlineLog() {
+
+    FollowPath.setDoubleLoggingConsumer(
+        value -> Logger.recordOutput(value.getFirst(), value.getSecond()));
+    FollowPath.setBooleanLoggingConsumer(
+        value -> Logger.recordOutput(value.getFirst(), value.getSecond()));
+    FollowPath.setPoseLoggingConsumer(
+        value -> Logger.recordOutput(value.getFirst(), value.getSecond()));
+    FollowPath.setTranslationListLoggingConsumer(
+        value -> Logger.recordOutput(value.getFirst(), value.getSecond()));
   }
 
   @Override

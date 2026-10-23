@@ -13,7 +13,6 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -25,10 +24,11 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.CrossBumpCommand;
 import frc.robot.commands.DriveCommands;
+import frc.robot.lib.BLine.BLineCommands;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
 import frc.robot.subsystems.agitator.AgitatorIO;
@@ -238,47 +238,47 @@ public class RobotContainer {
             .withDefaultShouldFlip()
             .withTRatioBasedTranslationHandoffs(true);
 
-    // ------- Intake Auto NamedCommands -------- \\
+    // ------- Intake Auto EventTrigger -------- \\
 
-    NamedCommands.registerCommand("pivotDown", pivotSubsystem.deployCommand());
-    NamedCommands.registerCommand("pivotUp", pivotSubsystem.stowCommand());
-    NamedCommands.registerCommand("pivotShake", pivotSubsystem.runSaltAndPepperCommand());
+    FollowPath.registerEventTrigger("pivotDown", pivotSubsystem.deployCommand());
+    FollowPath.registerEventTrigger("pivotUp", pivotSubsystem.stowCommand());
+    FollowPath.registerEventTrigger("pivotShake", pivotSubsystem.runSaltAndPepperCommand());
 
-    NamedCommands.registerCommand("rollerIntake", rollerSubsystem.intakeCommand());
+    FollowPath.registerEventTrigger("rollerIntake", rollerSubsystem.intakeCommand());
 
-    // ------- Agitator Auto NamedCommands -------- \\
+    // ------- Agitator Auto EventTrigger -------- \\
 
-    NamedCommands.registerCommand("agitatorIntake", agitatorSubsystem.intakeCommand());
-    NamedCommands.registerCommand("agitatorIndex", agitatorSubsystem.indexCommand());
+    FollowPath.registerEventTrigger("agitatorIntake", agitatorSubsystem.intakeCommand());
+    FollowPath.registerEventTrigger("agitatorIndex", agitatorSubsystem.indexCommand());
 
-    // ------- Indexer Auto NamedCommands -------- \\
+    // ------- Indexer Auto EventTrigger -------- \\
 
-    NamedCommands.registerCommand("indexerIndex", indexerSubsystem.indexCommand());
+    FollowPath.registerEventTrigger("indexerIndex", indexerSubsystem.indexCommand());
 
-    // ------- Kicker Auto NamedCommands -------- \\
+    // ------- Kicker Auto EventTrigger -------- \\
 
-    NamedCommands.registerCommand("kickerIndex", kickerSubsystem.indexCommand());
+    FollowPath.registerEventTrigger("kickerIndex", kickerSubsystem.indexCommand());
 
-    // ------- Shooter Auto NamedCommands -------- \\
+    // ------- Shooter Auto EventTrigger -------- \\
 
-    NamedCommands.registerCommand("flywheelLayup", flywheelSubsystem.runLayupCommand());
-    NamedCommands.registerCommand(
+    FollowPath.registerEventTrigger("flywheelLayup", flywheelSubsystem.runLayupCommand());
+    FollowPath.registerEventTrigger(
         "flywheelDynamic",
         flywheelSubsystem.dynamicUpdatedShootCommand(
             () -> shotCalculator.getCorrectTargetVelocity()));
-    NamedCommands.registerCommand("toggleWarm", flywheelSubsystem.toggleWarm());
+    FollowPath.registerEventTrigger("toggleWarm", flywheelSubsystem.toggleWarm());
 
-    NamedCommands.registerCommand("hoodLayup", hoodSubsystem.runLayupCommand());
-    NamedCommands.registerCommand(
+    FollowPath.registerEventTrigger("hoodLayup", hoodSubsystem.runLayupCommand());
+    FollowPath.registerEventTrigger(
         "hoodDynamic",
         hoodSubsystem.dynamicUpdatedShootCommand(
             () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())));
 
-    NamedCommands.registerCommand("toggleHub", shotCalculator.toggleShotMode(ShotMode.HUB));
+    FollowPath.registerEventTrigger("toggleHub", shotCalculator.toggleShotMode(ShotMode.HUB));
 
-    // ------- Drive Auto NamedCommands -------- \\
+    // ------- Drive Auto EventTrigger -------- \\
 
-    NamedCommands.registerCommand(
+    FollowPath.registerEventTrigger(
         "driveHubLock",
         DriveCommands.joystickDriveAtAngle(
             swerveSubsystem,
@@ -286,25 +286,97 @@ public class RobotContainer {
             () -> -driver.getLeftX(),
             () -> shotCalculator.getCorrectTargetRotation()));
 
-    NamedCommands.registerCommand(
-        "crossBumpNeutralZone",
-        new CrossBumpCommand(swerveSubsystem, CrossBumpCommand.CrossDirection.TO_NEUTRAL));
-
-    NamedCommands.registerCommand(
-        "crossBumpAllianceZone",
-        new CrossBumpCommand(swerveSubsystem, CrossBumpCommand.CrossDirection.TO_ALLIANCE));
-
     Path firstStraight = new Path("First_Path");
     Path pidTest = new Path("pidtest1");
+    Path spiral = new Path("spiral");
+    Path intakePart1 = new Path("intakeshoot");
+    Path intakePart2 = new Path("intaketoshoot");
+    Path oneSwipeEntry = new Path("oneSwipeEntry");
+    Path oneSwipeIntake = new Path("oneswipeintake");
+    Path oneSwipeReEntry = new Path("oneswipereentry");
+    Path oneSwipeRightEntry = new Path("oneSwipeRightEntry");
+    Path oneSwipeRightIntake = new Path("oneswipeRightintake");
+    Path oneSwipeRightReEntry = new Path("oneswipeRightreentry");
 
     Command firstAuto = pathBuilder.build(firstStraight);
     Command pidAuto = pathBuilder.build(pidTest);
 
+    Command shootingSequence =
+        BLineCommands.sequence(
+            DriveCommands.joystickDriveAtAngle(
+                swerveSubsystem,
+                () -> -driver.getLeftY(),
+                () -> -driver.getLeftX(),
+                () -> shotCalculator.getCorrectTargetRotation()),
+            BLineCommands.race(
+                hoodSubsystem.dynamicUpdatedShootCommand(
+                    () -> Units.degreesToRadians(shotCalculator.getCorrectedTargetAngle())),
+                flywheelSubsystem.dynamicUpdatedShootCommand(
+                    () -> shotCalculator.getCorrectTargetVelocity()),
+                BLineCommands.sequence(
+                    new WaitCommand(.75),
+                    BLineCommands.parallel(
+                        pivotSubsystem.runSaltAndPepperCommand(),
+                        kickerSubsystem.indexCommand(),
+                        agitatorSubsystem.intakeCommand(),
+                        indexerSubsystem.indexCommand())),
+                new WaitCommand(6)));
+
+    Command shootAuto =
+        BLineCommands.sequence(
+            flywheelSubsystem.toggleWarm(),
+            BLineCommands.parallel(
+                pathBuilder.build(spiral),
+                BLineCommands.sequence(
+                    new WaitCommand(3),
+                    BLineCommands.race(rollerSubsystem.intakeCommand(), new WaitCommand(2)))),
+            shootingSequence);
+    Command intakeAuto =
+        BLineCommands.sequence(
+            flywheelSubsystem.toggleWarm(),
+            BLineCommands.parallel(
+                pathBuilder.build(intakePart1),
+                BLineCommands.sequence(
+                    new WaitCommand(.5),
+                    BLineCommands.race(rollerSubsystem.intakeCommand(), new WaitCommand(1)))),
+            pathBuilder.build(intakePart2),
+            shootingSequence);
+    
+    Command oneSwipeCommand = 
+        BLineCommands.sequence(
+            flywheelSubsystem.toggleWarm(),
+            BLineCommands.race(pivotSubsystem.deployCommand(), new WaitCommand(1)),
+            pathBuilder.build(oneSwipeEntry),
+            BLineCommands.race(
+                pathBuilder.build(oneSwipeIntake),
+                rollerSubsystem.intakeCommand()),
+            pathBuilder.build(oneSwipeReEntry),
+            shootingSequence
+        );
+    
+    Command oneSwipeRightCommand = 
+        BLineCommands.sequence(
+            flywheelSubsystem.toggleWarm(),
+            BLineCommands.race(pivotSubsystem.deployCommand(), new WaitCommand(1)),
+            pathBuilder.build(oneSwipeRightEntry),
+            BLineCommands.race(
+                pathBuilder.build(oneSwipeRightIntake),
+                rollerSubsystem.intakeCommand()),
+            pathBuilder.build(oneSwipeRightReEntry),
+            shootingSequence
+        );
+    
+
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices");
     autoChooser.addDefaultOption("None", new InstantCommand());
-    autoChooser.addOption("1M Test", firstAuto);
-    autoChooser.addOption("Pid testing Auto", pidAuto);
+
+    // autoChooser.addOption("1M Test", firstAuto);
+    // autoChooser.addOption("Pid testing Auto", pidAuto);
+    // autoChooser.addOption("Shoot firstAuto", shootAuto);
+    // autoChooser.addOption("intakeAuto", intakeAuto);
+    autoChooser.addOption("oneSwipeLeft", oneSwipeCommand);
+    autoChooser.addOption("oneSwipeRight", oneSwipeRightCommand);
     // Set up SysId routines
 
     autoChooser.addOption(

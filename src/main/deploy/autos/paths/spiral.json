@@ -1,0 +1,91 @@
+{
+  "path_elements": [
+    {
+      "type": "waypoint",
+      "translation_target": {
+        "x_meters": 3.4,
+        "y_meters": 3.7,
+        "intermediate_handoff_radius_meters": 0.45
+      },
+      "rotation_target": {
+        "rotation_radians": 0.0,
+        "profiled_rotation": true
+      }
+    },
+    {
+      "type": "translation",
+      "x_meters": 3.53289,
+      "y_meters": 5.72245,
+      "intermediate_handoff_radius_meters": 0.45
+    },
+    {
+      "type": "event_trigger",
+      "t_ratio": 0.9,
+      "lib_key": "pivotDown"
+    },
+    {
+      "type": "translation",
+      "x_meters": 2.63533,
+      "y_meters": 6.01754,
+      "intermediate_handoff_radius_meters": 0.45
+    },
+    {
+      "type": "translation",
+      "x_meters": 1.99597,
+      "y_meters": 5.8823,
+      "intermediate_handoff_radius_meters": 0.45
+    },
+    {
+      "type": "translation",
+      "x_meters": 1.97138,
+      "y_meters": 4.24701,
+      "intermediate_handoff_radius_meters": 0.45
+    },
+    {
+      "type": "translation",
+      "x_meters": 2.7091,
+      "y_meters": 4.22242,
+      "intermediate_handoff_radius_meters": 0.45
+    },
+    {
+      "type": "translation",
+      "x_meters": 2.9673,
+      "y_meters": 4.71423,
+      "intermediate_handoff_radius_meters": 0.45
+    },
+    {
+      "type": "translation",
+      "x_meters": 2.46319,
+      "y_meters": 4.83719,
+      "intermediate_handoff_radius_meters": 0.45
+    },
+    {
+      "type": "waypoint",
+      "translation_target": {
+        "x_meters": 2.4263,
+        "y_meters": 5.41507,
+        "intermediate_handoff_radius_meters": 0.45
+      },
+      "rotation_target": {
+        "rotation_radians": 0.5236,
+        "profiled_rotation": true
+      }
+    }
+  ],
+  "constraints": {
+    "max_velocity_meters_per_sec": [
+      {
+        "value": 3.0,
+        "start_ordinal": 0,
+        "end_ordinal": 7
+      }
+    ],
+    "max_velocity_deg_per_sec": [
+      {
+        "value": 720.0,
+        "start_ordinal": 0,
+        "end_ordinal": 0
+      }
+    ]
+  }
+}
