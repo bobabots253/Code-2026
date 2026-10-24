@@ -359,10 +359,8 @@ public class RobotContainer {
             flywheelSubsystem.toggleWarm(),
             shotCalculator.toggleShotMode(ShotMode.HUB),
             BLineCommands.race(pivotSubsystem.deployCommand(), new WaitCommand(1)),
-            pathBuilder.build(oneSwipeRightEntry),
             BLineCommands.race(
                 pathBuilder.build(oneSwipeRightIntake), rollerSubsystem.intakeCommand()),
-            pathBuilder.build(oneSwipeRightReEntry),
             shootingSequence);
 
     Command shootPreload =
