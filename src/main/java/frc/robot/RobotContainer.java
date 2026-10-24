@@ -233,7 +233,7 @@ public class RobotContainer {
                 swerveSubsystem::getChassisSpeeds,
                 swerveSubsystem::runVelocity,
                 new PIDController(3.5, 0.0, 0.25),
-                new PIDController(1.5, 0.0, 0.0),
+                new PIDController(2, 0.0, 0.0),
                 new PIDController(0.0, 0.0, 0.0))
             .withDefaultShouldFlip()
             .withTRatioBasedTranslationHandoffs(true);
@@ -297,6 +297,7 @@ public class RobotContainer {
     Path oneSwipeRightEntry = new Path("oneSwipeRightEntry");
     Path oneSwipeRightIntake = new Path("oneswipeRightintake");
     Path oneSwipeRightReEntry = new Path("oneswipeRightreentry");
+    Path staticShootPreload = new Path("staticShootPreload");
 
     Command firstAuto = pathBuilder.build(firstStraight);
     Command pidAuto = pathBuilder.build(pidTest);
@@ -346,6 +347,7 @@ public class RobotContainer {
         BLineCommands.sequence(
             flywheelSubsystem.toggleWarm(),
             shotCalculator.toggleShotMode(ShotMode.HUB),
+            new WaitCommand(3),
             BLineCommands.race(pivotSubsystem.deployCommand(), new WaitCommand(1)),
             pathBuilder.build(oneSwipeEntry),
             BLineCommands.race(pathBuilder.build(oneSwipeIntake), rollerSubsystem.intakeCommand()),
@@ -361,6 +363,14 @@ public class RobotContainer {
             BLineCommands.race(
                 pathBuilder.build(oneSwipeRightIntake), rollerSubsystem.intakeCommand()),
             pathBuilder.build(oneSwipeRightReEntry),
+            shootingSequence);
+
+    Command shootPreload =
+        BLineCommands.sequence(
+            flywheelSubsystem.toggleWarm(),
+            shotCalculator.toggleShotMode(ShotMode.HUB),
+            BLineCommands.race(pivotSubsystem.deployCommand(), new WaitCommand(1)),
+            pathBuilder.build(staticShootPreload),
             shootingSequence);
 
     // Set up auto routines

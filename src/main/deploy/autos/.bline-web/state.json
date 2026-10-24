@@ -10,7 +10,7 @@
         "enabled": true,
         "distance_meters": 0.3,
         "side": "front",
-        "default_state": "hidden",
+        "default_state": "shown",
         "show_on_event_keys": [
           "pivotDown"
         ],
@@ -80,38 +80,27 @@
       "x_meters": 7.75,
       "y_meters": 3.4,
       "rotation_radians": 1.74533
+    },
+    {
+      "target_id": "target-aa146f8e",
+      "display_name": "endOfIntakingPathRight",
+      "kind": "waypoint",
+      "x_meters": 6.61,
+      "y_meters": 0.5,
+      "rotation_radians": 0.0
     }
   ],
   "paths": {
-    "oneSwipeRightEntry.json": {
-      "display_name": "oneSwipeRightEntry",
-      "editor_metadata": {
-        "linked_targets": [
-          {
-            "element_index": 3.0,
-            "target_id": "target-5dae51da"
-          }
-        ]
-      }
-    },
-    "oneswipeRightintake.json": {
-      "display_name": "oneswipeRightintake",
+    "oneswipereentry.json": {
+      "display_name": "oneSwipeReEntry",
       "editor_metadata": {
         "linked_targets": [
           {
             "element_index": 0.0,
-            "target_id": "target-5dae51da"
-          },
-          {
-            "element_index": 1.0,
-            "target_id": "target-27a0ff38"
+            "target_id": "target-bb3f6eff"
           }
         ]
       }
-    },
-    "intakeshoot.json": {
-      "display_name": "intakeShoot",
-      "editor_metadata": null
     },
     "pidtest1.json": {
       "display_name": "pidTest1",
@@ -143,6 +132,14 @@
         ]
       }
     },
+    "intakeshoot.json": {
+      "display_name": "intakeShoot",
+      "editor_metadata": null
+    },
+    "staticShootPreload.json": {
+      "display_name": "staticShootPreload",
+      "editor_metadata": null
+    },
     "spiral.json": {
       "display_name": "spiral",
       "editor_metadata": {
@@ -154,17 +151,6 @@
         ]
       }
     },
-    "oneswipereentry.json": {
-      "display_name": "oneSwipeReEntry",
-      "editor_metadata": {
-        "linked_targets": [
-          {
-            "element_index": 0.0,
-            "target_id": "target-bb3f6eff"
-          }
-        ]
-      }
-    },
     "intaketoshoot.json": {
       "display_name": "intakeToShoot",
       "editor_metadata": {
@@ -172,17 +158,6 @@
           {
             "element_index": 1.0,
             "target_id": "target-5270998b"
-          }
-        ]
-      }
-    },
-    "oneswipeRightreentry.json": {
-      "display_name": "oneswipeRightreentry",
-      "editor_metadata": {
-        "linked_targets": [
-          {
-            "element_index": 0.0,
-            "target_id": "target-27a0ff38"
           }
         ]
       }
@@ -209,6 +184,47 @@
           {
             "element_index": 1.0,
             "target_id": "target-bb3f6eff"
+          }
+        ]
+      }
+    },
+    "oneswipeRightintake.json": {
+      "display_name": "oneswipeRightintake",
+      "editor_metadata": {
+        "linked_targets": [
+          {
+            "element_index": 0.0,
+            "target_id": "target-5dae51da"
+          },
+          {
+            "element_index": 1.0,
+            "target_id": "target-27a0ff38"
+          },
+          {
+            "element_index": 7.0,
+            "target_id": "target-aa146f8e"
+          }
+        ]
+      }
+    },
+    "oneswipeRightreentry.json": {
+      "display_name": "oneswipeRightreentry",
+      "editor_metadata": {
+        "linked_targets": [
+          {
+            "element_index": 0.0,
+            "target_id": "target-aa146f8e"
+          }
+        ]
+      }
+    },
+    "oneSwipeRightEntry.json": {
+      "display_name": "oneSwipeRightEntry",
+      "editor_metadata": {
+        "linked_targets": [
+          {
+            "element_index": 3.0,
+            "target_id": "target-5dae51da"
           }
         ]
       }
