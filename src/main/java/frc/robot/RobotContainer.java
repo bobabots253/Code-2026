@@ -341,31 +341,27 @@ public class RobotContainer {
                     BLineCommands.race(rollerSubsystem.intakeCommand(), new WaitCommand(1)))),
             pathBuilder.build(intakePart2),
             shootingSequence);
-    
-    Command oneSwipeCommand = 
+
+    Command oneSwipeCommand =
         BLineCommands.sequence(
             flywheelSubsystem.toggleWarm(),
+            shotCalculator.toggleShotMode(ShotMode.HUB),
             BLineCommands.race(pivotSubsystem.deployCommand(), new WaitCommand(1)),
             pathBuilder.build(oneSwipeEntry),
-            BLineCommands.race(
-                pathBuilder.build(oneSwipeIntake),
-                rollerSubsystem.intakeCommand()),
+            BLineCommands.race(pathBuilder.build(oneSwipeIntake), rollerSubsystem.intakeCommand()),
             pathBuilder.build(oneSwipeReEntry),
-            shootingSequence
-        );
-    
-    Command oneSwipeRightCommand = 
+            shootingSequence);
+
+    Command oneSwipeRightCommand =
         BLineCommands.sequence(
             flywheelSubsystem.toggleWarm(),
+            shotCalculator.toggleShotMode(ShotMode.HUB),
             BLineCommands.race(pivotSubsystem.deployCommand(), new WaitCommand(1)),
             pathBuilder.build(oneSwipeRightEntry),
             BLineCommands.race(
-                pathBuilder.build(oneSwipeRightIntake),
-                rollerSubsystem.intakeCommand()),
+                pathBuilder.build(oneSwipeRightIntake), rollerSubsystem.intakeCommand()),
             pathBuilder.build(oneSwipeRightReEntry),
-            shootingSequence
-        );
-    
+            shootingSequence);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices");
